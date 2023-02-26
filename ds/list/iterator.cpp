@@ -1,5 +1,5 @@
 #include <iterator>
-#include "list.cpp"
+#include "node.cpp"
 
 template <
     class Nty_,
@@ -131,30 +131,3 @@ public:
 
 
 
-template <
-    class Ty_,
-    template <class ...> class List_node_ = Node,
-    class Alloc_ = std::allocator<Ty_>
->
-class linked_list { // biderectional linked list
-private:
-    using Node_    = List_node_<Ty_>;
-    using Nodeptr_ = List_node_<Ty_>*;
-
-public:
-    using value_type      = Ty_;
-    using allocator_type  = Alloc_;
-    using reference       = value_type&;
-    using const_reference = const value_type&;
-
-    using iterator       = _List_unchecked_iterator<Ty_>;
-    using const_iterator = _List_unchecked_const_iterator<Ty_>;
-
-    using reverse_iterator       = std::reverse_iterator<iterator>;
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-
-protected:
-    size_t   _size;
-    Nodeptr_ _begin;
-    Nodeptr_ _end;
-};
