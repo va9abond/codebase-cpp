@@ -2,106 +2,18 @@
 #include "list.cpp"
 
 template <
-    class Nty_
->
-class iterator_base {
-public: 
-    
-    // tags:
-    using iterator_category  = std::bidirectional_iterator_tag; 
-
-    using Nodeptr_           = Node<Nty_>*;
-    using value_type         = Nty_;
-    using difference_type    = std::ptrdiff_t;
-    using pointer            = Nty_*;
-    using const_pointer      = const Nty_*;
-    using reference          = Nty_&;
-    using const_reference    = const Nty_&;
-
-
-
-    explicit iterator_base (pointer item = nullptr) : _item(item) {}
-    
-    iterator_base (const iterator_base&) = default;
-    
-    iterator_base (iterator_base&&) noexcept = default;
-    
-    iterator_base& operator= (const iterator_base&) = default;
-    
-    iterator_base& operator= (iterator_base&&) noexcept = default;
-    
-    iterator_base& operator= (pointer item) {
-        _item = item;
-        return *this;
-    }
-
-    ~iterator_base() = default;
-
-
-
-    explicit operator bool() const {
-        return _item; // is nullptr
-    }
-
-
-
-    bool operator== (const iterator_base& itt_ref) const noexcept { return _item == itt_ref._item; }
-   
-    bool operator!= (const iterator_base& itt_ref) const noexcept {return !(*this == itt_ref); }
-
-    iterator_base& operator++ () noexcept {
-        ++_item; // why not item_++;
-        return *this;
-    }
-
-    iterator_base operator++(int) noexcept {
-        auto tmp = *this;
-        ++_item;
-
-        return tmp;
-    }
-
-    iterator_base& operator-- () noexcept {
-        --_item; // why not item_++;
-        return *this;
-    }
-
-    iterator_base operator--(int) noexcept {
-        auto tmp = *this;
-        --_item;
-
-        return tmp;
-    }
-
-
-
-    reference operator* () { return *_item; }
-
-    const_reference operator* () const { return *_item; }
-    
-    pointer operator-> () const { return _item; }
-
-
-
-private:
-    pointer _item;
-
-};
-
-
-
-template <
-    class Nty_
+    class Nty_,
+    template <class ...> class List_node_ = Node
 >
 class _List_unchecked_const_iterator {
 public: 
     using iterator_category = std::bidirectional_iterator_tag; 
 
-    using Nodeptr_        = Node<Nty_>*;
-    using value_type      = Node<Nty_>;
+    using Nodeptr_        = List_node_<Nty_>*;
+    using value_type      = List_node_<Nty_>;
     using difference_type = std::ptrdiff_t;
-    using pointer         = const Node<Nty_>*;
-    using reference       = const Node<Nty_>&;
+    using pointer         = const List_node_<Nty_>*;
+    using reference       = const List_node_<Nty_>&;
 
 
 
@@ -113,18 +25,7 @@ public:
     
     ~_List_unchecked_const_iterator() = default;
 
-    // _List_unchecked_const_iterator (const _List_unchecked_const_iterator&) = default;
-    
-    // _List_unchecked_const_iterator (_List_unchecked_const_iterator&&) noexcept = default;
-    
-    // _List_unchecked_const_iterator& operator= (const _List_unchecked_const_iterator&) = default;
-    
-    // _List_unchecked_const_iterator& operator= (_List_unchecked_const_iterator&&) noexcept = default;
-    
-    // _List_unchecked_const_iterator& operator= (pointer item) {
-    //     ptr_ = item;
-    //     return *this;
-    // }
+
 
     reference operator*() const noexcept {
         return *ptr_;
@@ -175,21 +76,25 @@ private:
 };
 
 
+
 template <
-    class Nty_
+    class Nty_,
+    template <class ...> class List_node_ = Node
 >
-class _List_unchecked_iterator : public _List_unchecked_const_iterator<Nty_> {
+class _List_unchecked_iterator : public _List_unchecked_const_iterator<Nty_, List_node_> {
 public:
     using Mybase_           = _List_unchecked_const_iterator<Nty_>;
     using iterator_category = std::bidirectional_iterator_tag;
 
-    using Nodeptr_        = Node<Nty_>*;
-    using value_type      = Node<Nty_>;
+    using Nodeptr_        = List_node_<Nty_>*;
+    using value_type      = List_node_<Nty_>;
     using difference_type = std::ptrdiff_t;
-    using pointer         = Node<Nty_>*;
-    using reference       = Node<Nty_>&;
+    using pointer         = List_node_<Nty_>*;
+    using reference       = List_node_<Nty_>&;
 
     using Mybase_::Mybase_;
+
+
 
     reference operator*() const noexcept {
         return const_cast<reference>(Mybase_::operator*());
@@ -223,37 +128,18 @@ public:
     }
 };
 
-// template <
-//     class Nty_
-// >
-// class _List_const_iterator : public _List_unchecked_const_iterator<Nty_> {
-// public:
-//     using Mybase_           = _List_unchecked_const_iterator<Nty_>;
-//     using iterator_category = std::bidirectional_iterator_tag;
-    
-//     using Nodeptr_        = Node<Nty_>*;
-//     using value_type      = Node<Nty_>;
-//     using difference_type = std::ptrdiff_t;
-//     using pointer         = Node<Nty_>*;
-//     using reference       = Node<Nty_>&;
 
-//     using Mybase_::Mybase_;
-
-//     reference operator*() const noexcept {
-
-//     }
-
-// };
 
 
 template <
     class Ty_,
+    template <class ...> class List_node_ = Node,
     class Alloc_ = std::allocator<Ty_>
 >
-class list { // biderectional linked list
+class linked_list { // biderectional linked list
 private:
-    using Node_    = Node<Ty_>;
-    using Nodeptr_ = Node<Ty_>*;
+    using Node_    = List_node_<Ty_>;
+    using Nodeptr_ = List_node_<Ty_>*;
 
 public:
     using value_type      = Ty_;
@@ -261,6 +147,14 @@ public:
     using reference       = value_type&;
     using const_reference = const value_type&;
 
-    using iterator = _List_unchecked_iterator<Ty_>;
+    using iterator       = _List_unchecked_iterator<Ty_>;
+    using const_iterator = _List_unchecked_const_iterator<Ty_>;
 
+    using reverse_iterator       = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+protected:
+    size_t   _size;
+    Nodeptr_ _begin;
+    Nodeptr_ _end;
 };
