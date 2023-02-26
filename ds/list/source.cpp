@@ -64,9 +64,10 @@ namespace ML {
 
 	class semantic_error : exception {
 	public:
-		semantic_error (const char* other) noexcept  
-			: exception("SEMANTIC_ERROR"),
-			_message(other) {}
+		semantic_error (const char* other) noexcept :
+			exception("SEMANTIC_ERROR"),
+			_message(other) 
+		{}
 
 		semantic_error (const semantic_error&) noexcept = default;
 		
@@ -114,12 +115,14 @@ namespace ML {
 				  double price = -1,
 				  int numCores = -1,
 				  int ram = -1,
-				  double diaganal = -1) 
-		: _model(model),
-		_price(price),
-		_numCores(numCores),
-		_ram(ram),
-		_diagonal(diaganal) {}
+				  double diaganal = -1
+		) noexcept :
+			_model(model),
+			_price(price),
+			_numCores(numCores),
+			_ram(ram),
+			_diagonal(diaganal)
+		{}
 
 		Computer (const Computer&) = default;
 
