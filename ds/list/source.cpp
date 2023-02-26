@@ -9,6 +9,7 @@
 
 #include <exception>
 #include <algorithm>
+#include <malloc.h>
 
 // #include <stdlib.h>
 
@@ -29,8 +30,26 @@ namespace ML {
 		
 		exception& operator= (const exception&) noexcept = default;
 		
+		exception (exception&& other) noexcept : _message(other._message) {
+			other._message = nullptr;
+		}
+
+		exception& operator= (exception&& other) {
+			if (this != &other)
+			{
+				delete[] _message;
+
+				_message = other._message;
+
+				other._message = nullptr;
+			}
+
+			return *this;
+		}
+
 		virtual ~exception() {
-			delete [] _message;
+			delete[] _message;
+			_message = nullptr;
 		}
 		
 		virtual const char* what() const noexcept {
@@ -45,16 +64,37 @@ namespace ML {
 
 	class semantic_error : exception {
 	public:
-		semantic_error (const char* other)  
-			: exception("SEMNANTIC_ERROR"),
+		semantic_error (const char* other) noexcept  
+			: exception("SEMANTIC_ERROR"),
 			_message(other) {}
 
 		semantic_error (const semantic_error&) noexcept = default;
 		
 		semantic_error& operator= (const semantic_error&) noexcept = default;
 
+		semantic_error (semantic_error&& other) noexcept
+			: exception("SEMANTIC_ERROR"),
+			_message(other._message)
+		{
+			other._message = nullptr;
+		}
+
+		semantic_error& operator= (semantic_error&& other) noexcept {
+			if (this != &other)
+			{
+				delete[] _message;
+
+				_message = other._message;
+
+				other._message = nullptr; 
+			}
+
+			return *this;
+		}
+
 		virtual ~semantic_error() {
 			delete[] _message;
+			_message = nullptr;
 		};
 
 		const char* what() const noexcept {
@@ -81,9 +121,9 @@ namespace ML {
 		_ram(ram),
 		_diagonal(diaganal) {}
 
-		Computer (const Computer &other) = default;
+		Computer (const Computer&) = default;
 
-		Computer &operator= (const Computer &other) = default;
+		Computer &operator= (const Computer&) = default;
 
 		~Computer() = default;
 
@@ -341,6 +381,7 @@ namespace ML {
 
 int main() {
 	// -------------- Задание 1.1 --------------
+	std::cout << '\n' << "-------------- Задание 1.1 --------------" << '\n';
 
 	// Демонстрация работы функции push()
 	std::list<double> doubleList;
@@ -355,13 +396,12 @@ int main() {
 
 	// Демонстрация работы функции filter()
 	auto listResult = _ml filter<std::list, double>(doubleList, &ML::EvaluateFractionalPart, 0.45);
-	_ml print(listResult);
+	_ml print(listResult); std::cout << '\n';
 
 
 
 	// -------------- Задание 1.2 --------------
-
-	std::cout << '\n';
+	std::cout << '\n' << "-------------- Задание 1.2 --------------" << '\n';
 
     std::list<ML::Computer> computerList;
 
@@ -382,7 +422,12 @@ int main() {
     auto computerHvalue = _ml POP(computerList, 2);
     std::cout << '\n' << '\n' << computerHvalue << '\n';
 
-    _ml print(computerList);
+    _ml print(computerList); std::cout << '\n';
+
+
+
+    // -------------- Задание 1.3 --------------
+    std::cout << '\n' << "-------------- Задание 1.3 --------------" << '\n';
 
 
 
