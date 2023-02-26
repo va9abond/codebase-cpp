@@ -1,11 +1,16 @@
 // #include <corecrt_terminate.h>
 #include <float.h>
+
 #include <iostream>
+#include <fstream>
+
 #include <iterator>
 #include <list>
+
 #include <exception>
 #include <algorithm>
-#include <stdlib.h>
+
+// #include <stdlib.h>
 
 
 #define _STD  ::std::
@@ -62,6 +67,145 @@ namespace ML {
 
 
 
+	class Computer {
+	public:
+
+		Computer (std::string model = "unknown",
+				  double price = -1,
+				  int numCores = -1,
+				  int ram = -1,
+				  double diaganal = -1) 
+		: _model(model),
+		_price(price),
+		_numCores(numCores),
+		_ram(ram),
+		_diagonal(diaganal) {}
+
+		Computer (const Computer &other) = default;
+
+		Computer &operator= (const Computer &other) = default;
+
+		~Computer() = default;
+
+
+
+
+		std::string GetModel() const noexcept { return _model; }
+
+		double GetPrice() const noexcept { return _price; }
+
+		int GetNumCores() const noexcept { return _numCores; }
+
+		int GetRam() const noexcept { return _ram; }
+
+		double GetDiagonal() const noexcept {return _diagonal; }
+
+
+
+		bool operator== (const Computer &other) const noexcept {
+			if (_model == other._model &&
+				_price == other._price &&
+				_numCores == other._numCores &&
+				_ram == other._ram &&
+				_diagonal == other._diagonal) { return true; }
+
+			return false;
+		}
+
+		bool operator!= (const Computer &other) const noexcept {
+			return !(*this == other);
+		}
+
+		bool operator> (const Computer &other) const noexcept {
+			std::string modelLowerCase = _model;
+			std::for_each(modelLowerCase.begin(), modelLowerCase.end(),
+					  [](unsigned char c) { return std::tolower(c); }); 
+
+
+			std::string otherModelLowerCase = other._model;
+			std::for_each(otherModelLowerCase.begin(), otherModelLowerCase.end(),
+					  [](unsigned char c) { return std::tolower(c); });
+
+
+			if ( modelLowerCase > otherModelLowerCase ) {
+				return true;
+			}
+
+			else if ( modelLowerCase == otherModelLowerCase ) {
+				if ( _price > other._price ) {
+					return true;
+				}
+				
+				else if ( _price == other._price ) {
+					if ( _diagonal > other._diagonal ) {
+						return true;
+					}
+					
+					else if ( _diagonal == other._diagonal ) {
+						if ( _numCores > other._numCores ) {
+							return true;
+						}
+						
+						else if ( _ram > other._ram ) {
+							return true;
+					}
+				}
+			}
+		}
+
+			return false;
+		}
+
+		bool operator< (const Computer &other) const noexcept {
+			return (!(*this > other) && !(*this != other));
+		}
+
+		bool operator>= (const Computer &other) const noexcept {
+			return (*this > other || *this == other);
+		}
+
+		bool operator<= (const Computer &other) const noexcept {
+			return (!(*this > other) || *this == other);
+		}
+
+
+
+		friend std::ostream &operator<< (std::ostream &output, const Computer &computer);
+
+
+
+	private:
+		std::string _model;
+		double      _price;
+		int         _numCores;
+		int         _ram;
+		double      _diagonal;
+	};
+
+	std::ostream &operator<< (std::ostream & output, const Computer & computer) {
+		if ( typeid(output).name() != typeid(std::ofstream).name() ) {
+			output << "{ " <<
+			 computer.GetModel() << "; " <<
+			 computer.GetPrice() << "; " <<
+			 computer.GetDiagonal() << "; "<< 
+			 computer.GetNumCores() << "; " <<
+			 computer.GetRam() << " }";
+		}
+		else {
+			output << '\n' <<
+			 computer.GetModel() << " " <<
+			 computer.GetPrice() << " " <<
+			 computer.GetDiagonal() << " " <<
+			 computer.GetNumCores() << " " <<
+			 computer.GetRam() << '\n';
+		}
+
+
+		return output;
+	}
+
+
+
 	double generateDouble(double value_min, double value_max) {
 		double value = (double)rand() / RAND_MAX;
 		return value_min + value * (value_max - value_min);
@@ -102,7 +246,6 @@ namespace ML {
 		
 		try {
 			auto objectToRemove = std::next(container.begin(), pos);
-		
 			return container.erase(objectToRemove);
 		}
 		catch(...) {
@@ -110,8 +253,32 @@ namespace ML {
 		}
 		
 	} 
-	
 
+
+
+	template <
+		template<class...> class TContainer,
+		class TObject
+	>
+	TObject POP (TContainer<TObject> &container, const int &pos) {
+		if (pos >= container.size() || pos < 0) {
+			throw std::out_of_range("function pop: Index out of range");
+		}
+		
+		try {
+			auto objectToRemove = std::next(container.begin(), pos);
+			container.erase(objectToRemove);
+			
+			auto objectToReturn = container.back();
+			return objectToReturn;
+		}
+		catch(...) {
+			throw _ml exception("BLA BLA BLA");
+		}
+		
+	} 
+	
+	
 
 	template <
 		template<class...> class TContainer,
@@ -178,7 +345,6 @@ int main() {
 	// Демонстрация работы функции push()
 	std::list<double> doubleList;
 	for (int i = 0; i < 5; i++) {
-		// _ml push<double, std::list>(doubleList, (double) rand());
 		_ml push<std::list, double>(doubleList, _ml generateDouble(0, 100));
 	}
 	_ml print<std::list, double>(doubleList);
@@ -190,4 +356,35 @@ int main() {
 	// Демонстрация работы функции filter()
 	auto listResult = _ml filter<std::list, double>(doubleList, &ML::EvaluateFractionalPart, 0.45);
 	_ml print(listResult);
+
+
+
+	// -------------- Задание 1.2 --------------
+
+	std::cout << '\n';
+
+    std::list<ML::Computer> computerList;
+
+    ML::Computer Apple  ((std::string) "apple",  1000, 16, 64, 17.8);
+    ML::Computer Lenovo ((std::string) "lenovo", 500,  16, 16, 15.0);
+    ML::Computer Huawei ((std::string) "huawei", 400,  16, 32, 16.7);
+    ML::Computer HP     ((std::string) "hp",     350,   4,  8, 14.5);
+    ML::Computer Dell   ((std::string) "dell",   200,   4,  8, 16.2);
+
+    _ml push(computerList, Apple);
+    _ml push(computerList, Lenovo);
+    _ml push(computerList, Huawei);
+    _ml push(computerList, HP);
+    _ml push(computerList, Dell);
+
+    _ml print(computerList);
+
+    auto computerHvalue = _ml POP(computerList, 2);
+    std::cout << '\n' << '\n' << computerHvalue << '\n';
+
+    _ml print(computerList);
+
+
+
+
 }
