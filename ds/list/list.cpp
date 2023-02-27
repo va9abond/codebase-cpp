@@ -2,6 +2,7 @@
 // #include <exception>
 // #include <limits.h>
 #include <limits>
+#include <memory>
 
 
 template <
@@ -45,7 +46,7 @@ public:
                 throw _ml exception("Invalid size");
             }
 
-            _end = _begin = new Node_(data);
+            _begin = _end = new Node_(data);
             for (size_t s = size; s > 0; s--)
             {
                 auto new_node = new Node_(data); 
@@ -66,7 +67,7 @@ public:
     {
         if (_size != 0)
         {
-            _end = _begin = new Node_( *(right._begin) );
+            _begin = _end = new Node_( *(right._begin) );
             
             auto right_nodeptr = right._begin->_next;
             while (right_nodeptr != nullptr) 
@@ -81,16 +82,61 @@ public:
 
         }
     }
-    // linked_list (const linked_list& right) noexcept :
-    //     _size(right._size),
-    //     _begin(nullptr),
-    //     _end(nullptr)
+    // TODO: check
+    linked_list& operator= (const linked_list& right) noexcept {
+        if (std::addressof(*this) == std::addressof(right)) { return *this; }
 
-    // {
-    // 	if (_size != 0) {
-    //         _begin = new Node_
-    //     }
-    // }
+        this->clear();
+
+        if (right._size != 0)
+        {
+            _begin = _end = new Node_( *(right._begin) );
+            
+            auto right_nodeptr = right._begin->_next;
+            while (right_nodeptr != nullptr) 
+            {
+                auto new_node = new Node_(*right_nodeptr);
+                new_node->setPrev(_end);
+                _end->setNext(new_node); // TODO: PUSH_BACK_NOCHECK
+                _end = new_node;
+
+                right_nodeptr = right_nodeptr->_next;
+            }
+        }
+        return *this;
+    }
+    // TODO: need check
+    linked_list (linked_list&& right) noexcept : // shallow copy
+        _size(right._size),
+        _begin(right._begin),
+        _end(right._end)
+    {
+        right._size  = 0;
+        right._begin = nullptr;
+        right._end   = nullptr;
+    }
+    // TODO: need check
+    linked_list& operator= (linked_list&& right) noexcept {
+        if (std::addressof(*this) == std::addressof(right)) { return *this; }
+
+        this->clear();
+
+        _size  = right._size;  
+        _begin = right._begin; 
+        _end   = right._end;
+
+        right._size  = 0;
+        right._begin = nullptr;
+        right._end   = nullptr;   
+
+        return *this;
+    }
+
+    void clear() noexcept {}
+
+private:
+
+
 
 
 
