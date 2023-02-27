@@ -141,13 +141,21 @@ public:
     	_prev = nullptr;
     }
 
-    Noderef_ operator= (const Nodeptr_ other) noexcept {
-    	_data = other->_data;
-    	_prev = other->_prev;
-    	_next = other->_next;
+    Noderef_ operator= (Noderef_ other) noexcept {
+    	_data = other._data;
+    	_prev = other._prev;
+    	_next = other._next;
 
     	return this;
     }
+
+    // Nodeptr_ operator= (const Nodeptr_ other) noexcept {
+    // 	_data = other->_data;
+    // 	_prev = other->_prev;
+    // 	_next = other->_next;
+
+    // 	return this;
+    // }
 
     // Node (Node&& other) noexcept :
     // 	_data(other.data),
@@ -267,25 +275,25 @@ void swap (Node<Dty_>* a, Node<Dty_>* b) {
 
 
 
-int main() {
+// int main() {
 
 
-	int x = 32;
-	int* px = &x;
-	std::cout << px << "\n";
+// 	int x = 32;
+// 	int* px = &x;
+// 	std::cout << px << "\n";
 
-	int* ptr = new int(32);
-	std::cout << *ptr << '\n';
+// 	int* ptr = new int(32);
+// 	std::cout << *ptr << '\n';
 
-	auto node1 = new Node<int>(1);
-	auto node2 = new Node<int>(2);
+// 	auto node1 = new Node<int>(1);
+// 	auto node2 = new Node<int>(2);
 
-	node1->setNext(node2);
-	node2->setPrev(node1);
+// 	node1->setNext(node2);
+// 	node2->setPrev(node1);
 
-	std::cout << *node1 << " " << *node2;
+// 	std::cout << *node1 << " " << *node2;
 
-	swap(node1, node2);
+// 	swap(node1, node2);
 
-	std::cout << '\n' << *node1 << " " << *node2;
-}
+// 	std::cout << '\n' << *node1 << " " << *node2;
+// }
