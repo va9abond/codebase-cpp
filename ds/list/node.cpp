@@ -55,29 +55,6 @@ namespace ML {
 			b = std::move(tmp);
 		}
 	}
-
-	// template <
-	// 	class Ty_
-	// >
-	// void swap (Ty_* a, Ty_* b) {
-	// 	std::swap(a,b);
-	// 	// Ty_ tmp(a);
-	// 	// a = b;
-	// 	// b = tmp;
-	// }
-
-	// template <
-	// 	class Ty_
-	// >
-	// void swap (Ty_&& a, Ty_&& b) {
-	// 	auto tmp(std::move(a));
-	// 	a = std::move(b);
-	// 	b = std::move(tmp);
-
-	// 	// auto tmp(a);
-	// 	// a = b;
-	// 	// b = tmp;
-	// }
 }
 
 
@@ -88,37 +65,36 @@ template <
 >
 class Node {
 public:
-
-	// tags:
-    using value_type      = Dty_;           
-    using pointer         = Node<Dty_>*;
-    using const_pointer   = const Node<Dty_>*;  
+    using value_type      = Dty_;
+    using Nodeptr_        = Node<Dty_>*;           
+    using pointer         = Dty_*;
+    using const_pointer   = const Dty_*;  
     using reference       = Dty_&; 
     using const_reference = const Dty_&;
 
 
 
-    Node (const_reference data,
-    	  pointer prev = nullptr,
-    	  pointer next = nullptr
+    explicit Node (const_reference data,
+    	  Nodeptr_ prev = nullptr,
+    	  Nodeptr_ next = nullptr
     ) noexcept :
     	_data(data), 
     	_prev(prev),
     	_next(next)
     {} 
 
-    explicit Node (const_pointer other) noexcept :
+    explicit Node (Nodeptr_ other) noexcept :
     	_data(other->_data), 
     	_prev(other->_prev), 
     	_next(other->_next)
     {}
     	
     virtual ~Node() {
-    	// _next = nullptr;
-    	// _prev = nullptr;
+    	_next = nullptr;
+    	_prev = nullptr;
     }
 
-    pointer operator= (const_pointer other) noexcept {
+    pointer operator= (const Nodeptr_ other) noexcept {
     	_data = other->_data;
     	_prev = other->_prev;
     	_next = other->_next;
@@ -149,49 +125,51 @@ public:
     // }
 
 
-
-    pointer getPrev() const noexcept { return _prev; }
+    // const?
+    Nodeptr_ getPrev() const noexcept { return _prev; }
     
-    pointer getNext() const noexcept { return _next; }
+    Nodeptr_ getNext() const noexcept { return _next; }
     
     const_reference getData() const noexcept { return _data; }
 
 
 
-    void setPrev (pointer prev) noexcept { _prev = prev; }
+    void setPrev (Nodeptr_ prev) noexcept { _prev = prev; }
 
-    void setNext (pointer next) noexcept { _next = next; }
+    void setNext (Nodeptr_ next) noexcept { _next = next; }
 
     void setData (const_reference data) noexcept { _data = data; }
 
 
 
-    pointer operator= (const_reference data) noexcept {
+    Node& operator= (const_reference data) noexcept {
     	_data(data);
 		return this;
     }
 
-    bool operator== (const_pointer other) {
-    	try {
-    		if (other == nullptr) {
-    			throw exception("Comparison with nullptr is imppssible");
-    		}
+    // TODO: comparison _prev and othre->_prev calls operator==(const Nodeptr_ other) therefore recursion, but comparison 
+    // just _data is not correct
+    // bool operator== (const Nodeptr_ other) {
+    // 	try {
+    // 		if (this == nullptr || other == nullptr) {
+    // 			throw exception("Comparison with nullptr is not possible");
+    // 		}
 
-    		if (_prev == other->_prev &&
-    			_next == other->_next &&
-    			_data == other->_data) { return true; }
+    // 		if (_prev == other->_prev &&
+    // 			_next == other->_next &&
+    // 			_data == other->_data) { return true; }
     		
-    		return false;
-    	}
-    	catch (exception A) {
-    		std::cerr << A.what();
-    	}
-    }
+    // 		return false;
+    // 	}
+    // 	catch (exception A) {
+    // 		std::cerr << A.what();
+    // 	}
+    // }
 
     template <
     	class Ty_
     >
-    friend std::ostream& operator<< (std::ostream& output, const_pointer node);
+    friend std::ostream& operator<< (std::ostream& output, const Node<Ty_>* nodeptr);
 
     template <
     	class Ty_
@@ -200,24 +178,24 @@ public:
 
 
 protected:
-	Dty_    _data;
-	pointer _prev; 
-	pointer _next;
+	Dty_     _data;
+	Nodeptr_ _prev; 
+	Nodeptr_ _next;
 };
 
 template <
 	class Dty_
 >
-std::ostream& operator<< (std::ostream& output, const Node<Dty_>* node) {
-	output << node->getData();
+std::ostream& operator<< (std::ostream& output, const Node<Dty_>* nodeptr) {
+	output << nodeptr->getData();
 
 	return output;
 }
 
 template <
-	class Ty_
+	class Dty_
 >
-void swap (Node<Ty_>* a, Node<Ty_>* b) {
+void swap (Node<Dty_>* a, Node<Dty_>* b) {
 	_ml swap(a->_prev, b->_prev);
 	_ml swap(a->_next, b->_next);
  	_ml swap(a->_data, b->_data);
