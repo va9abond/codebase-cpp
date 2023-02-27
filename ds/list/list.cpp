@@ -1,255 +1,103 @@
-#include <iostream>
-#include <memory>
-
-#define _ml ML::
-
-class exception {
-public:
-	exception (const char* other) noexcept : _message(other) {}
-	
-	exception (const exception&) noexcept = default;
-	
-	exception& operator= (const exception&) noexcept = default;
-	
-	exception (exception&& other) noexcept : _message(other._message) {
-		other._message = nullptr;
-	}
-
-	exception& operator= (exception&& other) {
-		if (this != &other)
-		{
-			delete[] _message;
-
-			_message = other._message;
-
-			other._message = nullptr;
-		}
-
-		return *this;
-	}
-
-	virtual ~exception() {
-		delete[] _message;
-		_message = nullptr;
-	}
-	
-	virtual const char* what() const noexcept {
-		return _message;
-	}
-
-
-protected:
-	const char *_message;
-};
-
-namespace ML {
-
-	template <
-		class Ty_
-	>
-	void swap (Ty_& a, Ty_& b) {
-		if (std::addressof(a) != std::addressof(b)) 
-		{
-			auto tmp = std::move(a);
-			a = std::move(b);
-			b = std::move(tmp);
-			// Ty_ tmp(a);
-			// a = b;
-			// b = tmp;
-		}
-	}
-
-	// template <
-	// 	class Ty_
-	// >
-	// void swap (Ty_* a, Ty_* b) {
-	// 	std::swap(a,b);
-	// 	// Ty_ tmp(a);
-	// 	// a = b;
-	// 	// b = tmp;
-	// }
-
-	// template <
-	// 	class Ty_
-	// >
-	// void swap (Ty_&& a, Ty_&& b) {
-	// 	auto tmp(std::move(a));
-	// 	a = std::move(b);
-	// 	b = std::move(tmp);
-
-	// 	// auto tmp(a);
-	// 	// a = b;
-	// 	// b = tmp;
-	// }
-}
-
-
+#include "iterator.cpp"
+// #include <exception>
+// #include <limits.h>
+#include <limits>
 
 
 template <
-	class Dty_
+    class Ty_,
+    template <class ...> class List_node_ = Node,
+    class Alloc_ = std::allocator<Ty_>
 >
-class Node {
+class linked_list { // biderectional linked list
+private:
+    using Node_    = List_node_<Ty_>;
+    using Nodeptr_ = List_node_<Ty_>*;
+
 public:
+    using value_type      = Ty_;
+    using allocator_type  = Alloc_;
+    using reference       = value_type&;
+    using const_reference = const value_type&;
 
-	// tags:
-    using value_type      = Dty_;           
-    using pointer         = Node<Dty_>*;
-    using const_pointer   = const Node<Dty_>*;  
-    using reference       = Dty_&; 
-    using const_reference = const Dty_&;
+    using iterator       = _List_unchecked_iterator<Ty_>;
+    using const_iterator = _List_unchecked_const_iterator<Ty_>;
+
+    using reverse_iterator       = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 
 
-    Node (const_reference data,
-    	  pointer prev = nullptr,
-    	  pointer next = nullptr
-    ) noexcept :
-    	_data(data), 
-    	_prev(prev),
-    	_next(next)
-    {} 
-
-    explicit Node (const_pointer other) noexcept :
-    	_data(other->_data), 
-    	_prev(other->_prev), 
-    	_next(other->_next)
+    linked_list() noexcept :
+        _size(0),
+        _begin(nullptr),
+        _end(nullptr)
     {}
-    	
-    virtual ~Node() {
-    	// _next = nullptr;
-    	// _prev = nullptr;
+    // TODO: need check
+    explicit linked_list (size_t size, const Ty_ &data = Ty_() ) :
+        _size(size),
+        _begin(nullptr),
+        _end(nullptr)
+    {
+        try 
+        {
+            if (size <= 0 || size > _MAX_CAPACITY) {
+                throw _ml exception("Invalid size");
+            }
+
+            _end = _begin = new Node_(data);
+            for (size_t s = size; s > 0; s--)
+            {
+                auto new_node = new Node_(data); 
+                new_node->setPrev(_end);
+                _end->setNext(new_node); // TODO: PUSH_BACK_NOCHECK
+                _end = new_node;
+            }
+        }
+        catch (_ml exception invalid_size) {
+            std::cerr << invalid_size.what();
+        }
     }
+    // TODO: need check
+    linked_list (const linked_list& right) noexcept : // deep copy
+        _size(right._size),
+        _end(nullptr),
+        _begin(nullptr)
+    {
+        if (_size != 0)
+        {
+            _end = _begin = new Node_( *(right._begin) );
+            
+            auto right_nodeptr = right._begin->_next;
+            while (right_nodeptr != nullptr) 
+            {
+                auto new_node = new Node_(*right_nodeptr);
+                new_node->setPrev(_end);
+                _end->setNext(new_node); // TODO: PUSH_BACK_NOCHECK
+                _end = new_node;
 
-    pointer operator= (const_pointer other) noexcept {
-    	_data = other->_data;
-    	_prev = other->_prev;
-    	_next = other->_next;
+                right_nodeptr = right_nodeptr->_next;
+            }
 
-    	return this;
+        }
     }
+    // linked_list (const linked_list& right) noexcept :
+    //     _size(right._size),
+    //     _begin(nullptr),
+    //     _end(nullptr)
 
-    // Node (Node&& other) noexcept :
-    // 	_data(other.data),
-    // 	_prev(other._prev),
-    // 	_next(other._next)
     // {
-    // 	// _other._data ??
-    // 	other._prev = nullptr;
-    // 	other._next = nullptr;
-    // }
-
-    // pointer operator= (Node&& other) {
-    // 	if (this != &other)
-    // 	{
-    // 		_data = other._data;
-    // 		_prev = other._prev;
-    // 		_next = other._next;
-
-    // 		other._prev = nullptr;
-    // 		other._next = nullptr;
-    // 	}
+    // 	if (_size != 0) {
+    //         _begin = new Node_
+    //     }
     // }
 
 
-
-    pointer getPrev() const noexcept { return _prev; }
-    
-    pointer getNext() const noexcept { return _next; }
-    
-    const_reference getData() const noexcept { return _data; }
-
-
-
-    void setPrev (pointer prev) noexcept { _prev = prev; }
-
-    void setNext (pointer next) noexcept { _next = next; }
-
-    void setData (const_reference data) noexcept { _data = data; }
-
-    
-
-    pointer operator= (const_reference data) noexcept {
-    	_data(data);
-		return this;
-    }
-
-    bool operator== (const_pointer other) {
-    	try {
-    		if (other == nullptr) {
-    			throw exception("Comparison with nullptr is imppssible");
-    		}
-
-    		if (_prev == other->_prev &&
-    			_next == other->_next &&
-    			_data == other->_data) { return true; }
-    		
-    		return false;
-    	}
-    	catch (exception A) {
-    		std::cerr << A.what();
-    	}
-    }
-
-    template <
-    	class Ty_
-    >
-    friend std::ostream& operator<< (std::ostream& output, const_pointer node);
-
-    template <
-    	class Ty_
-    >
-    friend void swap (Node<Ty_>* a, Node<Ty_>* b);
 
 
 protected:
-	Dty_    _data;
-	pointer _prev; 
-	pointer _next;
+    size_t   _size;
+    Nodeptr_ _begin;
+    Nodeptr_ _end;
+    static const unsigned int _MAX_CAPACITY = UINT_MAX;
 };
-
-template <
-	class Dty_
->
-std::ostream& operator<< (std::ostream& output, const Node<Dty_>* node) {
-	output << node->getData();
-
-	return output;
-}
-
-template <
-	class Ty_
->
-void swap (Node<Ty_>* a, Node<Ty_>* b) {
-	_ml swap(a->_prev, b->_prev);
-	_ml swap(a->_next, b->_next);
- 	_ml swap(a->_data, b->_data);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-int main() {
-
-
-	auto node1 = new Node<int>(1);
-	auto node2 = new Node<int>(2);
-
-	node1->setNext(node2);
-	node2->setPrev(node1);
-
-	std::cout << node1 << " " << node2;
-
-	swap(node1, node2);
-
-	std::cout << '\n' << node1 << " " << node2;
-}

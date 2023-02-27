@@ -1,4 +1,4 @@
-// #include <corecrt_terminate.h>
+// TODO: chanhe how i throw exceptions
 #include <float.h>
 
 #include <iostream>
@@ -7,11 +7,7 @@
 #include <iterator>
 #include <list>
 
-#include <exception>
 #include <algorithm>
-#include <malloc.h>
-
-// #include <stdlib.h>
 
 
 #define _STD  ::std::
