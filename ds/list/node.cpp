@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 
+
 #define _ml ML::
 
 
@@ -105,7 +106,6 @@ namespace ML {
 
 
 
-
 template <
 	class Dty_
 >
@@ -165,6 +165,11 @@ public:
     friend void swap (DListNode<Ty_>* a, DListNode<Ty_>* b);
 
 
+    template <
+    	class,
+    	template <class ...> class,
+    	class
+    >
     friend class linked_list;
 
 
