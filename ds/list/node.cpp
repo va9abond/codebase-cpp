@@ -109,11 +109,10 @@ namespace ML {
 template <
 	class Dty_
 >
-class Node {
+class DListNode {
 public:
     using value_type      = Dty_;
-    using Nodeptr_        = Node<Dty_>*;
-    using Noderef_        = Node<Dty_>&;           
+    using Nodeptr_        = DListNode<Dty_>*;           
     using pointer         = Dty_*;
     using const_pointer   = const Dty_*;  
     using reference       = Dty_&; 
@@ -121,97 +120,52 @@ public:
 
 
 
-    explicit Node (const_reference data,
-    	  Nodeptr_ prev = nullptr,
-    	  Nodeptr_ next = nullptr
+    explicit DListNode (
+    	const_reference data,
+    	Nodeptr_ prev = nullptr,
+		Nodeptr_ next = nullptr
     ) noexcept :
     	_data(data), 
     	_prev(prev),
     	_next(next)
     {} 
 
-    explicit Node (Nodeptr_ other) noexcept :
+    explicit DListNode (Nodeptr_ other) noexcept :
     	_data(other->_data), 
     	_prev(other->_prev), 
     	_next(other->_next)
     {}
     	
-    virtual ~Node() {
+    virtual ~DListNode() {
     	_next = nullptr;
     	_prev = nullptr;
     }
 
-    Noderef_ operator= (Noderef_ other) noexcept {
+    DListNode& operator= (const DListNode& other) noexcept {
     	_data = other._data;
     	_prev = other._prev;
     	_next = other._next;
 
-    	return this;
+    	return *this;
     }
 
-    // Nodeptr_ operator= (const Nodeptr_ other) noexcept {
-    // 	_data = other->_data;
-    // 	_prev = other->_prev;
-    // 	_next = other->_next;
 
-    // 	return this;
-    // }
-
-    // Node (Node&& other) noexcept :
-    // 	_data(other.data),
-    // 	_prev(other._prev),
-    // 	_next(other._next)
-    // {
-    // 	// _other._data ??
-    // 	other._prev = nullptr;
-    // 	other._next = nullptr;
-    // }
-
-    // pointer operator= (Node&& other) {
-    // 	if (this != &other)
-    // 	{
-    // 		_data = other._data;
-    // 		_prev = other._prev;
-    // 		_next = other._next;
-
-    // 		other._prev = nullptr;
-    // 		other._next = nullptr;
-    // 	}
-    // }
-
-
-    // const?
-    Nodeptr_ getPrev() const noexcept { return _prev; }
-    
-    Nodeptr_ getNext() const noexcept { return _next; }
-    
     const_reference operator*() const noexcept { return _data; }
 
 
-    void setPrev (Nodeptr_ prev) noexcept { _prev = prev; }
-
-    void setNext (Nodeptr_ next) noexcept { _next = next; }
-
-    void setData (const_reference data) noexcept { _data = data; }
-
-
-
-    Node& operator= (const_reference data) noexcept {
-    	_data(data);
-		return this;
-    }
-
+    template <
+    	class Ty_
+    >
+    friend std::ostream& operator<< (std::ostream& output, const DListNode<Ty_> node);
 
 
     template <
     	class Ty_
     >
-    friend std::ostream& operator<< (std::ostream& output, const Node<Ty_> node);
+    friend void swap (DListNode<Ty_>* a, DListNode<Ty_>* b);
 
-    template <
-    	class Ty_
-    >
-    friend void swap (Node<Ty_>* a, Node<Ty_>* b);
+
+    friend class linked_list;
 
 
 protected:
@@ -220,10 +174,12 @@ protected:
 	Nodeptr_ _next;
 };
 
+
+
 template <
 	class Dty_
 >
-std::ostream& operator<< (std::ostream& output, const Node<Dty_> node) {
+std::ostream& operator<< (std::ostream& output, const DListNode<Dty_> node) {
 	output << *node;
 
 	return output;
@@ -232,7 +188,7 @@ std::ostream& operator<< (std::ostream& output, const Node<Dty_> node) {
 template <
 	class Dty_
 >
-void swap (Node<Dty_>* a, Node<Dty_>* b) {
+void swap (DListNode<Dty_>* a, DListNode<Dty_>* b) {
 	_ml swap(a->_prev, b->_prev);
 	_ml swap(a->_next, b->_next);
  	_ml swap(a->_data, b->_data);
