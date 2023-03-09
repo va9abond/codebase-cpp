@@ -188,10 +188,13 @@ std::ostream& operator<< (std::ostream& output, const DListNode<Dty_> node) {
 template <
 	class Dty_
 >
-void swap (DListNode<Dty_>* a, DListNode<Dty_>* b) {
-	_ml swap(a->_prev, b->_prev);
-	_ml swap(a->_next, b->_next);
- 	_ml swap(a->_data, b->_data);
+void swap (DListNode<Dty_>& a, DListNode<Dty_>& b) {
+	if (std::addressof(a) != std::addressof(b))
+	{
+		_ml swap(a._prev, b._prev);
+		_ml swap(a._next, b._next);
+ 		_ml swap(a._data, b._data);
+	}
 }
 
 
