@@ -165,7 +165,7 @@ public:
     }
 
     DListNode (DListNode&& other) noexcept : // ????????????????????????
-    	_data(std::forward(other._data)), // does destructor for other delete other._data => delete _data? 
+    	_data(std::forward<Dty_>(other._data)), // does destructor for other delete other._data => delete _data? 
     	_prev(other._prev),
     	_next(other._next)
     {
@@ -177,7 +177,7 @@ public:
     DListNode& operator= (DListNode&& other) noexcept { // ??????????????????
     	if (std::addressof(*this) != std::addressof(other))
     	{
-    		_data = std::forward(other._data); // does destructor for other delete other._data => delete _data? 
+    		_data = std::forward<Dty_>(other._data); // does destructor for other delete other._data => delete _data? 
     		_prev = other._prev;
     		_next = other._next;
 
@@ -195,7 +195,7 @@ public:
     template <
     	class Ty_
     >
-    friend std::ostream& operator<< (std::ostream& output, const DListNode<Ty_> node);
+    friend std::ostream& operator<< (std::ostream& output, const DListNode<Ty_>& node);
 
     // TODO: need to check
     template <
@@ -222,7 +222,7 @@ protected:
 template <
 	class Dty_
 >
-std::ostream& operator<< (std::ostream& output, const DListNode<Dty_> node) {
+std::ostream& operator<< (std::ostream& output, const DListNode<Dty_>& node) {
 	output << *node;
 
 	return output;
