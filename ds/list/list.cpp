@@ -3,12 +3,13 @@
 // #include <limits.h>
 #include <limits>
 #include <memory>
+#include <stdlib.h>
+#include <utility>
 
 
 template <
     class Ty_,
-    template <class ...> class List_node_ = DListNode,
-    class Alloc_ = std::allocator<Ty_>
+    template <class ...> class List_node_ = DListNode // ERROR HERE: linke_list<int, DListNode<std::string>> list;
 >
 class linked_list { // biderectional double linked list
 private:
@@ -17,7 +18,7 @@ private:
 
 public:
     using value_type      = Ty_;
-    using allocator_type  = Alloc_;
+    using allocator_type  = typename List_node_<Ty_>::allocator_type;
     using reference       = value_type&;
     using const_reference = const value_type&;
 
@@ -31,15 +32,13 @@ public:
 
     linked_list() noexcept :
         _size(0),
-        _head(nullptr),
-        _tail(nullptr)
+        _head(nullptr)
     {}
 
     // TODO: need check
-    explicit linked_list (size_t size, const Ty_ &data = Ty_() ) :
+    explicit linked_list (size_t size, const_reference data = Ty_() ) :
         _size(size),
-        _head(nullptr),
-        _tail(nullptr)
+        _head(nullptr)
     {
         try 
         {
@@ -48,14 +47,12 @@ public:
                 throw _ml exception("Invalid size");
             }
 
-            _head = _tail = new Node_(data);
-            for (size_t s = size; s > 0; s--)
-            {
-                auto new_node = new Node_(data); 
-                PUSH_BACK_NOCHECK(new_node);
-                // new_node->setPrev(_end);
-                // _end->setNext(new_node); // TODO: PUSH_BACK_NOCHECK
-                // _end = new_node;
+            _head->_prev = _head->_next = new Node_(data, _head);
+            while (size --> 0) { 
+                EMPLACE_BACK_NOCHECK( std::move( Ty_(data) ) );
+                // EMPLACE_BACK_NOCHECK )) ); 
+                // there I use std::move instead of std::forward, because
+                // Ty_(data) return a rvalue of type Ty_
             }
         }
         catch (_ml exception invalid_size) {
@@ -63,21 +60,48 @@ public:
         }
     }
 
+protected:
+    //TODO: need to check
+    void ALLOCATE_HEAD() noexcept {
+        _head = static_cast<Nodeptr_>(::operator new(sizeof(Node_)));
+    }
+
+    // TODO: need check
+    Nodeptr_ EMPLACE_NOCHECK (Nodeptr_ where, Ty_&& data) noexcept { // new element will be emplaced at where
+        // *be careful*
+        // if _size == 0 ==> where = nullptr ==> _prev for where doesn't exist ==> where->_prev is bad
+        Nodeptr_ new_node = new Node_(std::forward<Ty_>(data), where->_prev, where);
+        
+        where->_prev->_next = new_node;
+        where->_prev = new_node;
+
+        return new_node;
+    }
+
+    Nodeptr_ EMPLACE_BACK_NOCHECK (Ty_&& data) noexcept {
+        return EMPLACE_NOCHECK(_head, std::forward<Ty_>(data));
+    }
+
+    Nodeptr_ EMPLACE_FRONT_NOCHECK (Ty_&& data) noexcept {
+        return EMPLACE_NOCHECK(_head->_next, std::forward<Ty_>(data));
+    }
+
+
+public:
     // TODO: need check
     linked_list (const linked_list& right) noexcept : // deep copy
         _size(right._size),
-        _tail(nullptr),
         _head(nullptr)
     {
         if (_size != 0)
         {
-            _head = _tail = new Node_( *(right._head) );
+            _head = new Node_( *(right._head) );
             
             auto right_nodeptr = right._head->_next;
             while (right_nodeptr != nullptr) 
             {
                 auto new_node = new Node_(*right_nodeptr);
-                PUSH_BACK_NOCHECK(new_node);
+                EMPLACE_BACK_NOCHECK(new_node);
                 // new_node->setPrev(_end);
                 // _end->setNext(new_node); // TODO: PUSH_BACK_NOCHECK
                 // _end = new_node;
@@ -104,7 +128,7 @@ public:
             while (right_nodeptr != nullptr) 
             {
                 auto new_node = new Node_(*right_nodeptr);
-                PUSH_BACK_NOCHECK(new_node);
+                EMPLACE_BACK_NOCHECK(new_node);
                 // new_node->setPrev(_end);
                 // _end->setNext(new_node); // TODO: PUSH_BACK_NOCHECK
                 // _end = new_node;
@@ -158,7 +182,7 @@ public:
             size_t i = 1; Node_* new_node;
             while (i < size) {
                 new_node = new Node_(std::move(init_list[i++]));
-                PUSH_BACK_NOCHECK(new_node);
+                EMPLACE_BACK_NOCHECK(new_node);
                 // new_node->setPrev(_end);
                 // _end->setNext(new_node); // TODO: PUSH_BACK_NOCHECK
                 // _end = new_node;
@@ -185,12 +209,12 @@ public:
         }
     }
 
-    
+
 
 
 
 protected:
-    Nodeptr_ PUSH_BACK_NOCHECK (Nodeptr_ new_node) noexcept {
+    Nodeptr_ EMPLACE_BACK_NOCHECK (Nodeptr_ new_node) noexcept {
         // **be careful**                                            
         // new_node may have a not nullptr as the _next                                                      
         
@@ -221,7 +245,6 @@ private:
 protected:
     size_t   _size;
     Nodeptr_ _head;
-    Nodeptr_ _tail;
     static const unsigned int _MAX_CAPACITY = UINT_MAX;
 };
 
@@ -229,3 +252,10 @@ protected:
 int main() {
     linked_list<int, DListNode> list;
 }
+
+// Чего я хочу? Я хочу, чтобы 
+//     list.front()->prev = head;
+//     list.back()->next = head;
+//     head->prev = list.back(); 
+//     list.end() = head;
+//     list.begin() = head->next

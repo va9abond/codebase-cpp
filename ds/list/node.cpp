@@ -107,7 +107,8 @@ namespace ML {
 
 
 template <
-	class Dty_
+	class Dty_,
+	class Alloc_ = std::allocator<Dty_>
 >
 class DListNode {
 public:
@@ -117,6 +118,8 @@ public:
     using const_pointer   = const Dty_*;  
     using reference       = Dty_&; 
     using const_reference = const Dty_&;
+
+    using allocator_type  = Alloc_;
 
 
 
@@ -129,6 +132,16 @@ public:
     	_prev(prev),
     	_next(next)
     {} 
+
+    explicit DListNode ( // ??????????????????????????????????
+    	Dty_&& data,
+    	Nodeptr_ prev = nullptr,
+		Nodeptr_ next = nullptr
+    ) noexcept :
+    	_data(std::move(data)),
+    	_prev(nullptr),
+    	_next(nullptr)
+    {}
 
     explicit DListNode (Nodeptr_ other) noexcept :
     	_data(other->_data), 
@@ -167,9 +180,8 @@ public:
 
     template <
     	class,
-    	template <class ...> class,
-    	class
-    >
+    	template <class ...> class
+    > 
     friend class linked_list;
 
 
