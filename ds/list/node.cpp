@@ -133,7 +133,7 @@ public:
     	_next(next)
     {} 
 
-    explicit DListNode ( // ??????????????????????????????????
+    explicit DListNode ( 
     	Dty_&& data,
     	Nodeptr_ prev = nullptr,
 		Nodeptr_ next = nullptr
@@ -155,9 +155,35 @@ public:
     }
 
     DListNode& operator= (const DListNode& other) noexcept {
-    	_data = other._data;
-    	_prev = other._prev;
-    	_next = other._next;
+    	if (std::addressof(*this) != std::addressof(other)) {
+    		_data = other._data;
+    		_prev = other._prev;
+    		_next = other._next;
+    	}
+
+    	return *this;
+    }
+
+    DListNode (DListNode&& other) noexcept : // ????????????????????????
+    	_data(std::forward(other._data)), // does destructor for other delete other._data => delete _data? 
+    	_prev(other._prev),
+    	_next(other._next)
+    {
+    	// *this = std::move(other);
+    	other._prev = nullptr;
+    	other._next = nullptr;
+    }
+
+    DListNode& operator= (DListNode&& other) noexcept { // ??????????????????
+    	if (std::addressof(*this) != std::addressof(other))
+    	{
+    		_data = std::forward(other._data); // does destructor for other delete other._data => delete _data? 
+    		_prev = other._prev;
+    		_next = other._next;
+
+    		other._prev = nullptr;
+    		other._next = nullptr;
+    	}
 
     	return *this;
     }
@@ -171,11 +197,11 @@ public:
     >
     friend std::ostream& operator<< (std::ostream& output, const DListNode<Ty_> node);
 
-
+    // TODO: need to check
     template <
     	class Ty_
     >
-    friend void swap (DListNode<Ty_>* a, DListNode<Ty_>* b);
+    friend void swap (DListNode<Ty_>& a, DListNode<Ty_>& b);
 
 
     template <
