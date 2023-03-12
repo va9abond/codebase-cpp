@@ -1,6 +1,7 @@
 #include "iterator.cpp"
 // #include <exception>
 // #include <limits.h>
+#include <initializer_list>
 #include <limits.h>
 #include <limits>
 #include <memory>
@@ -229,11 +230,11 @@ public:
     // TODO: reverse iterators
 
     const_iterator cbegin() const noexcept {
-
+        return begin();
     }
 
     const_iterator cend() const noexcept {
-
+        return end();
     }
 
     // TODO: const reverse iterators
@@ -373,20 +374,25 @@ public:
         }
     }
 
-    iterator emplace (const const_iterator where, value_type&& data) { // insert element at where
-
+    iterator emplace (const const_iterator Where_, value_type&& data) { // insert element at Where_
+        return _MAKE_ITER(_EMPLACE(Where_.Ptr_, std::forward<value_type>(data)));
     }
 
     reference emplace_front (value_type&& data) { // insert element at beginning
-
+        reference Result_ = _EMPLACE(_head->_next, std::forward<value_type>(data))->_data;
+        return Result_;
     }
 
     reference emplace_back (value_type&& data) { // insert element at end
-
+        reference Result_ = _EMPLACE(_head, std::forward<value_type>(data))->_data;
     }
 
-    iterator insert (const_iterator where, const_reference data) { // insert data at where
+    iterator insert (const_iterator Where_, std::initializer_list<Ty_> Ilist_) { // insert initializer_list
+        return insert(Where_, Ilist_.begin(), Ilist_.end());
+    }
 
+    iterator insert (const_iterator Where_, const_reference data) { // insert data at Where_
+        return _MAKE_ITER(_EMPLACE(Where_.Ptr_, data));
     }
 
     iterator insert (const_iterator where, int count, const_reference data) { // insert count * data before where
@@ -400,14 +406,35 @@ public:
 
     }
 
-    iterator erase (const_iterator where) noexcept {
-
+    iterator erase (const_iterator Where_) { // erase element at Where_
+        // TODO: check if iterator outside list 
+        const auto Result_ = Where_.Ptr_->_next;
+        _FREENODE(_UNLINK_NODE(Where_.Ptr_));
     }
 
 protected:
-    
-    Nodeptr_ _UNCHECKED_ERASE (const Nodeptr_ Pnode_) {
 
+    Nodeptr_ _UNLINK_NODE (Nodeptr_ Dnode_) { // detach Dnode_ from list   
+        Dnode_->_prev->_next = Dnode_->_next;
+        Dnode_->_next->_prev = Dnode_->_prev;
+
+        Dnode_->_prev = Dnode_->_next = nullptr;
+        return Dnode_;
+    }
+
+    void _FREENODE (Nodeptr_ Pnode_) { // DANGEROUS //
+        delete Pnode_;
+    }
+    
+    Nodeptr_ _UNCHECKED_ERASE (const Nodeptr_ Pnode_) noexcept { // erase element at Pnode_
+        const auto Result_ = Pnode_->_next;
+        // TODO: orphan iterators with specified node pointers      
+        Pnode_->_prev->_next = Result_;
+        Result_->_prev       = Pnode_->_prev;
+        
+        _FREENODE(Pnode_);
+        _size--;
+        return Result_;
     }
 
 public:
