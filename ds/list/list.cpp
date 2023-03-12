@@ -199,29 +199,29 @@ public:
 
 
     iterator begin() noexcept {
-
+        return iterator(_head->_next);
     }
 
     const_iterator begin() const noexcept {
-
+        return const_iterator(_head->_next);
     }
 
     iterator end() noexcept {
-
+        return iterator(_head);
     }
 
     const_iterator end() const noexcept {
-
+        return const_iterator(_head);
     }
 
 protected:
 
     iterator _MAKE_ITER (Nodeptr_ Where_) const noexcept {
-
+        return iterator(Where_);
     }
 
     const_iterator _MAKE_CONST_ITER (Nodeptr_ Where_) const noexcept {
-
+        return const_iterator(Where_);
     }
 
 public:
