@@ -17,10 +17,10 @@ public:
 
 
 
-    _List_unchecked_const_iterator() noexcept : ptr_() {}
+    _List_unchecked_const_iterator() noexcept : Ptr_() {}
 
     _List_unchecked_const_iterator (Nodeptr_ node = nullptr) noexcept : 
-        ptr_(node)
+        Ptr_(node)
     {}
     
     ~_List_unchecked_const_iterator() = default;
@@ -28,50 +28,49 @@ public:
 
 
     reference operator*() const noexcept {
-        return *ptr_;
+        return *Ptr_;
     }
 
     pointer operator->() const noexcept { 
-        return ptr_;
+        return Ptr_;
     }
 
     explicit operator bool() const {
-        return ptr_; // is nullptr
+        return Ptr_; // is nullptr
     }
 
     _List_unchecked_const_iterator& operator++ () noexcept {
-        ptr_ = ptr_->_next; 
+        Ptr_ = Ptr_->_next; 
         return *this;
     }
 
     _List_unchecked_const_iterator operator++(int) noexcept {
         auto tmp = *this;
-        ptr_     = ptr_->_next;
+        Ptr_     = Ptr_->_next;
         return tmp;
     }
 
     _List_unchecked_const_iterator& operator--() noexcept {
-        ptr_ = ptr_->_prev;
+        Ptr_ = Ptr_->_prev;
         return *this;
     }
 
     _List_unchecked_const_iterator operator--(int) noexcept {
         auto tmp = *this;
-        ptr_     = ptr_->_prev;
+        Ptr_     = Ptr_->_prev;
         return tmp;
     }
 
     bool operator== (const _List_unchecked_const_iterator& right) const noexcept {
-        return ptr_ == right.ptr_;
+        return Ptr_ == right.Ptr_;
     }
    
     bool operator!= (const _List_unchecked_const_iterator& right) const noexcept {
         return !(*this == right);
     }
-
-
-private:
-    Nodeptr_ ptr_;
+    
+    
+    Nodeptr_ Ptr_;
 
 };
 
@@ -101,7 +100,7 @@ public:
     }    
 
     pointer operator->() const noexcept {
-        return Mybase_::ptr_;
+        return Mybase_::Ptr_;
         // return const_cast<pointer>(Mybase_::operator->());
     }
 
