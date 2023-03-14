@@ -201,14 +201,8 @@ public:
     template <
     	class Ty_
     >
-    friend void swap (DListNode<Ty_>& a, DListNode<Ty_>& b);
+    void swap (DListNode<Ty_>& a, DListNode<Ty_>& b);
 
-
-    template <
-    	class,
-    	template <class ...> class
-    > 
-    friend class linked_list;
 
 
 protected:
