@@ -1,238 +1,64 @@
-#include <iostream>
-#include <memory>
-
-
-#define _ml ML::
-
-
-namespace ML {
-
-	class exception {
-	public:
-		exception (const char* other) noexcept : _message(other) {}
-		
-		exception (const exception&) noexcept = default;
-		
-		exception& operator= (const exception&) noexcept = default;
-		
-		exception (exception&& other) noexcept : _message(other._message) {
-			other._message = nullptr;
-		}
-
-		exception& operator= (exception&& other) {
-			if (this != &other)
-			{
-				delete[] _message;
-
-				_message = other._message;
-
-				other._message = nullptr;
-			}
-
-			return *this;
-		}
-
-		virtual ~exception() {
-			delete[] _message;
-			_message = nullptr;
-		}
-		
-		virtual const char* what() const noexcept {
-			return _message;
-		}
-
-
-	protected:
-		const char *_message;
-	};
-
-	class semantic_error : exception {
-	public:
-		semantic_error (const char* other) noexcept :
-			exception("SEMANTIC_ERROR"),
-			_message(other) 
-		{}
-
-		semantic_error (const semantic_error&) noexcept = default;
-		
-		semantic_error& operator= (const semantic_error&) noexcept = default;
-
-		semantic_error (semantic_error&& other) noexcept
-			: exception("SEMANTIC_ERROR"),
-			_message(other._message)
-		{
-			other._message = nullptr;
-		}
-
-		semantic_error& operator= (semantic_error&& other) noexcept {
-			if (this != &other)
-			{
-				delete[] _message;
-
-				_message = other._message;
-
-				other._message = nullptr; 
-			}
-
-			return *this;
-		}
-
-		virtual ~semantic_error() {
-			delete[] _message;
-			_message = nullptr;
-		};
-
-		const char* what() const noexcept {
-			return _message;
-		}
-
-	private:
-		const char *_message;
-	};
-
-
-	template <
-		class Ty_
-	>
-	void swap (Ty_& a, Ty_& b) {
-		if (std::addressof(a) != std::addressof(b)) 
-		{
-			auto tmp = std::move(a);
-			a = std::move(b);
-			b = std::move(tmp);
-		}
-	}
-}
+#include "myldef.cpp"
 
 
 
 template <
-	class Dty_,
-	class Alloc_ = std::allocator<Dty_>
+	class Vty_
 >
-class DListNode {
-public:
-    using value_type      = Dty_;
-    using Nodeptr_        = DListNode<Dty_>*;           
-    using pointer         = Dty_*;
-    using const_pointer   = const Dty_*;  
-    using reference       = Dty_&; 
-    using const_reference = const Dty_&;
+struct List_node_ {
 
-    using allocator_type  = Alloc_;
+    using value_type      = Vty_;
+    using Nodeptr_        = List_node_<Vty_>*;           
 
 
 
-    explicit DListNode (
-    	const_reference data,
-    	Nodeptr_ prev = nullptr,
-		Nodeptr_ next = nullptr
-    ) noexcept :
-    	_data(data), 
-    	_prev(prev),
-    	_next(next)
-    {} 
+    List_node_ (const List_node_&) = delete;
+    List_node_& operator= (const List_node_&) = delete;
 
-    explicit DListNode ( 
-    	Dty_&& data,
-    	Nodeptr_ prev = nullptr,
-		Nodeptr_ next = nullptr
-    ) noexcept :
-    	_data(std::move(data)),
-    	_prev(nullptr),
-    	_next(nullptr)
-    {}
+    void _DEALLOCATE (Nodeptr_ ptr) noexcept {
+    	delete ptr->_next; ptr->_next = nullptr;
+    	delete ptr->_prev; ptr->_prev = nullptr;
 
-    explicit DListNode (Nodeptr_ other) noexcept :
-    	_data(other->_data), 
-    	_prev(other->_prev), 
-    	_next(other->_next)
-    {}
-    	
-    virtual ~DListNode() {
-    	_next = nullptr;
-    	_prev = nullptr;
+    	::operator delete(ptr);
+    } 
+
+    void _Freenode (Nodeptr_ ptr) noexcept { // destroy all members in ptr and deallocate memory
+    	_MYL _destroy(_MYL addressof(ptr->_myval));
+    	_DEALLOCATE(ptr);
     }
 
-    DListNode& operator= (const DListNode& other) noexcept {
-    	if (std::addressof(*this) != std::addressof(other)) {
-    		_data = other._data;
-    		_prev = other._prev;
-    		_next = other._next;
+    void _Free_non_head (Nodeptr_ head) noexcept { // free a list starting at head 
+    	head->_prev->_next = nullptr;
+
+    	auto Pnode = head->_next;
+    	for (Nodeptr_ Pnext; Pnode != nullptr; Pnode = Pnext) {
+    		Pnext = Pnode->_next;
+    		_Freenode(Pnode);
     	}
-
-    	return *this;
     }
 
-    DListNode (DListNode&& other) noexcept : // ????????????????????????
-    	_data(std::forward<Dty_>(other._data)), // does destructor for other delete other._data => delete _data? 
-    	_prev(other._prev),
-    	_next(other._next)
-    {
-    	// *this = std::move(other);
-    	other._prev = nullptr;
-    	other._next = nullptr;
-    }
-
-    DListNode& operator= (DListNode&& other) noexcept { // ??????????????????
-    	if (std::addressof(*this) != std::addressof(other))
-    	{
-    		_data = std::forward<Dty_>(other._data); // does destructor for other delete other._data => delete _data? 
-    		_prev = other._prev;
-    		_next = other._next;
-
-    		other._prev = nullptr;
-    		other._next = nullptr;
-    	}
-
-    	return *this;
-    }
-
-
-    const_reference operator*() const noexcept { return _data; }
-
-
-    template <
-    	class Ty_
-    >
-    friend std::ostream& operator<< (std::ostream& output, const DListNode<Ty_>& node);
-
-    // TODO: need to check
-    template <
-    	class Ty_
-    >
-    void swap (DListNode<Ty_>& a, DListNode<Ty_>& b);
+    template <class Ty_>
+    friend std::ostream& operator<< (std::ostream& output, const List_node_<Ty_>& node);
 
 
 
-protected:
-	Dty_     _data;
-	Nodeptr_ _prev; 
-	Nodeptr_ _next;
+	value_type _myval; // the stored value, unused if head
+	Nodeptr_   _prev;  // successor node, or first element if head
+	Nodeptr_   _next;  // the stored value, unused if head
 };
 
 
 
 template <
-	class Dty_
+	class Vty_
 >
-std::ostream& operator<< (std::ostream& output, const DListNode<Dty_>& node) {
+std::ostream& operator<< (std::ostream& output, const List_node_<Vty_>& node) {
 	output << *node;
 
 	return output;
 }
 
-template <
-	class Dty_
->
-void swap (DListNode<Dty_>& a, DListNode<Dty_>& b) {
-	if (std::addressof(a) != std::addressof(b))
-	{
-		_ml swap(a._prev, b._prev);
-		_ml swap(a._next, b._next);
- 		_ml swap(a._data, b._data);
-	}
-}
+
 
 
 

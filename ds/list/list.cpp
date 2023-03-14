@@ -11,16 +11,16 @@
 
 template <
     class Ty_,
-    template <class ...> class List_node_ = DListNode // ERROR HERE: linke_list<int, DListNode<std::string>> list;
+    template <class ...> class List_node = List_node_ // ERROR HERE: linke_list<int, DListNode<std::string>> list;
 >
 class linked_list { // biderectional double linked list
 private:
-    using Node_    = List_node_<Ty_>;
-    using Nodeptr_ = List_node_<Ty_>*;
+    using Node_    = List_node<Ty_>;
+    using Nodeptr_ = List_node<Ty_>*;
 
 public:
     using value_type      = Ty_;
-    using allocator_type  = typename List_node_<Ty_>::allocator_type;
+    using allocator_type  = typename List_node<Ty_>::allocator_type;
     using reference       = value_type&;
     using const_reference = const value_type&;
 
@@ -48,7 +48,7 @@ public:
         try {
             if (size <= 0 || size > UINT_MAX) {
                 _size = 0;
-                throw _ml exception("Invalid size");
+                throw _MYL exception("Invalid size");
             }
 
             _ALLOCATE_HEAD();
@@ -60,7 +60,7 @@ public:
                 // Ty_(data) return rvalue of type Ty_
             }
         }
-        catch (_ml exception invalid_size) {
+        catch (_MYL exception invalid_size) {
             std::cerr << invalid_size.what();
         }
     }
@@ -76,7 +76,7 @@ protected:
         try {
             
             if (_size == max_size()) {
-                throw _ml exception("list too long");
+                throw _MYL exception("list too long");
             }
 
             Nodeptr_ new_node = new Node_(std::forward<Ty_>(data), where->_prev, where);
@@ -86,7 +86,7 @@ protected:
             _size++;
             return new_node;
         }
-        catch (_ml exception length_error) {
+        catch (_MYL exception length_error) {
             std::cerr << length_error.what();
         }
     }
@@ -246,7 +246,7 @@ public:
     Ty_& operator[] (size_t index) const {
         try {
             if (index < 0 || index >= _size) {
-                throw _ml exception("Invalid index");
+                throw _MYL exception("Invalid index");
             }
 
             auto node_it = _head->_next;
@@ -256,7 +256,7 @@ public:
 
             return node_it->_data;
         }
-        catch (_ml exception invalid_index) {
+        catch (_MYL exception invalid_index) {
             std::cerr << invalid_index.what();
         }
     }
@@ -276,12 +276,12 @@ public:
     reference front() { 
         try {
             if ( _size == 0 ) {
-                throw _ml exception("front() called on empty list");
+                throw _MYL exception("front() called on empty list");
             }
 
             return _head->_next->_data;     
         }
-        catch (_ml exception length_error) {
+        catch (_MYL exception length_error) {
             std::cerr << length_error.what();
         }
     }  
@@ -289,12 +289,12 @@ public:
     const_reference front() const {
         try {
             if ( _size == 0 ) {
-                throw _ml exception("front() called on empty list");
+                throw _MYL exception("front() called on empty list");
             }
 
             return _head->_next->_data;     
         }
-        catch (_ml exception length_error) {
+        catch (_MYL exception length_error) {
             std::cerr << length_error.what();
         }
     }
@@ -303,12 +303,12 @@ public:
     reference back() { 
         try { 
             if ( _size == 0 ) {
-                throw _ml exception("back() called on empty list");
+                throw _MYL exception("back() called on empty list");
             }
 
             return _head->_prev->_data;     
         }
-        catch (_ml exception length_error) {
+        catch (_MYL exception length_error) {
             std::cerr << length_error.what();
         }
     }
@@ -316,12 +316,12 @@ public:
     const_reference back() const { 
         try {
             if ( _size == 0 ) {
-                throw _ml exception("back() called on empty list");
+                throw _MYL exception("back() called on empty list");
             }
 
             return _head->_prev->_data;     
         }
-        catch (_ml exception length_error) {
+        catch (_MYL exception length_error) {
             std::cerr << length_error.what();
         }
     }
@@ -351,12 +351,12 @@ public:
     void pop_front() {
         try {
             if (_size == 0) {
-                throw _ml exception("pop_front() called on empty list");
+                throw _MYL exception("pop_front() called on empty list");
             }
 
             _UNCHECKED_ERASE(_head->_next);
         }
-        catch (_ml exception length_error) {
+        catch (_MYL exception length_error) {
             std::cerr << length_error.what();
         }
     }
@@ -364,12 +364,12 @@ public:
     void pop_back() {
         try {
             if (_size == 0) {
-                throw _ml exception("pop_back() called on empty list");
+                throw _MYL exception("pop_back() called on empty list");
             }
 
             _UNCHECKED_ERASE(_head->_prev);
         }
-        catch (_ml exception length_error) {
+        catch (_MYL exception length_error) {
             std::cerr << length_error.what();
         }
     }
