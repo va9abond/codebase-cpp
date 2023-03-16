@@ -1,4 +1,7 @@
 #include <iostream> 
+#include <iterator>
+
+
 
 
 
@@ -10,9 +13,10 @@
 
 _MYL_BEGIN // my library to replace functions from STD 
 
+
+
+// ************ utility ************ //
 	
-
-
 template <class _Ty>
 constexpr _Ty* addressof(_Ty& _Val) noexcept { // copy of std::addressof()
     // return __builtin_addressof(_Val);	
@@ -75,10 +79,14 @@ void swap(_Ty& _Left, _Ty& _Right) { // *WARNING* no check if _Ty is is_nothrow_
 }
 
 template <class _Ty>
-void _destroy(_Ty* _Ptr) {
+void destroy_(_Ty* _Ptr) {
 	_Ptr->~_Ty();
 }
 
+
+
+
+// ************ class exception ************ //  
 
 class exception {
 public:
@@ -115,6 +123,8 @@ public:
 protected:
 	const char *_message;
 };
+
+// ************ class semantic_error ************ //
 
 class semantic_error : exception {
 public:
@@ -162,9 +172,106 @@ protected:
 
 
 
+// ************ Iterators ************ //
+struct Iterator_base_;
+struct Container_base_;
+
+
+struct Container_proxy_ { // store head of iterator chain and back pointer    
+    
+    Container_proxy_() noexcept = default;
+    
+    Container_proxy_(Container_base_* Mycont_) noexcept : Mycont(Mycont_) {}
+
+    ~Container_proxy_() {
+    	Mycont      = nullptr;
+    	Myfirstiter = nullptr;
+    } 
+
+    const   Container_base_* Mycont      = nullptr; // pointer to parent container
+    mutable Iterator_base_*  Myfirstiter = nullptr; // head iterator of parent container
+};
+
+
+struct Container_base_ {
+	
+	Container_base_() noexcept = default;
+
+	Container_base_ (const Container_base_&) = delete;
+	Container_base_& operator= (const Container_base_&) = delete;
+
+	~Container_base_() {
+		delete Myproxy; Myproxy = nullptr;
+	}
+
+	void Alloc_proxy_() {
+		Myproxy = new Container_proxy_(this);
+		// new_proxy->Mycont = this;
+	}
+
+	void Orphan_all_() noexcept {}
+
+
+	Container_proxy_* Myproxy = nullptr;
+};
 
 
 
+// ************ Iterators ************ //
+
+struct Iterator_base_ { // store links to container and next iterator
+
+	Iterator_base_() noexcept = default; // construct orphaned iterator
+	
+	Iterator_base_ (const Iterator_base_& Right) noexcept {
+		*this = Right;
+	}
+
+	Iterator_base_& operator= (const Iterator_base_& Right) noexcept {
+		Myproxy = Right.Myproxy;
+		return *this;
+	}
+
+	~Iterator_base_() {
+		Myproxy    = nullptr;
+		Mynextiter = nullptr;
+	}
+
+	const Container_base_* Getcont_() const noexcept {
+		return Myproxy != nullptr ? Myproxy->Mycont : nullptr;
+	}
+
+	void Adopt_ (const Container_base_* Parent) noexcept {
+		if (Parent != nullptr) { // have a parent, do adoption
+			Myproxy = Parent->Myproxy;
+		} 
+		else { // no future parent, just disown current parent
+			Myproxy = nullptr;
+		}
+	}
+
+	mutable Container_proxy_* Myproxy    = nullptr;
+	mutable Iterator_base_*   Mynextiter = nullptr;
+};
+
+template <class IterTy_>
+struct iterator_traits {
+	using value_type        = typename IterTy_::value_type;
+	using difference_type   = typename IterTy_::difference_type;
+	using iterator_category = typename IterTy_::iterator_category;
+	using pointer           = typename IterTy_::pointer;
+	using reference         = typename IterTy_::reference;
+};
+
+
+template <class PtrTy_>
+struct iterator_traits<PtrTy_*> {
+	using value_type        = PtrTy_;
+	using difference_type   = std::ptrdiff_t;
+	using iterator_category = std::random_access_iterator_tag;
+	using pointer           = PtrTy_*;
+	using reference         = PtrTy_&;
+};
 
 
 
@@ -188,3 +295,4 @@ protected:
 
 
 _MYL_END
+

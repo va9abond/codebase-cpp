@@ -15,25 +15,25 @@ struct List_node_ {
     List_node_ (const List_node_&) = delete;
     List_node_& operator= (const List_node_&) = delete;
 
-    void _DEALLOCATE (Nodeptr_ ptr) noexcept {
+    void DEALLOCATE_ (Nodeptr_ ptr) noexcept {
     	delete ptr->_next; ptr->_next = nullptr;
     	delete ptr->_prev; ptr->_prev = nullptr;
 
     	::operator delete(ptr);
     } 
 
-    void _Freenode (Nodeptr_ ptr) noexcept { // destroy all members in ptr and deallocate memory
-    	_MYL _destroy(_MYL addressof(ptr->_myval));
-    	_DEALLOCATE(ptr);
+    void Freenode_ (Nodeptr_ ptr) noexcept { // destroy all members in ptr and deallocate memory
+    	_MYL destroy_(_MYL addressof(ptr->_myval));
+    	DEALLOCATE_(ptr);
     }
 
-    void _Free_non_head (Nodeptr_ head) noexcept { // free a list starting at head 
+    void Free_non_head_ (Nodeptr_ head) noexcept { // free a list starting at head 
     	head->_prev->_next = nullptr;
 
     	auto Pnode = head->_next;
     	for (Nodeptr_ Pnext; Pnode != nullptr; Pnode = Pnext) {
     		Pnext = Pnode->_next;
-    		_Freenode(Pnode);
+    		Freenode_(Pnode);
     	}
     }
 
