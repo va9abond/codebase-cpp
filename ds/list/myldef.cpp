@@ -172,26 +172,8 @@ protected:
 
 
 
-// ************ Iterators ************ //
+// ************ Container_base_ ************ //
 struct Iterator_base_;
-struct Container_base_;
-
-
-struct Container_proxy_ { // store head of iterator chain and back pointer    
-    
-    Container_proxy_() noexcept = default;
-    
-    Container_proxy_(Container_base_* Mycont_) noexcept : Mycont(Mycont_) {}
-
-    ~Container_proxy_() {
-    	Mycont      = nullptr;
-    	Myfirstiter = nullptr;
-    } 
-
-    const   Container_base_* Mycont      = nullptr; // pointer to parent container
-    mutable Iterator_base_*  Myfirstiter = nullptr; // head iterator of parent container
-};
-
 
 struct Container_base_ {
 	
@@ -201,23 +183,17 @@ struct Container_base_ {
 	Container_base_& operator= (const Container_base_&) = delete;
 
 	~Container_base_() {
-		delete Myproxy; Myproxy = nullptr;
+		Myfirstiter = nullptr;
 	}
 
-	void Alloc_proxy_() {
-		Myproxy = new Container_proxy_(this);
-		// new_proxy->Mycont = this;
-	}
-
-	void Orphan_all_() noexcept {}
 
 
-	Container_proxy_* Myproxy = nullptr;
+	Iterator_base_* Myfirstiter = nullptr;
 };
 
 
 
-// ************ Iterators ************ //
+// ************ Iterator_base_ ************ //
 
 struct Iterator_base_ { // store links to container and next iterator
 
@@ -228,30 +204,30 @@ struct Iterator_base_ { // store links to container and next iterator
 	}
 
 	Iterator_base_& operator= (const Iterator_base_& Right) noexcept {
-		Myproxy = Right.Myproxy;
+		Mycont = Right.Mycont;
 		return *this;
 	}
 
 	~Iterator_base_() {
-		Myproxy    = nullptr;
+		Mycont     = nullptr;
 		Mynextiter = nullptr;
 	}
 
-	const Container_base_* Getcont_() const noexcept {
-		return Myproxy != nullptr ? Myproxy->Mycont : nullptr;
+	const Container_base_* Getcont() const noexcept {
+		return Mycont != nullptr ? Mycont : nullptr;
 	}
 
-	void Adopt_ (const Container_base_* Parent) noexcept {
+	void Adopt (Container_base_* Parent) noexcept {
 		if (Parent != nullptr) { // have a parent, do adoption
-			Myproxy = Parent->Myproxy;
+			Mycont = Parent;
 		} 
 		else { // no future parent, just disown current parent
-			Myproxy = nullptr;
+			Mycont = nullptr;
 		}
 	}
 
-	mutable Container_proxy_* Myproxy    = nullptr;
-	mutable Iterator_base_*   Mynextiter = nullptr;
+	mutable Container_base_* Mycont     = nullptr;
+	mutable Iterator_base_*  Mynextiter = nullptr;
 };
 
 template <class IterTy_>
