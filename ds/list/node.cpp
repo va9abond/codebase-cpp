@@ -60,6 +60,9 @@ std::ostream& operator<< (std::ostream& output, const List_node_<Vty_>& node) {
 
 
 
+int main() {
+	List_node_<int> node();
+}
 
 
 
