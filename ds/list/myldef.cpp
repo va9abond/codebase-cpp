@@ -9,7 +9,7 @@
 #define _MYL_BEGIN namespace myl {
 #define _MYL_END   }
 #define _MYL       ::myl::
-
+#define _STD       ::std::
 
 
 _MYL_BEGIN // my library to replace functions from STD 

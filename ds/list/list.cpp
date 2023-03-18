@@ -5,8 +5,10 @@
 #include <limits.h>
 #include <limits>
 #include <memory>
+#include <sal.h>
 #include <stdlib.h>
 #include <utility>
+#include <xmemory>
 
 
 _MYL_BEGIN
@@ -15,6 +17,26 @@ template <class Ty_>
 struct _List_simple_types : _Simple_types<Ty_> {
     using _Node    = _List_node<Ty_>;
     using _Nodeptr = _List_node<Ty_>*;
+};
+
+
+template < 
+    class Value_type_,
+    class Size_type_,
+    class Difference_type_,
+    class Pointer_,
+    class Const_pointer_,
+    class Reference_,
+    class Const_reference,
+    class Nodeptr_type
+>
+struct _List_iter_types {
+    using value_type      = Value_type_;
+    using size_type       = Size_type_;
+    using difference_type = Difference_type_;
+    using pointer         = Pointer_;
+    using const_pointer   = Const_pointer_;
+    using _Nodeptr        = Nodeptr_type;
 };
 
 
@@ -60,8 +82,6 @@ public:
         --Mysize;
         return Pnode;
     }
-
-
 
 
     _Nodeptr  Myhead; // pointer to head node
@@ -127,24 +147,46 @@ public:
 
 template <
     class Ty_,
-    template <class ...> class List_node = _List_node // ERROR HERE: linke_list<int, DListNode<std::string>> list;
+    class _Alloc = _STD allocator<Ty_>
 >
 class linked_list { // biderectional double linked list
 private:
-    using Node_    = List_node<Ty_>;
-    using _Nodeptr = List_node<Ty_>*;
+    using _Alty          = std::_Rebind_alloc_t<_Alloc, Ty_>;
+    using _Alty_traits   = std::allocator_traits<_Alty>;
+    using _Node          = _List_node<Ty_>;
+    using _Alnode        = std::_Rebind_alloc_t<_Alloc, _Node>;
+    using _Alnode_traits = std::allocator<_Alnode>;
+    using _Nodeptr       = typename _Alnode_traits::pointer;
+
+    using _Val_types = _List_iter_types <
+        Ty_,
+        typename _Alty_traits::size_type,
+        typename _Alty_traits::difference_type,        
+        typename _Alty_traits::pointer,
+        typename _Alty_traits::const_pointer,
+        Ty_&,
+        const Ty_&,
+        _Nodeptr
+    >;
+    using _Scary_val = _List_val<_Val_types>;
 
 public:
     using value_type      = Ty_;
-    using allocator_type  = typename List_node<Ty_>::allocator_type;
+    using allocator_type  = _Alloc;
+    using size_type       = typename _Alty_traits::size_type;
+    using difference_type = typename _Alty_traits::difference_type;
+    using pointer         = typename _Alty_traits::pointer;
+    using const_pointer   = typename _Alty_traits::const_pointer;
     using reference       = value_type&;
     using const_reference = const value_type&;
 
-    using iterator       = _List_unchecked_iterator<Ty_>;
-    using const_iterator = _List_unchecked_const_iterator<Ty_>;
+    using iterator                  = _List_iterator<_Scary_val>;
+    using const_iterator            = _List_const_iterator<_Scary_val>;
+    using _Unchecked_iterator       = _List_unchecked_iterator<_Scary_val>;
+    using _Unchecked_const_iterator = _List_unchecked_const_iterator<_Scary_val>;
 
-    using reverse_iterator       = std::reverse_iterator<iterator>;
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+    using reverse_iterator       = _STD reverse_iterator<iterator>;
+    using const_reverse_iterator = _STD reverse_iterator<const_iterator>;
 
 
     /* Ctors, Dtor & Assignment Operators */
@@ -167,7 +209,7 @@ public:
             }
 
             _ALLOCATE_HEAD();
-            _head->_prev = _head->_next = new Node_(value, _head, _head);
+            _head->_prev = _head->_next = new _Node(value, _head, _head);
             
             while (size --> 0) { 
                 _EMPLACE_BACK( std::move( Ty_(value) ) ); 
@@ -183,7 +225,7 @@ public:
 protected:
     //TODO: need to check
     void _ALLOCATE_HEAD() noexcept {
-        _head = static_cast<_Nodeptr>(::operator new(sizeof(Node_)));
+        _head = static_cast<_Nodeptr>(::operator new(sizeof(_Node)));
         // ::operator new return void*, i need to cast void* to _Nodeptr by static_cast
     }
 
@@ -195,7 +237,7 @@ protected:
                 throw _MYL exception("list too long");
             }
 
-            _Nodeptr new_node = new Node_(std::forward<Ty_>(data), where->_prev, where);
+            _Nodeptr new_node = new _Node(std::forward<Ty_>(data), where->_prev, where);
             where->_prev->_next = new_node;
             where->_prev = new_node;
 
@@ -303,7 +345,7 @@ public:
         if (size > 0)
         {
             _ALLOCATE_HEAD();
-            _head->_prev = _head->_next = new Node_(std::move(init_list[0]), _head, _head);
+            _head->_prev = _head->_next = new _Node(std::move(init_list[0]), _head, _head);
             
             for (size_t i = 1; i < size; i++) {
                 _EMPLACE_BACK(std::move(init_list[i]));
