@@ -9,16 +9,17 @@
 #include <utility>
 
 
+_MYL_BEGIN
 
 template <class Ty_>
-struct _List_simple_types : _MYL _Simple_types<Ty_> {
+struct _List_simple_types : _Simple_types<Ty_> {
     using _Node    = _List_node<Ty_>;
     using _Nodeptr = _List_node<Ty_>*;
 };
 
 
 template <class Val_types_>
-class _List_val : public _MYL _Container_base {
+class _List_val : public _Container_base {
 public:
     using _Nodeptr = typename Val_types_::_Nodeptr;
 
@@ -33,7 +34,32 @@ public:
 
     _List_val() noexcept : Myhead(), Mysize(0) {} // initialize data
 
-    
+    void _Orphan_iterator (_Nodeptr Ptr) noexcept { // orphan iterator from node it contains to
+        _Iterator_base* ItNext = this->Myfirstiter;
+        const auto head = Myhead;
+
+        while(ItNext != nullptr) {
+            _Iterator_base* ItNextNext = ItNext->Mynextiter;
+            const auto PtrNext = static_cast<_List_const_iterator<_List_val>&>(ItNext)._Ptr;
+            
+            if (PtrNext == head || PtrNext != Ptr) {
+                // ItNext == end() or ItNext doesn't point at the one we are orphaning, move on
+                ItNext = ItNextNext;
+            } else { // orphan the iterator
+                ItNext->Mycont = nullptr;
+                ItNext         = ItNextNext;
+                // break;
+            }
+        }
+    }
+
+    _Nodeptr _Unlinknode(_Nodeptr Pnode) noexcept { // unlink Pnode from the list
+
+        Pnode->_prev->_next = Pnode->_next;
+        Pnode->_next->_prev = Pnode->_prev;
+        --Mysize;
+        return Pnode;
+    }
 
 
 
@@ -572,3 +598,4 @@ protected:
 };
 
 
+_MYL_END
