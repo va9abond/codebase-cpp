@@ -5,6 +5,7 @@
 
 
 
+
 #define _MYL_BEGIN namespace myl {
 #define _MYL_END   }
 #define _MYL       ::myl::
@@ -25,7 +26,6 @@ constexpr _Ty* addressof(_Ty& _Val) noexcept { // copy of std::addressof()
 
 template <class _Ty>
 const _Ty* addressof (const _Ty&&) = delete; // copy of std::addressof()
-
 
 
 
@@ -85,12 +85,10 @@ void destroy_(_Ty* _Ptr) {
 
 
 
-
 // ************ class exception ************ //  
 
 class exception {
 public:
-
 	exception (const char* other) noexcept : _message(other) {}
 	
 	exception (const exception&) noexcept = default;
@@ -120,15 +118,17 @@ public:
 		return _message;
 	}
 	
+
 protected:
 	const char *_message;
 };
+
+
 
 // ************ class semantic_error ************ //
 
 class semantic_error : exception {
 public:
-
 	semantic_error (const char* other) noexcept :
 		exception("SEMANTIC_ERROR"),
 		_message(other) 
@@ -164,60 +164,60 @@ public:
 		return _message;
 	}
 
+
 protected:
 	const char *_message;
 };
 
 
 
-
-
 // ************ Container_base_ ************ //
-struct Iterator_base_;
 
-struct Container_base_ {
+struct _Iterator_base;
+
+
+struct _Container_base {
 	
-	Container_base_() noexcept = default;
+	_Container_base() noexcept = default;
 
-	Container_base_ (const Container_base_&) = delete;
-	Container_base_& operator= (const Container_base_&) = delete;
+	_Container_base (const _Container_base&) = delete;
+	_Container_base& operator= (const _Container_base&) = delete;
 
-	~Container_base_() {
+	~_Container_base() {
 		Myfirstiter = nullptr;
 	}
 
 
-
-	Iterator_base_* Myfirstiter = nullptr;
+	_Iterator_base* Myfirstiter = nullptr;
 };
 
 
 
 // ************ Iterator_base_ ************ //
 
-struct Iterator_base_ { // store links to container and next iterator
+struct _Iterator_base { // store links to container and next iterator
 
-	Iterator_base_() noexcept = default; // construct orphaned iterator
+	_Iterator_base() noexcept = default; // construct orphaned iterator
 	
-	Iterator_base_ (const Iterator_base_& Right) noexcept {
+	_Iterator_base (const _Iterator_base& Right) noexcept {
 		*this = Right;
 	}
 
-	Iterator_base_& operator= (const Iterator_base_& Right) noexcept {
+	_Iterator_base& operator= (const _Iterator_base& Right) noexcept {
 		Mycont = Right.Mycont;
 		return *this;
 	}
 
-	~Iterator_base_() {
+	~_Iterator_base() {
 		Mycont     = nullptr;
 		Mynextiter = nullptr;
 	}
 
-	const Container_base_* Getcont() const noexcept {
+	const _Container_base* Getcont() const noexcept {
 		return Mycont != nullptr ? Mycont : nullptr;
 	}
 
-	void Adopt (Container_base_* Parent) noexcept {
+	void Adopt (_Container_base* Parent) noexcept {
 		if (Parent != nullptr) { // have a parent, do adoption
 			Mycont = Parent;
 		} 
@@ -226,12 +226,14 @@ struct Iterator_base_ { // store links to container and next iterator
 		}
 	}
 
-	mutable Container_base_* Mycont     = nullptr;
-	mutable Iterator_base_*  Mynextiter = nullptr;
+
+	mutable _Container_base* Mycont     = nullptr;
+	mutable _Iterator_base*  Mynextiter = nullptr;
 };
 
+
 template <class IterTy_>
-struct iterator_traits {
+struct iterator_traits { // traits for iterators
 	using value_type        = typename IterTy_::value_type;
 	using difference_type   = typename IterTy_::difference_type;
 	using iterator_category = typename IterTy_::iterator_category;
@@ -241,7 +243,7 @@ struct iterator_traits {
 
 
 template <class PtrTy_>
-struct iterator_traits<PtrTy_*> {
+struct iterator_traits<PtrTy_*> { // traits for pointers
 	using value_type        = PtrTy_;
 	using difference_type   = std::ptrdiff_t;
 	using iterator_category = std::random_access_iterator_tag;
@@ -250,13 +252,15 @@ struct iterator_traits<PtrTy_*> {
 };
 
 
-
-
-
-
-
-
-
+template <class ValTy_>
+struct _Simple_types { // wraps types from allocators with simple addressing for use in iterators
+                       // and other SCARY machinery
+	using value_type      = ValTy_;
+	using size_type       = size_t;
+	using difference_type = ptrdiff_t;
+	using pointer         = value_type*;
+	using const_pointer   = const value_type*;
+}; // full copy from STD
 
 
 

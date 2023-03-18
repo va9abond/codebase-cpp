@@ -1,50 +1,78 @@
 #include "myldef.cpp"
 
 
+_MYL_BEGIN
 
 template <
 	class Vty_
 >
-struct List_node_ {
-
+struct _List_node {
+public:
     using value_type      = Vty_;
-    using Nodeptr_        = List_node_<Vty_>*;           
+    using _Nodeptr        = _List_node<Vty_>*;           
 
 
+    explicit _List_node (
+    	const value_type& value,
+    	_Nodeptr prev,
+    	_Nodeptr next
+    ) noexcept :
+    	_myval(value),
+    	_prev(prev),
+    	_next(next)
+    {}
 
-    List_node_ (const List_node_&) = delete;
-    List_node_& operator= (const List_node_&) = delete;
+    explicit _List_node (
+    	value_type&& value,
+    	_Nodeptr prev,
+    	_Nodeptr next
+    ) noexcept :
+    	_myval(move(value)), // CHECK THIS
+    	_prev(prev),
+    	_next(next)
+    {}
 
-    void DEALLOCATE_ (Nodeptr_ ptr) noexcept {
-    	delete ptr->_next; ptr->_next = nullptr;
-    	delete ptr->_prev; ptr->_prev = nullptr;
+    _List_node (const _List_node&) = delete;
+    
+    _List_node& operator= (const _List_node&) = delete;
 
-    	::operator delete(ptr);
-    } 
-
-    void Freenode_ (Nodeptr_ ptr) noexcept { // destroy all members in ptr and deallocate memory
-    	_MYL destroy_(_MYL addressof(ptr->_myval));
-    	DEALLOCATE_(ptr);
+    ~_List_node() {
+    	_myval.~value_type(); // calling destructor explicitly is bad 
+    	_next = nullptr;
+    	_prev = nullptr;
     }
 
-    void Free_non_head_ (Nodeptr_ head) noexcept { // free a list starting at head 
-    	head->_prev->_next = nullptr;
+    // void DEALLOCATE_ (_Nodeptr ptr) noexcept {
+    // 	delete ptr->_next; ptr->_next = nullptr;
+    // 	delete ptr->_prev; ptr->_prev = nullptr;
 
-    	auto Pnode = head->_next;
-    	for (Nodeptr_ Pnext; Pnode != nullptr; Pnode = Pnext) {
-    		Pnext = Pnode->_next;
-    		Freenode_(Pnode);
-    	}
-    }
+    // 	::operator delete(ptr);
+    // } 
+
+    // void Freenode_ (_Nodeptr ptr) noexcept { // destroy all members in ptr and deallocate memory
+    // 	_MYL destroy_(_MYL addressof(ptr->_myval));
+    // 	DEALLOCATE_(ptr);
+    // }
+
+    // void Free_non_head_ (_Nodeptr head) noexcept { // free a list starting at head 
+    // 	head->_prev->_next = nullptr;
+
+    // 	auto Pnode = head->_next;
+    // 	for (_Nodeptr Pnext; Pnode != nullptr; Pnode = Pnext) {
+    // 		Pnext = Pnode->_next;
+    // 		Freenode_(Pnode);
+    // 	}
+    // }
 
     template <class Ty_>
-    friend std::ostream& operator<< (std::ostream& output, const List_node_<Ty_>& node);
-
-
+    friend std::ostream& operator<< (std::ostream& output, const _List_node<Ty_>& node);
+    void get() {
+    	std::cout << this << "\n" << &this;
+    }
 
 	value_type _myval; // the stored value, unused if head
-	Nodeptr_   _prev;  // successor node, or first element if head
-	Nodeptr_   _next;  // the stored value, unused if head
+	_Nodeptr   _prev;  // successor node, or first element if head
+	_Nodeptr   _next;  // the stored value, unused if head
 };
 
 
@@ -52,17 +80,32 @@ struct List_node_ {
 template <
 	class Vty_
 >
-std::ostream& operator<< (std::ostream& output, const List_node_<Vty_>& node) {
-	output << *node;
+std::ostream& operator<< (std::ostream& output, const _List_node<Vty_>& node) {
+	output << node;
 
 	return output;
 }
 
+_MYL_END
 
 
-int main() {
-	List_node_<int> node();
-}
+// int main() {
+// 	auto node1 = static_cast<_List_node<int>*>(::operator new(sizeof(_List_node<int>)));
+// 	auto node2 = static_cast<_List_node<int>*>(::operator new(sizeof(_List_node<int>)));
+	
+// 	node1->_next = node2;
+
+// 	// std::cout << node1->_next << '\n';
+	
+// 	node1->get();
+
+// 	// _List_node<int> node(2542, node1, node2);
+
+
+// 	operator delete(node1);
+// 	// operator delete(node1);
+// 	operator delete(node2);
+// }
 
 
 

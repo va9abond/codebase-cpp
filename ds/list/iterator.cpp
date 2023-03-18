@@ -1,14 +1,18 @@
 #include "node.cpp"
 
+
+
+
+
 template <
     class Mylist_,
-    class Base_ = _MYL Iterator_base_
+    class Base_ = _MYL _Iterator_base
 >
 class _List_unchecked_const_iterator : public Base_ {
 public: 
     using iterator_category = std::bidirectional_iterator_tag; 
 
-    using Nodeptr_        = typename Mylist_::Nodeptr_;
+    using _Nodeptr        = typename Mylist_::_Nodeptr;
     using value_type      = typename Mylist_::value_type;
     using difference_type = typename Mylist_::difference_type;
     using pointer         = typename Mylist_::pointer;
@@ -18,13 +22,11 @@ public:
 
     _List_unchecked_const_iterator() noexcept : Ptr_() {}
 
-    _List_unchecked_const_iterator (Nodeptr_ Pnode, const Mylist_* Plist) noexcept : 
+    _List_unchecked_const_iterator (_Nodeptr Pnode, const Mylist_* Plist) noexcept : 
         Ptr_(Pnode)
     {
         this->Adopt(Plist);
     }
-    
-    // ~_List_unchecked_const_iterator() = default;
 
     reference operator*() const noexcept {
         return Ptr_->_myval;
@@ -69,10 +71,8 @@ public:
     }
 
 
-    Nodeptr_ Ptr_; // pointer to node
-
+    _Nodeptr Ptr_; // pointer to node
 };
-
 
 
 template <
@@ -83,7 +83,7 @@ public:
     using Mybase           = _List_unchecked_const_iterator<Mylist_>;
     using iterator_category = std::bidirectional_iterator_tag;
 
-    using Nodeptr_        = typename Mylist_::Nodeptr_;
+    using _Nodeptr        = typename Mylist_::_Nodeptr;
     using value_type      = typename Mylist_::value_type;
     using difference_type = typename Mylist_::difference_type;
     using pointer         = typename Mylist_::pointer;
@@ -125,7 +125,6 @@ public:
 };
 
 
-
 template <
     class Mylist_
 >
@@ -134,13 +133,14 @@ public:
     using Mybase = _List_unchecked_const_iterator<Mylist_>;
     using iterator_category = std::bidirectional_iterator_tag;
 
-    using Nodeptr_        = typename Mylist_::Nodeptr_;
+    using _Nodeptr        = typename Mylist_::_Nodeptr;
     using value_type      = typename Mylist_::value_type;
     using difference_type = typename Mylist_::difference_type;
     using pointer         = typename Mylist_::pointer;
     using reference       = const value_type&; 
 
     using Mybase::Mybase;
+
 
 
     reference operator*() const {
@@ -241,7 +241,6 @@ public:
 };
 
 
-
 template <
     class Mylist_
 >
@@ -250,13 +249,14 @@ public:
     using Mybase = _List_unchecked_const_iterator<Mylist_>;
     using iterator_category = std::bidirectional_iterator_tag;
 
-    using Nodeptr_        = typename Mylist_::Nodeptr_;
+    using _Nodeptr        = typename Mylist_::_Nodeptr;
     using value_type      = typename Mylist_::value_type;
     using difference_type = typename Mylist_::difference_type;
     using pointer         = typename Mylist_::pointer;
     using reference       = const value_type&; 
 
     using Mybase::Mybase;
+
 
 
     reference operator*() const {
@@ -292,5 +292,4 @@ public:
     _List_unchecked_iterator<Mylist_> Unwrapped_() const noexcept {
         return _List_unchecked_iterator<Mylist_>(this->Ptr_, static_cast<const Mylist_*>(this->Getcont()));
     }
-
 };

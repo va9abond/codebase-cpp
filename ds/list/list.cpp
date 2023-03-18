@@ -9,14 +9,104 @@
 #include <utility>
 
 
+
+template <class Ty_>
+struct _List_simple_types : _MYL _Simple_types<Ty_> {
+    using _Node    = _List_node<Ty_>;
+    using _Nodeptr = _List_node<Ty_>*;
+};
+
+
+template <class Val_types_>
+class _List_val : public _MYL _Container_base {
+public:
+    using _Nodeptr = typename Val_types_::_Nodeptr;
+
+    using value_type      = typename Val_types_::value_type;
+    using size_type       = typename Val_types_::size_type; // ?????????
+    using difference_type = typename Val_types_::difference_type;
+    using pointer         = typename Val_types_::pointer;
+    using const_pointer   = typename Val_types_::const_pointer;
+    using reference       = value_type&;
+    using const_reference = const value_type&;
+
+
+    _List_val() noexcept : Myhead(), Mysize(0) {} // initialize data
+
+    
+
+
+
+
+    _Nodeptr  Myhead; // pointer to head node
+    size_type Mysize; // number of elements
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 template <
     class Ty_,
-    template <class ...> class List_node = List_node_ // ERROR HERE: linke_list<int, DListNode<std::string>> list;
+    template <class ...> class List_node = _List_node // ERROR HERE: linke_list<int, DListNode<std::string>> list;
 >
 class linked_list { // biderectional double linked list
 private:
     using Node_    = List_node<Ty_>;
-    using Nodeptr_ = List_node<Ty_>*;
+    using _Nodeptr = List_node<Ty_>*;
 
 public:
     using value_type      = Ty_;
@@ -39,9 +129,8 @@ public:
     {}
 
     // TODO: need check
+    // **be careful** type Ty_ must have default ctor
     explicit linked_list (size_t size, const_reference value = Ty_() ) :
-    // **be careful**
-    // type Ty_ must have default ctor
         // _size(size),
         _head(nullptr)
     {
@@ -68,18 +157,19 @@ public:
 protected:
     //TODO: need to check
     void _ALLOCATE_HEAD() noexcept {
-        _head = static_cast<Nodeptr_>(::operator new(sizeof(Node_)));
+        _head = static_cast<_Nodeptr>(::operator new(sizeof(Node_)));
+        // ::operator new return void*, i need to cast void* to _Nodeptr by static_cast
     }
 
     // TODO: need check
-    Nodeptr_ _EMPLACE (Nodeptr_ where, Ty_&& data) noexcept { // create element at where
+    _Nodeptr _EMPLACE (_Nodeptr where, Ty_&& data) noexcept { // create element at where
         try {
             
             if (_size == max_size()) {
                 throw _MYL exception("list too long");
             }
 
-            Nodeptr_ new_node = new Node_(std::forward<Ty_>(data), where->_prev, where);
+            _Nodeptr new_node = new Node_(std::forward<Ty_>(data), where->_prev, where);
             where->_prev->_next = new_node;
             where->_prev = new_node;
 
@@ -91,11 +181,11 @@ protected:
         }
     }
 
-    Nodeptr_ _EMPLACE_BACK (Ty_&& data) noexcept {
+    _Nodeptr _EMPLACE_BACK (Ty_&& data) noexcept {
         return _EMPLACE(_head, std::forward<Ty_>(data));
     }
 
-    Nodeptr_ _EMPLACE_FRONT (Ty_&& data) noexcept {
+    _Nodeptr _EMPLACE_FRONT (Ty_&& data) noexcept {
         return _EMPLACE(_head->_next, std::forward<Ty_>(data));
     }
 
@@ -217,11 +307,11 @@ public:
 
 protected:
 
-    iterator _MAKE_ITER (Nodeptr_ Where_) const noexcept {
+    iterator _MAKE_ITER (_Nodeptr Where_) const noexcept {
         return iterator(Where_);
     }
 
-    const_iterator _MAKE_CONST_ITER (Nodeptr_ Where_) const noexcept {
+    const_iterator _MAKE_CONST_ITER (_Nodeptr Where_) const noexcept {
         return const_iterator(Where_);
     }
 
@@ -414,7 +504,7 @@ public:
 
 protected:
 
-    Nodeptr_ _UNLINK_NODE (Nodeptr_ Dnode_) { // detach Dnode_ from list   
+    _Nodeptr _UNLINK_NODE (_Nodeptr Dnode_) { // detach Dnode_ from list   
         Dnode_->_prev->_next = Dnode_->_next;
         Dnode_->_next->_prev = Dnode_->_prev;
 
@@ -422,11 +512,11 @@ protected:
         return Dnode_;
     }
 
-    void _FREENODE (Nodeptr_ Pnode_) { // DANGEROUS //
+    void _FREENODE (_Nodeptr Pnode_) { // DANGEROUS //
         delete Pnode_;
     }
     
-    Nodeptr_ _UNCHECKED_ERASE (const Nodeptr_ Pnode_) noexcept { // erase element at Pnode_
+    _Nodeptr _UNCHECKED_ERASE (const _Nodeptr Pnode_) noexcept { // erase element at Pnode_
         const auto Result_ = Pnode_->_next;
         // TODO: orphan iterators with specified node pointers      
         Pnode_->_prev->_next = Result_;
@@ -445,7 +535,7 @@ public:
 
 protected:
 
-    Nodeptr_ _UNCHECKED_ERASE (Nodeptr_ First_, const Nodeptr_ Last_) noexcept {
+    _Nodeptr _UNCHECKED_ERASE (_Nodeptr First_, const _Nodeptr Last_) noexcept {
 
     }
 
@@ -478,11 +568,7 @@ public:
 
 protected:
     size_t   _size;
-    Nodeptr_ _head;
+    _Nodeptr _head;
 };
 
-
-int main() {
-    linked_list<int, DListNode> list;
-}
 
