@@ -204,7 +204,9 @@ struct _Iterator_base { // store links to container and next iterator
 	}
 
 	_Iterator_base& operator= (const _Iterator_base& Right) noexcept {
+		*this  = Right;
 		Mycont = Right.Mycont;
+		
 		return *this;
 	}
 
