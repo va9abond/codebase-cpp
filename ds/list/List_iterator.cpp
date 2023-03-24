@@ -20,16 +20,16 @@ public:
 
 
 
-    _List_unchecked_const_iterator() noexcept : Ptr_() {}
+    _List_unchecked_const_iterator() noexcept : _Ptr() {}
 
     _List_unchecked_const_iterator (_Nodeptr Pnode, const Mylist_* Plist) noexcept : 
-        Ptr_(Pnode)
+        _Ptr(Pnode)
     {
         this->Adopt(Plist);
     }
 
     reference operator*() const noexcept {
-        return Ptr_->_myval;
+        return _Ptr->_Myval;
     }
 
     pointer operator->() const noexcept { 
@@ -37,33 +37,33 @@ public:
     }
 
     explicit operator bool() const {
-        return Ptr_; // is nullptr
+        return _Ptr; // is nullptr
     }
 
     _List_unchecked_const_iterator& operator++ () noexcept {
-        Ptr_ = Ptr_->_next; 
+        _Ptr = _Ptr->_Next; 
         return *this;
     }
 
     _List_unchecked_const_iterator operator++(int) noexcept {
         auto tmp = *this;
-        Ptr_     = Ptr_->_next;
+        _Ptr     = _Ptr->_Next;
         return tmp;
     }
 
     _List_unchecked_const_iterator& operator--() noexcept {
-        Ptr_ = Ptr_->_prev;
+        _Ptr = _Ptr->_Prev;
         return *this;
     }
 
     _List_unchecked_const_iterator operator--(int) noexcept {
         auto tmp = *this;
-        Ptr_     = Ptr_->_prev;
+        _Ptr     = _Ptr->_Prev;
         return tmp;
     }
 
     bool operator== (const _List_unchecked_const_iterator& right) const noexcept {
-        return Ptr_ == right.Ptr_;
+        return _Ptr == right._Ptr;
     }
    
     bool operator!= (const _List_unchecked_const_iterator& right) const noexcept {
@@ -71,7 +71,7 @@ public:
     }
 
 
-    _Nodeptr Ptr_; // pointer to node
+    _Nodeptr _Ptr; // pointer to node
 };
 
 
@@ -145,16 +145,16 @@ public:
 
     reference operator*() const {
         try {
-            const auto Mycont = static_cast<const Mylist_*>(this->Getcont());
-            if (Mycont == nullptr) {
+            const auto _Mycont = static_cast<const Mylist_*>(this->Getcont());
+            if (_Mycont == nullptr) {
                 throw _MYL exception("Cannot dereference value-initialized list iterator");
             }
 
-            if (this->Ptr_ == Mycont->Myfirstiter->Ptr_) {
+            if (this->_Ptr == _Mycont->_Myfirstiter->_Ptr) {
                 throw _MYL exception("Cannot dereference end list iterator");
             }
 
-            return this->Ptr_->_myval; 
+            return this->_Ptr->_Myval; 
         }
         catch (_MYL exception general_exception) {
             std::cerr << general_exception.what();
@@ -167,15 +167,15 @@ public:
 
     _List_const_iterator& operator++() {
         try {
-            const auto Mycont = static_cast<const Mylist_*>(this->Getcont());
-            if (Mycont == nullptr) {
+            const auto _Mycont = static_cast<const Mylist_*>(this->Getcont());
+            if (_Mycont == nullptr) {
                 throw _MYL exception("Cannot increment value-initialized list iterator");
             }
 
-            if (this->Ptr_ == Mycont->Myfirstiter->Ptr_) {
+            if (this->_Ptr == _Mycont->_Myfirstiter->_Ptr) {
                 throw _MYL exception("Cannot increment end list iterator");
             } 
-            this->Ptr_ = this->Ptr_->_next;
+            this->_Ptr = this->_Ptr->_Next;
             return *this;
         }   
         catch (_MYL exception general_exception) {
@@ -191,16 +191,16 @@ public:
 
     _List_const_iterator& operator--() {
         try {
-            const auto Mycont = static_cast<const Mylist_*>(this->Getcont());
-            const auto New_ptr = this->Ptr_->_prev;
-            if (Mycont == nullptr) {
+            const auto _Mycont = static_cast<const Mylist_*>(this->Getcont());
+            const auto New_ptr = this->_Ptr->_Prev;
+            if (_Mycont == nullptr) {
                 throw _MYL exception("Cannot decrement value-initialized list iterator");
             }
 
-            if (New_ptr == Mycont->Myfirstiter->Ptr_) {
+            if (New_ptr == _Mycont->_Myfirstiter->_Ptr) {
                 throw _MYL exception("Cannot decrement end list iterator");
             } 
-            this->Ptr_ = New_ptr;
+            this->_Ptr = New_ptr;
             return *this;
         }   
         catch (_MYL exception general_exception) {
@@ -220,7 +220,7 @@ public:
                 throw _MYL exception("List iterators incompatible");
             }
 
-            return this->Ptr_ == Right.Ptr_; 
+            return this->_Ptr == Right._Ptr; 
         }
         catch (_MYL exception incorrect_Right) {
             std::cerr << incorrect_Right.what();
@@ -236,7 +236,7 @@ public:
     }
 
     _List_unchecked_const_iterator<Mylist_> Unwrapped_() const noexcept {
-        return _List_unchecked_const_iterator<Mylist_>(this->Ptr_, static_cast<const Mylist_*>(this->Getcont())); 
+        return _List_unchecked_const_iterator<Mylist_>(this->_Ptr, static_cast<const Mylist_*>(this->Getcont())); 
     }
 };
 
@@ -290,7 +290,7 @@ public:
     }
 
     _List_unchecked_iterator<Mylist_> Unwrapped_() const noexcept {
-        return _List_unchecked_iterator<Mylist_>(this->Ptr_, static_cast<const Mylist_*>(this->Getcont()));
+        return _List_unchecked_iterator<Mylist_>(this->_Ptr, static_cast<const Mylist_*>(this->Getcont()));
     }
 };
 

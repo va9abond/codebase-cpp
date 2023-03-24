@@ -17,9 +17,9 @@ public:
     	_Nodeptr prev,
     	_Nodeptr next
     ) noexcept :
-    	_myval(value),
-    	_prev(prev),
-    	_next(next)
+    	_Myval(value),
+    	_Prev(prev),
+    	_Next(next)
     {}
 
     explicit _List_node (
@@ -27,9 +27,9 @@ public:
     	_Nodeptr prev,
     	_Nodeptr next
     ) noexcept :
-    	_myval(move(value)), // CHECK THIS
-    	_prev(prev),
-    	_next(next)
+    	_Myval(move(value)), // CHECK THIS
+    	_Prev(prev),
+    	_Next(next)
     {}
 
     _List_node (const _List_node&) = delete;
@@ -37,29 +37,29 @@ public:
     _List_node& operator= (const _List_node&) = delete;
 
     ~_List_node() {
-    	_myval.~value_type(); // calling destructor explicitly is bad 
-    	_next = nullptr;
-    	_prev = nullptr;
+    	_Myval.~value_type(); // calling destructor explicitly is bad 
+    	_Next = nullptr;
+    	_Prev = nullptr;
     }
 
     // void DEALLOCATE_ (_Nodeptr ptr) noexcept {
-    // 	delete ptr->_next; ptr->_next = nullptr;
-    // 	delete ptr->_prev; ptr->_prev = nullptr;
+    // 	delete ptr->_Next; ptr->_Next = nullptr;
+    // 	delete ptr->_Prev; ptr->_Prev = nullptr;
 
     // 	::operator delete(ptr);
     // } 
 
     // void Freenode_ (_Nodeptr ptr) noexcept { // destroy all members in ptr and deallocate memory
-    // 	_MYL destroy_(_MYL addressof(ptr->_myval));
+    // 	_MYL destroy_(_MYL addressof(ptr->_Myval));
     // 	DEALLOCATE_(ptr);
     // }
 
     // void Free_non_head_ (_Nodeptr head) noexcept { // free a list starting at head 
-    // 	head->_prev->_next = nullptr;
+    // 	head->_Prev->_Next = nullptr;
 
-    // 	auto Pnode = head->_next;
+    // 	auto Pnode = head->_Next;
     // 	for (_Nodeptr Pnext; Pnode != nullptr; Pnode = Pnext) {
-    // 		Pnext = Pnode->_next;
+    // 		Pnext = Pnode->_Next;
     // 		Freenode_(Pnode);
     // 	}
     // }
@@ -70,9 +70,9 @@ public:
     	std::cout << this << "\n" << &this;
     }
 
-	value_type _myval; // the stored value, unused if head
-	_Nodeptr   _prev;  // successor node, or first element if head
-	_Nodeptr   _next;  // the stored value, unused if head
+	value_type _Myval; // the stored value, unused if head
+	_Nodeptr   _Prev;  // successor node, or first element if head
+	_Nodeptr   _Next;  // the stored value, unused if head
 };
 
 
@@ -93,9 +93,9 @@ _MYL_END
 // 	auto node1 = static_cast<_List_node<int>*>(::operator new(sizeof(_List_node<int>)));
 // 	auto node2 = static_cast<_List_node<int>*>(::operator new(sizeof(_List_node<int>)));
 	
-// 	node1->_next = node2;
+// 	node1->_Next = node2;
 
-// 	// std::cout << node1->_next << '\n';
+// 	// std::cout << node1->_Next << '\n';
 	
 // 	node1->get();
 

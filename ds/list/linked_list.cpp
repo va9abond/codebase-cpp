@@ -54,21 +54,21 @@ public:
     using const_reference = const value_type&;
 
 
-    _List_val() noexcept : Myhead(), Mysize(0) {} // initialize data
+    _List_val() noexcept : _Myhead(), _Mysize(0) {} // initialize data
 
     void _Orphan_iterator (_Nodeptr Ptr) noexcept { // orphan iterator from node it contains to
-        _Iterator_base* ItNext = this->Myfirstiter;
-        const auto head = Myhead;
+        _Iterator_base* ItNext = this->_Myfirstiter;
+        const auto head = _Myhead;
 
         while(ItNext != nullptr) {
-            _Iterator_base* ItNextNext = ItNext->Mynextiter;
+            _Iterator_base* ItNextNext = ItNext->_Mynextiter;
             const auto PtrNext = static_cast<_List_const_iterator<_List_val>&>(ItNext)._Ptr;
             
             if (PtrNext == head || PtrNext != Ptr) {
                 // ItNext == end() or ItNext doesn't point at the one we are orphaning, move on
                 ItNext = ItNextNext;
             } else { // orphan the iterator
-                ItNext->Mycont = nullptr;
+                ItNext->_Mycont = nullptr;
                 ItNext         = ItNextNext;
                 // break;
             }
@@ -77,15 +77,15 @@ public:
 
     _Nodeptr _Unlinknode(_Nodeptr Pnode) noexcept { // unlink Pnode from the list
 
-        Pnode->_prev->_next = Pnode->_next;
-        Pnode->_next->_prev = Pnode->_prev;
-        --Mysize;
+        Pnode->_Prev->_Next = Pnode->_Next;
+        Pnode->_Next->_Prev = Pnode->_Prev;
+        --_Mysize;
         return Pnode;
     }
 
 
-    _Nodeptr  Myhead; // pointer to head node
-    size_type Mysize; // number of elements
+    _Nodeptr  _Myhead; // pointer to head node
+    size_type _Mysize; // number of elements
 };
 
 
@@ -209,7 +209,7 @@ public:
             }
 
             _ALLOCATE_HEAD();
-            _head->_prev = _head->_next = new _Node(value, _head, _head);
+            _head->_Prev = _head->_Next = new _Node(value, _head, _head);
             
             while (size --> 0) { 
                 _EMPLACE_BACK( std::move( Ty_(value) ) ); 
@@ -237,9 +237,9 @@ protected:
                 throw _MYL exception("list too long");
             }
 
-            _Nodeptr new_node = new _Node(std::forward<Ty_>(data), where->_prev, where);
-            where->_prev->_next = new_node;
-            where->_prev = new_node;
+            _Nodeptr new_node = new _Node(std::forward<Ty_>(data), where->_Prev, where);
+            where->_Prev->_Next = new_node;
+            where->_Prev = new_node;
 
             _size++;
             return new_node;
@@ -254,7 +254,7 @@ protected:
     }
 
     _Nodeptr _EMPLACE_FRONT (Ty_&& data) noexcept {
-        return _EMPLACE(_head->_next, std::forward<Ty_>(data));
+        return _EMPLACE(_head->_Next, std::forward<Ty_>(data));
     }
 
 
@@ -268,11 +268,11 @@ public:
         {
             _ALLOCATE_HEAD();
             
-            auto right_nodeptr = right._head->_next;
+            auto right_nodeptr = right._head->_Next;
             while (right_nodeptr != nullptr) 
             {
                 _EMPLACE_BACK( Ty_(right_nodeptr->_data) );
-                right_nodeptr = right_nodeptr->_next;
+                right_nodeptr = right_nodeptr->_Next;
             }
 
         }
@@ -292,11 +292,11 @@ public:
 
             if (right._size != 0)
             {   
-                auto right_nodeptr = right._head->_next;
+                auto right_nodeptr = right._head->_Next;
                 while (right_nodeptr != nullptr) 
                 {
                     _EMPLACE_BACK( Ty_(right_nodeptr->_data) );
-                    right_nodeptr = right_nodeptr->_next;
+                    right_nodeptr = right_nodeptr->_Next;
                 }
             }
         }
@@ -310,8 +310,8 @@ public:
         _head(nullptr) // _head(std::move(right._head))
     {
         _ALLOCATE_HEAD();
-        _head->_prev = right._head->_prev;
-        _head->_next = right._head->_next; // TODO: SWAP HEADS
+        _head->_Prev = right._head->_Prev;
+        _head->_Next = right._head->_Next; // TODO: SWAP HEADS
 
         right._size  = 0;
         right._head = nullptr; //TODO: operator delete(right._head); MEMORY LEAK
@@ -345,7 +345,7 @@ public:
         if (size > 0)
         {
             _ALLOCATE_HEAD();
-            _head->_prev = _head->_next = new _Node(std::move(init_list[0]), _head, _head);
+            _head->_Prev = _head->_Next = new _Node(std::move(init_list[0]), _head, _head);
             
             for (size_t i = 1; i < size; i++) {
                 _EMPLACE_BACK(std::move(init_list[i]));
@@ -358,11 +358,11 @@ public:
 
 
     iterator begin() noexcept {
-        return iterator(_head->_next);
+        return iterator(_head->_Next);
     }
 
     const_iterator begin() const noexcept {
-        return const_iterator(_head->_next);
+        return const_iterator(_head->_Next);
     }
 
     iterator end() noexcept {
@@ -407,9 +407,9 @@ public:
                 throw _MYL exception("Invalid index");
             }
 
-            auto node_it = _head->_next;
+            auto node_it = _head->_Next;
             for (size_t i = 0; i < index; i++) {
-                node_it = node_it->_next;
+                node_it = node_it->_Next;
             }
 
             return node_it->_data;
@@ -437,7 +437,7 @@ public:
                 throw _MYL exception("front() called on empty list");
             }
 
-            return _head->_next->_data;     
+            return _head->_Next->_data;     
         }
         catch (_MYL exception length_error) {
             std::cerr << length_error.what();
@@ -450,7 +450,7 @@ public:
                 throw _MYL exception("front() called on empty list");
             }
 
-            return _head->_next->_data;     
+            return _head->_Next->_data;     
         }
         catch (_MYL exception length_error) {
             std::cerr << length_error.what();
@@ -464,7 +464,7 @@ public:
                 throw _MYL exception("back() called on empty list");
             }
 
-            return _head->_prev->_data;     
+            return _head->_Prev->_data;     
         }
         catch (_MYL exception length_error) {
             std::cerr << length_error.what();
@@ -477,7 +477,7 @@ public:
                 throw _MYL exception("back() called on empty list");
             }
 
-            return _head->_prev->_data;     
+            return _head->_Prev->_data;     
         }
         catch (_MYL exception length_error) {
             std::cerr << length_error.what();
@@ -489,7 +489,7 @@ public:
 
 
     void push_front (value_type&& data) {
-        _EMPLACE(_head->_next, std::move(data));
+        _EMPLACE(_head->_Next, std::move(data));
         // _EMPLACE_FRONT(std::move(data));
     }
 
@@ -499,7 +499,7 @@ public:
     }
 
     void push_front (const_reference data) {
-        _EMPLACE(_head->_next, data);
+        _EMPLACE(_head->_Next, data);
     }
 
     void push_back (const_reference data) { // TODO: vs. _EMPLACE(_head, data);
@@ -512,7 +512,7 @@ public:
                 throw _MYL exception("pop_front() called on empty list");
             }
 
-            _UNCHECKED_ERASE(_head->_next);
+            _UNCHECKED_ERASE(_head->_Next);
         }
         catch (_MYL exception length_error) {
             std::cerr << length_error.what();
@@ -525,7 +525,7 @@ public:
                 throw _MYL exception("pop_back() called on empty list");
             }
 
-            _UNCHECKED_ERASE(_head->_prev);
+            _UNCHECKED_ERASE(_head->_Prev);
         }
         catch (_MYL exception length_error) {
             std::cerr << length_error.what();
@@ -533,11 +533,11 @@ public:
     }
 
     iterator emplace (const const_iterator Where_, value_type&& data) { // insert element at Where_
-        return _MAKE_ITER(_EMPLACE(Where_.Ptr_, std::forward<value_type>(data)));
+        return _MAKE_ITER(_EMPLACE(Where_._Ptr, std::forward<value_type>(data)));
     }
 
     reference emplace_front (value_type&& data) { // insert element at beginning
-        reference Result_ = _EMPLACE(_head->_next, std::forward<value_type>(data))->_data;
+        reference Result_ = _EMPLACE(_head->_Next, std::forward<value_type>(data))->_data;
         return Result_;
     }
 
@@ -550,7 +550,7 @@ public:
     }
 
     iterator insert (const_iterator Where_, const_reference data) { // insert data at Where_
-        return _MAKE_ITER(_EMPLACE(Where_.Ptr_, data));
+        return _MAKE_ITER(_EMPLACE(Where_._Ptr, data));
     }
 
     iterator insert (const_iterator where, int count, const_reference data) { // insert count * data before where
@@ -566,17 +566,17 @@ public:
 
     iterator erase (const_iterator Where_) { // erase element at Where_
         // TODO: check if iterator outside list 
-        const auto Result_ = Where_.Ptr_->_next;
-        _FREENODE(_UNLINK_NODE(Where_.Ptr_));
+        const auto Result_ = Where_._Ptr->_Next;
+        _FREENODE(_UNLINK_NODE(Where_._Ptr));
     }
 
 protected:
 
     _Nodeptr _UNLINK_NODE (_Nodeptr Dnode_) { // detach Dnode_ from list   
-        Dnode_->_prev->_next = Dnode_->_next;
-        Dnode_->_next->_prev = Dnode_->_prev;
+        Dnode_->_Prev->_Next = Dnode_->_Next;
+        Dnode_->_Next->_Prev = Dnode_->_Prev;
 
-        Dnode_->_prev = Dnode_->_next = nullptr;
+        Dnode_->_Prev = Dnode_->_Next = nullptr;
         return Dnode_;
     }
 
@@ -585,10 +585,10 @@ protected:
     }
     
     _Nodeptr _UNCHECKED_ERASE (const _Nodeptr Pnode_) noexcept { // erase element at Pnode_
-        const auto Result_ = Pnode_->_next;
+        const auto Result_ = Pnode_->_Next;
         // TODO: orphan iterators with specified node pointers      
-        Pnode_->_prev->_next = Result_;
-        Result_->_prev       = Pnode_->_prev;
+        Pnode_->_Prev->_Next = Result_;
+        Result_->_Prev       = Pnode_->_Prev;
         
         _FREENODE(Pnode_);
         _size--;
