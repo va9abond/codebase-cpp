@@ -174,7 +174,16 @@ protected:
 // ************ Container_base_ ************ //
 
 struct _Iterator_base;
+struct _Container_base;
 
+struct _Container_proxy { // struct to connect _Container_base and _Iterator_base
+	_Container_proxy() noexcept = default;
+	_Container_proxy (_Container_base* Mycont) noexcept : _Mycont(Mycont) {} 
+
+
+	const   _Container_base* _Mycont      = nullptr;
+	mutable _Iterator_base*  _Myfirstiter = nullptr;
+};
 
 struct _Container_base {
 	
@@ -184,11 +193,18 @@ struct _Container_base {
 	_Container_base& operator= (const _Container_base&) = delete;
 
 	~_Container_base() {
-		Myfirstiter = nullptr;
+		delete _Myproxy; _Myproxy = nullptr;
+	}
+
+	template <class Alloc>
+	void Alloc_proxy (Alloc&& Al) {
+		_Container_proxy* const New_proxy = new _Container_proxy(this);  // TODO: *WARNING* where i need to delete _Myproxy
+		_Myproxy = New_proxy;
+		// New_proxy->_Mycont = this;
 	}
 
 
-	_Iterator_base* Myfirstiter = nullptr;
+	_Container_proxy* _Myproxy = nullptr;
 };
 
 
@@ -204,33 +220,82 @@ struct _Iterator_base { // store links to container and next iterator
 	}
 
 	_Iterator_base& operator= (const _Iterator_base& Right) noexcept {
-		*this  = Right;
-		Mycont = Right.Mycont;
+		_Assign(Right);
+		_Myproxy = Right._Myproxy;
 		
 		return *this;
 	}
 
 	~_Iterator_base() {
-		Mycont     = nullptr;
-		Mynextiter = nullptr;
+		this->_Orphan_me();
+		_Myproxy    = nullptr;
+		_Mynextiter = nullptr;
 	}
 
 	const _Container_base* Getcont() const noexcept {
-		return Mycont != nullptr ? Mycont : nullptr;
+		return _Myproxy->_Mycont != nullptr ? _Myproxy->_Mycont : nullptr;
 	}
 
-	void Adopt (_Container_base* Parent) noexcept {
-		if (Parent != nullptr) { // have a parent, do adoption
-			Mycont = Parent;
-		} 
-		else { // no future parent, just disown current parent
-			Mycont = nullptr;
+
+	mutable _Container_proxy* _Myproxy    = nullptr;
+	mutable _Iterator_base*   _Mynextiter = nullptr;
+
+
+private:
+	void _Adopt (const _Container_base* Parent) noexcept {
+		if (Parent == nullptr) {
+			_Orphan_me(); return;
+		}
+
+		_Container_proxy* Parent_proxy = Parent->_Myproxy;
+		if (_Myproxy != Parent_proxy) { // change parentage
+			if (_Myproxy != nullptr) { // already have a parent
+				_Orphan_me();
+			}
+			_Mynextiter = Parent_proxy->_Myfirstiter;
+			Parent_proxy->_Myfirstiter = this;
+			_Myproxy = Parent_proxy;
 		}
 	}
 
+	void _Orphan_me() { // TODO: how it works?
+		if (_Myproxy == nullptr) { // already orphaned
+			return;
+		}
 
-	mutable _Container_base* Mycont     = nullptr;
-	mutable _Iterator_base*  Mynextiter = nullptr;
+		// adopted, remove self from list
+		_Iterator_base* Pnext = _Myproxy->_Myfirstiter;
+		while (Pnext != nullptr && Pnext != this) {
+			const auto Tmp = Pnext;
+			Pnext = Tmp->_Mynextiter;
+		}
+
+		try {
+			if (Pnext == nullptr) {
+				throw _MYL exception("ITERATOR LIST CORRUPTED!");
+
+				Pnext = _Mynextiter;
+				_Myproxy = nullptr;
+			}
+		}
+		catch (_MYL exception corrupted_list) { // TODO: why there is a warning?
+			std::cerr << corrupted_list.what();
+		}
+	}
+
+	void _Assign (const _Iterator_base& Right) noexcept {
+		if (_Myproxy == Right._Myproxy) {
+			return;
+		}
+
+		if (Right._Myproxy != nullptr) {
+			_Adopt(Right._Myproxy->_Mycont);
+		}
+		else {
+			_Orphan_me();
+		}
+	}
+
 };
 
 
