@@ -1,14 +1,6 @@
 #include "List_iterator.cpp"
-// #include <exception>
-// #include <limits.h>
 #include <initializer_list>
-#include <limits.h>
-#include <limits>
-#include <memory>
-#include <sal.h>
-#include <stdlib.h>
-#include <utility>
-#include <xmemory>
+
 
 
 _MYL_BEGIN
@@ -68,8 +60,8 @@ public:
                 // ItNext == end() or ItNext doesn't point at the one we are orphaning, move on
                 ItNext = ItNextNext;
             } else { // orphan the iterator
-                ItNext->_Mycont = nullptr;
-                ItNext         = ItNextNext;
+                ItNext->_Myproxy = nullptr;
+                ItNext           = ItNextNext;
                 // break;
             }
         }
@@ -146,16 +138,23 @@ public:
 
 
 template <
-    class Ty_,
-    class _Alloc = _STD allocator<Ty_>
+    class Ty_
 >
 class linked_list { // biderectional double linked list
 private:
-    using _Alty          = std::_Rebind_alloc_t<_Alloc, Ty_>;
-    using _Alty_traits   = std::allocator_traits<_Alty>;
+    // *WARNING*
+    // I provide only std::allocator and _Default_allocator_traits,
+    // because implement _Normal_allocator_traits quite complicated,
+    // that's why I excluded _Alloc from templates parametrs for linked_list. 
+    using _Alloc = _STD allocator<Ty_>;
+
+
+
+    using _Alty          = typename _MYL _Default_allocator_traits<_Alloc>::template rebind_alloc<Ty_>;
+    using _Alty_traits   = _MYL _Default_allocator_traits<_Alty>;
     using _Node          = _List_node<Ty_>;
-    using _Alnode        = std::_Rebind_alloc_t<_Alloc, _Node>;
-    using _Alnode_traits = std::allocator<_Alnode>;
+    using _Alnode        = typename _MYL _Default_allocator_traits<_Alloc>::template rebind_alloc<_Node>;
+    using _Alnode_traits = _MYL _Default_allocator_traits<_Alnode>;
     using _Nodeptr       = typename _Alnode_traits::pointer;
 
     using _Val_types = _List_iter_types <

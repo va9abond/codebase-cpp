@@ -272,9 +272,9 @@ private:
 
 		try {
 			if (*Pnext == nullptr) {
-				throw _MYL exception("ITERATOR LIST CORRUPTED!");
+				throw exception("ITERATOR LIST CORRUPTED!");
 			}
-			
+
 			*Pnext   = _Mynextiter;
 			_Myproxy = nullptr;
 		}
@@ -330,9 +330,38 @@ struct _Simple_types { // wraps types from allocators with simple addressing for
 }; // full copy from STD
 
 
+// template <class _Alloc>
+// struct _Normal_allocator_traits { // defines traits for allocators
+//     using allocator_type = _Alloc;
+//     using value_type     = typename _Alloc::value_type;
+
+//     using pointer            = typename _Get_pointer_type<_Alloc>::type;
+//     using const_pointer      = typename _Get_const_pointer_type<_Alloc>::type;
+//     using void_pointer       = typename _Get_void_pointer_type<_Alloc>::type;
+//     using const_void_pointer = typename _Get_const_void_pointer_type<_Alloc>::type;
+
+//     using size_type       = typename _Get_size_type<_Alloc>::type;
+//     using difference_type = typename _Get_difference_type<_Alloc>::type;
+// };
 
 
+template <class _Alloc>
+struct _Default_allocator_traits { // traits for std::allocator
+    using allocator_type = _Alloc;
+    using value_type     = typename _Alloc::value_type;
 
+    using pointer            = value_type*;
+    using const_pointer      = const value_type*;
+    using void_pointer       = void*;
+    using const_void_pointer = const void*;
+
+    using size_type       = size_t;
+    using difference_type = ptrdiff_t;
+
+    template <class _Other>
+    using rebind_alloc = std::allocator<_Other>;
+
+}; // full copy from STD
 
 
 
