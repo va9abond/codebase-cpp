@@ -264,21 +264,21 @@ private:
 		}
 
 		// adopted, remove self from list
-		_Iterator_base* Pnext = _Myproxy->_Myfirstiter;
-		while (Pnext != nullptr && Pnext != this) {
-			const auto Tmp = Pnext;
-			Pnext = Tmp->_Mynextiter;
+		_Iterator_base** Pnext = &_Myproxy->_Myfirstiter;
+		while (*Pnext != nullptr && *Pnext != this) {
+			const auto Tmp = *Pnext;
+			Pnext = &Tmp->_Mynextiter;
 		}
 
 		try {
-			if (Pnext == nullptr) {
+			if (*Pnext == nullptr) {
 				throw _MYL exception("ITERATOR LIST CORRUPTED!");
-
-				Pnext = _Mynextiter;
-				_Myproxy = nullptr;
 			}
+			
+			*Pnext   = _Mynextiter;
+			_Myproxy = nullptr;
 		}
-		catch (_MYL exception corrupted_list) { // TODO: why there is a warning?
+		catch (exception corrupted_list) { // TODO: why there is a warning?
 			std::cerr << corrupted_list.what();
 		}
 	}
@@ -289,10 +289,10 @@ private:
 		}
 
 		if (Right._Myproxy != nullptr) {
-			_Adopt(Right._Myproxy->_Mycont);
+			this->_Adopt(Right._Myproxy->_Mycont);
 		}
 		else {
-			_Orphan_me();
+			this->_Orphan_me();
 		}
 	}
 
