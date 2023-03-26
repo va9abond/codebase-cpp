@@ -1,5 +1,7 @@
 #include "List_iterator.cpp"
 #include <initializer_list>
+#include <limits>
+#include <memory>
 
 
 
@@ -350,43 +352,43 @@ public:
     /* Accessors & Mutators */
 
 
-    Ty_& operator[] (size_t index) const {
-        try {
-            if (index < 0 || index >= _size) {
-                throw _MYL exception("Invalid index");
-            }
+    // Ty_& operator[] (size_t index) const {
+    //     try {
+    //         if (index < 0 || index >= _Mycont._Mysize) {
+    //             throw _MYL exception("Invalid index"); // TODO: out_of_range
+    //         }
 
-            auto node_it = _Mycont._Myhead->_Next;
-            for (size_t i = 0; i < index; i++) {
-                node_it = node_it->_Next;
-            }
+    //         auto node_it = _Mycont._Myhead->_Next;
+    //         for (size_t i = 0; i < index; i++) {
+    //             node_it = node_it->_Next;
+    //         }
 
-            return node_it->_data;
-        }
-        catch (_MYL exception& invalid_index) {
-            std::cerr << invalid_index.what();
-        }
+    //         return node_it->_data;
+    //     }
+    //     catch (_MYL exception& invalid_index) {
+    //         std::cerr << invalid_index.what();
+    //     }
+    // }
+
+    size_type size() const noexcept {
+        return _Mycont._Mysize;
     }
 
-    size_t size() const noexcept {
-        return _size;
-    }
-
-    size_t max_size() const noexcept {
-        return UINT_MAX;
+    size_type max_size() const noexcept {
+        return static_cast<size_type>(std::numeric_limits<difference_type>::max());
     }
 
     bool empty() const noexcept {
-        return _size == 0;
+        return _Mycont._Mysize == 0;
     }
 
     reference front() { 
         try {
-            if ( _size == 0 ) {
-                throw _MYL exception("front() called on empty list");
+            if ( _Mycont._Mysize == 0 ) {
+                throw _MYL exception("front() called on empty list"); // TODO: out_of_range
             }
 
-            return _Mycont._Myhead->_Next->_data;     
+            return _Mycont._Myhead->_Next->_Myval;     
         }
         catch (_MYL exception& length_error) {
             std::cerr << length_error.what();
@@ -395,11 +397,11 @@ public:
         
     const_reference front() const {
         try {
-            if ( _size == 0 ) {
-                throw _MYL exception("front() called on empty list");
+            if ( _Mycont._Mysize == 0 ) {
+                throw _MYL exception("front() called on empty list"); // TODO: out_of_range
             }
 
-            return _Mycont._Myhead->_Next->_data;     
+            return _Mycont._Myhead->_Next->_Myval;     
         }
         catch (_MYL exception& length_error) {
             std::cerr << length_error.what();
@@ -409,11 +411,11 @@ public:
 
     reference back() { 
         try { 
-            if ( _size == 0 ) {
-                throw _MYL exception("back() called on empty list");
+            if ( _Mycont._Mysize == 0 ) {
+                throw _MYL exception("back() called on empty list"); // TODO: out_of_range
             }
 
-            return _Mycont._Myhead->_Prev->_data;     
+            return _Mycont._Myhead->_Prev->_Myval;     
         }
         catch (_MYL exception& length_error) {
             std::cerr << length_error.what();
@@ -422,11 +424,11 @@ public:
         
     const_reference back() const { 
         try {
-            if ( _size == 0 ) {
-                throw _MYL exception("back() called on empty list");
+            if ( _Mycont._Mysize == 0 ) {
+                throw _MYL exception("back() called on empty list"); // TODO: out_of_range
             }
 
-            return _Mycont._Myhead->_Prev->_data;     
+            return _Mycont._Myhead->_Prev->_Myval;     
         }
         catch (_MYL exception& length_error) {
             std::cerr << length_error.what();
@@ -437,28 +439,26 @@ public:
     /* Modifiers */
 
 
-    void push_front (value_type&& data) {
-        _EMPLACE(_Mycont._Myhead->_Next, std::move(data));
-        // _EMPLACE_FRONT(std::move(data));
+    void push_front (value_type&& Value) {
+        _EMPLACE(_Mycont._Myhead->_Next, move(Value));
     }
 
-    void push_back (value_type&& data) {
-        _EMPLACE(_Mycont._Myhead, std::move(data));
-        // _EMPLACE_BACK(std::move(data));
+    void push_back (value_type&& Value) {
+        _EMPLACE(_Mycont._Myhead, move(Value));
     }
 
-    void push_front (const_reference data) {
-        _EMPLACE(_Mycont._Myhead->_Next, data);
+    void push_front (const_reference Value) {
+        _EMPLACE(_Mycont._Myhead->_Next, Value);
     }
 
-    void push_back (const_reference data) { // TODO: vs. _EMPLACE(_Mycont._Myhead, data);
-        _EMPLACE_BACK(data);
+    void push_back (const_reference Value) {
+        _EMPLACE(_Mycont._Myhead, Value);
     }
 
     void pop_front() {
         try {
-            if (_size == 0) {
-                throw _MYL exception("pop_front() called on empty list");
+            if (_Mycont._Mysize == 0) {
+                throw _MYL exception("pop_front() called on empty list"); // TODO: out_of_range
             }
 
             _UNCHECKED_ERASE(_Mycont._Myhead->_Next);
@@ -470,8 +470,8 @@ public:
 
     void pop_back() {
         try {
-            if (_size == 0) {
-                throw _MYL exception("pop_back() called on empty list");
+            if (_Mycont._Mysize == 0) {
+                throw _MYL exception("pop_back() called on empty list"); // TODO: out_of_range
             }
 
             _UNCHECKED_ERASE(_Mycont._Myhead->_Prev);
@@ -540,7 +540,7 @@ protected:
         Result_->_Prev       = Pnode_->_Prev;
         
         _FREENODE(Pnode_);
-        _size--;
+        _Mycont._Mysize--;
         return Result_;
     }
 
