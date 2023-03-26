@@ -156,7 +156,7 @@ public:
 
             return this->_Ptr->_Myval; 
         }
-        catch (_MYL exception general_exception) {
+        catch (_MYL exception& general_exception) {
             std::cerr << general_exception.what();
         }
     }
@@ -178,7 +178,7 @@ public:
             this->_Ptr = this->_Ptr->_Next;
             return *this;
         }   
-        catch (_MYL exception general_exception) {
+        catch (_MYL exception& general_exception) {
             std::cerr << general_exception.what();
         }
     }
@@ -203,7 +203,7 @@ public:
             this->_Ptr = New_ptr;
             return *this;
         }   
-        catch (_MYL exception general_exception) {
+        catch (_MYL exception& general_exception) {
             std::cerr << general_exception.what();
         }
     }
@@ -222,7 +222,7 @@ public:
 
             return this->_Ptr == Right._Ptr; 
         }
-        catch (_MYL exception incorrect_Right) {
+        catch (_MYL exception& incorrect_Right) {
             std::cerr << incorrect_Right.what();
         }
     }

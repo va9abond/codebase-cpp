@@ -196,8 +196,7 @@ struct _Container_base {
 		delete _Myproxy; _Myproxy = nullptr;
 	}
 
-	template <class Alloc>
-	void Alloc_proxy (Alloc&& Al) {
+	void Alloc_proxy () {
 		_Container_proxy* const New_proxy = new _Container_proxy(this);  // TODO: *WARNING* where i need to delete _Myproxy
 		_Myproxy = New_proxy;
 		// New_proxy->_Mycont = this;
@@ -278,7 +277,7 @@ private:
 			*Pnext   = _Mynextiter;
 			_Myproxy = nullptr;
 		}
-		catch (exception corrupted_list) { // TODO: why there is a warning?
+		catch (_MYL exception& corrupted_list) { // TODO: why there is a warning?
 			std::cerr << corrupted_list.what();
 		}
 	}
