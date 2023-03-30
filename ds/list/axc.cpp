@@ -7,13 +7,13 @@
 
 
 
-#define _MYL_BEGIN namespace myl {
-#define _MYL_END   }
-#define _MYL       ::myl::
+#define _AXC_BEGIN namespace axc {
+#define _AXC_END   }
+#define _AXC       ::axc::
 #define _STD       ::std::
 
 
-_MYL_BEGIN // my library to replace functions from STD 
+_AXC_BEGIN // my library to replace functions from STD 
 
 
 
@@ -281,7 +281,7 @@ private:
 			*Pnext   = _Mynextiter;
 			_Myproxy = nullptr;
 		}
-		catch (_MYL exception& corrupted_list) { // TODO: why there is a warning?
+		catch (_AXC exception& corrupted_list) { // TODO: why there is a warning?
 			std::cerr << corrupted_list.what();
 		}
 	}
@@ -400,5 +400,5 @@ struct _Default_allocator_traits { // traits for std::allocator
 
 
 
-_MYL_END
+_AXC_END
 

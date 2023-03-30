@@ -1,11 +1,11 @@
-#include "List_iterator.cpp"
+#include "listIterator.cpp"
 #include <initializer_list>
 #include <limits>
 #include <memory>
 
 
 
-_MYL_BEGIN
+_AXC_BEGIN
 
 template <class Ty_>
 struct _List_simple_types : _Simple_types<Ty_> {
@@ -96,11 +96,11 @@ private:
 
 
 
-    using _Alty          = typename _MYL _Default_allocator_traits<_Alloc>::template rebind_alloc<Ty_>;
-    using _Alty_traits   = _MYL _Default_allocator_traits<_Alty>;
+    using _Alty          = typename _AXC _Default_allocator_traits<_Alloc>::template rebind_alloc<Ty_>;
+    using _Alty_traits   = _AXC _Default_allocator_traits<_Alty>;
     using _Node          = _List_node<Ty_>;
-    using _Alnode        = typename _MYL _Default_allocator_traits<_Alloc>::template rebind_alloc<_Node>;
-    using _Alnode_traits = _MYL _Default_allocator_traits<_Alnode>;
+    using _Alnode        = typename _AXC _Default_allocator_traits<_Alloc>::template rebind_alloc<_Node>;
+    using _Alnode_traits = _AXC _Default_allocator_traits<_Alnode>;
     using _Nodeptr       = typename _Alnode_traits::pointer;
 
     using _Val_types = _List_iter_types <
@@ -147,7 +147,7 @@ public:
         try {
             if (size <= 0 || size > 4294967295) { // UINT_MAX = 4294967295, to not include <limits.h>
                 _Mycont._Mysize = 0;
-                throw _MYL exception("Invalid size"); // TODO: invalid_argument
+                throw _AXC exception("Invalid size"); // TODO: invalid_argument
             }
 
             _ALLOCATE_HEAD_AND_PROXY();
@@ -159,7 +159,7 @@ public:
                 // Ty_(Value) return rvalue of type Ty_ and no perfect forwarding ever
             }
         }
-        catch (_MYL exception& invalid_size) { // TODO: invalid_argument
+        catch (_AXC exception& invalid_size) { // TODO: invalid_argument
             std::cerr << invalid_size.what();
         }
     }
@@ -185,7 +185,7 @@ protected:
         try {
             
             if (_Mycont._Mysize == max_size()) {
-                throw _MYL exception("list too long"); // TODO: lenght_error
+                throw _AXC exception("list too long"); // TODO: lenght_error
             }
 
             _Nodeptr new_node = new _Node(std::forward<Ty_>(Value), Where->_Prev, Where);
@@ -195,7 +195,7 @@ protected:
             _Mycont._Mysize++;
             return new_node;
         }
-        catch (_MYL exception& length_error) {
+        catch (_AXC exception& length_error) {
             std::cerr << length_error.what();
         }
     }
@@ -273,8 +273,8 @@ private:
     void _SWAP_VAL (linked_list& Right) noexcept { // swap with Right, same allocator
         auto Rightcont = Right._Mycont;
         _Mycont._Swap_proxy_and_iterators(Rightcont);
-        _MYL swap(_Mycont._Mycont._Myhead, Rightcont._Myhead); // *WARNING* no _Swap_adl
-        _MYL swap(_Mycont._Mycont._Mysize, Rightcont._Mysize);
+        _AXC swap(_Mycont._Mycont._Myhead, Rightcont._Myhead); // *WARNING* no _Swap_adl
+        _AXC swap(_Mycont._Mycont._Mysize, Rightcont._Mysize);
     }
 
     void _MOVE_ASSIGN (linked_list&& Right) {
@@ -303,19 +303,19 @@ public:
 
 
     iterator begin() noexcept {
-        return iterator(_Mycont._Myhead->_Next, _MYL addressof(_Mycont));
+        return iterator(_Mycont._Myhead->_Next, _AXC addressof(_Mycont));
     }
 
     const_iterator begin() const noexcept {
-        return const_iterator(_Mycont._Myhead->_Next, _MYL addressof(_Mycont));
+        return const_iterator(_Mycont._Myhead->_Next, _AXC addressof(_Mycont));
     }
 
     iterator end() noexcept {
-        return iterator(_Mycont._Myhead, _MYL addressof(_Mycont));
+        return iterator(_Mycont._Myhead, _AXC addressof(_Mycont));
     }
 
     const_iterator end() const noexcept {
-        return const_iterator(_Mycont._Myhead, _MYL addressof(_Mycont));
+        return const_iterator(_Mycont._Myhead, _AXC addressof(_Mycont));
     }
 
     _Unchecked_iterator _Unchecked_begin() noexcept {
@@ -337,11 +337,11 @@ public:
 
 protected:
     iterator _MAKE_ITER (_Nodeptr Where_) const noexcept {
-        return iterator(Where_, _MYL addressof(_Mycont));
+        return iterator(Where_, _AXC addressof(_Mycont));
     }
 
     const_iterator _MAKE_CONST_ITER (_Nodeptr Where_) const noexcept {
-        return const_iterator(Where_, _MYL addressof(_Mycont));
+        return const_iterator(Where_, _AXC addressof(_Mycont));
     }
 
 public:
@@ -364,7 +364,7 @@ public:
     // Ty_& operator[] (size_t index) const {
     //     try {
     //         if (index < 0 || index >= _Mycont._Mysize) {
-    //             throw _MYL exception("Invalid index"); // TODO: out_of_range
+    //             throw _AXC exception("Invalid index"); // TODO: out_of_range
     //         }
 
     //         auto node_it = _Mycont._Myhead->_Next;
@@ -374,7 +374,7 @@ public:
 
     //         return node_it->_data;
     //     }
-    //     catch (_MYL exception& invalid_index) {
+    //     catch (_AXC exception& invalid_index) {
     //         std::cerr << invalid_index.what();
     //     }
     // }
@@ -394,12 +394,12 @@ public:
     reference front() { 
         try {
             if ( _Mycont._Mysize == 0 ) {
-                throw _MYL exception("front() called on empty list"); // TODO: out_of_range
+                throw _AXC exception("front() called on empty list"); // TODO: out_of_range
             }
 
             return _Mycont._Myhead->_Next->_Myval;     
         }
-        catch (_MYL exception& length_error) {
+        catch (_AXC exception& length_error) {
             std::cerr << length_error.what();
         }
     }  
@@ -407,12 +407,12 @@ public:
     const_reference front() const {
         try {
             if ( _Mycont._Mysize == 0 ) {
-                throw _MYL exception("front() called on empty list"); // TODO: out_of_range
+                throw _AXC exception("front() called on empty list"); // TODO: out_of_range
             }
 
             return _Mycont._Myhead->_Next->_Myval;     
         }
-        catch (_MYL exception& length_error) {
+        catch (_AXC exception& length_error) {
             std::cerr << length_error.what();
         }
     }
@@ -421,12 +421,12 @@ public:
     reference back() { 
         try { 
             if ( _Mycont._Mysize == 0 ) {
-                throw _MYL exception("back() called on empty list"); // TODO: out_of_range
+                throw _AXC exception("back() called on empty list"); // TODO: out_of_range
             }
 
             return _Mycont._Myhead->_Prev->_Myval;     
         }
-        catch (_MYL exception& length_error) {
+        catch (_AXC exception& length_error) {
             std::cerr << length_error.what();
         }
     }
@@ -434,12 +434,12 @@ public:
     const_reference back() const { 
         try {
             if ( _Mycont._Mysize == 0 ) {
-                throw _MYL exception("back() called on empty list"); // TODO: out_of_range
+                throw _AXC exception("back() called on empty list"); // TODO: out_of_range
             }
 
             return _Mycont._Myhead->_Prev->_Myval;     
         }
-        catch (_MYL exception& length_error) {
+        catch (_AXC exception& length_error) {
             std::cerr << length_error.what();
         }
     }
@@ -467,12 +467,12 @@ public:
     void pop_front() {
         try {
             if (_Mycont._Mysize == 0) {
-                throw _MYL exception("pop_front() called on empty list"); // TODO: out_of_range
+                throw _AXC exception("pop_front() called on empty list"); // TODO: out_of_range
             }
 
             _UNCHECKED_ERASE(_Mycont._Myhead->_Next);
         }
-        catch (_MYL exception& length_error) {
+        catch (_AXC exception& length_error) {
             std::cerr << length_error.what();
         }
     }
@@ -480,12 +480,12 @@ public:
     void pop_back() {
         try {
             if (_Mycont._Mysize == 0) {
-                throw _MYL exception("pop_back() called on empty list"); // TODO: out_of_range
+                throw _AXC exception("pop_back() called on empty list"); // TODO: out_of_range
             }
 
             _UNCHECKED_ERASE(_Mycont._Myhead->_Prev);
         }
-        catch (_MYL exception& length_error) {
+        catch (_AXC exception& length_error) {
             std::cerr << length_error.what();
         }
     }
@@ -597,4 +597,4 @@ protected:
 };
 
 
-_MYL_END
+_AXC_END

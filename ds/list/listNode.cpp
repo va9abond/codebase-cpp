@@ -1,7 +1,7 @@
-#include "myldef.cpp"
+#include "axc.cpp"
 
 
-_MYL_BEGIN
+_AXC_BEGIN
 
 template <
 	class Vty_
@@ -50,7 +50,7 @@ public:
     // } 
 
     // void Freenode_ (_Nodeptr ptr) noexcept { // destroy all members in ptr and deallocate memory
-    // 	_MYL destroy_(_MYL addressof(ptr->_Myval));
+    // 	_AXC destroy_(_AXC addressof(ptr->_Myval));
     // 	DEALLOCATE_(ptr);
     // }
 
@@ -86,7 +86,7 @@ std::ostream& operator<< (std::ostream& output, const _List_node<Vty_>& node) {
 	return output;
 }
 
-_MYL_END
+_AXC_END
 
 
 // int main() {

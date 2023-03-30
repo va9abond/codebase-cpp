@@ -1,8 +1,8 @@
-#include "List_node.cpp"
+#include "listNode.cpp"
 
 
 
-_MYL_BEGIN
+_AXC_BEGIN
 
 template <
     class Mylist_,
@@ -147,16 +147,16 @@ public:
         try {
             const auto _Mycont = static_cast<const Mylist_*>(this->Getcont());
             if (_Mycont == nullptr) {
-                throw _MYL exception("Cannot dereference value-initialized list iterator");
+                throw _AXC exception("Cannot dereference value-initialized list iterator");
             }
 
             if (this->_Ptr == _Mycont->_Myfirstiter->_Ptr) {
-                throw _MYL exception("Cannot dereference end list iterator");
+                throw _AXC exception("Cannot dereference end list iterator");
             }
 
             return this->_Ptr->_Myval; 
         }
-        catch (_MYL exception& general_exception) {
+        catch (_AXC exception& general_exception) {
             std::cerr << general_exception.what();
         }
     }
@@ -169,16 +169,16 @@ public:
         try {
             const auto _Mycont = static_cast<const Mylist_*>(this->Getcont());
             if (_Mycont == nullptr) {
-                throw _MYL exception("Cannot increment value-initialized list iterator");
+                throw _AXC exception("Cannot increment value-initialized list iterator");
             }
 
             if (this->_Ptr == _Mycont->_Myfirstiter->_Ptr) {
-                throw _MYL exception("Cannot increment end list iterator");
+                throw _AXC exception("Cannot increment end list iterator");
             } 
             this->_Ptr = this->_Ptr->_Next;
             return *this;
         }   
-        catch (_MYL exception& general_exception) {
+        catch (_AXC exception& general_exception) {
             std::cerr << general_exception.what();
         }
     }
@@ -194,16 +194,16 @@ public:
             const auto _Mycont = static_cast<const Mylist_*>(this->Getcont());
             const auto New_ptr = this->_Ptr->_Prev;
             if (_Mycont == nullptr) {
-                throw _MYL exception("Cannot decrement value-initialized list iterator");
+                throw _AXC exception("Cannot decrement value-initialized list iterator");
             }
 
             if (New_ptr == _Mycont->_Myfirstiter->_Ptr) {
-                throw _MYL exception("Cannot decrement end list iterator");
+                throw _AXC exception("Cannot decrement end list iterator");
             } 
             this->_Ptr = New_ptr;
             return *this;
         }   
-        catch (_MYL exception& general_exception) {
+        catch (_AXC exception& general_exception) {
             std::cerr << general_exception.what();
         }
     }
@@ -217,12 +217,12 @@ public:
     bool operator== (const _List_const_iterator& Right) const {
         try {
             if ( (this->Getcont() =! Right.Getcont()) ) {
-                throw _MYL exception("List iterators incompatible");
+                throw _AXC exception("List iterators incompatible");
             }
 
             return this->_Ptr == Right._Ptr; 
         }
-        catch (_MYL exception& incorrect_Right) {
+        catch (_AXC exception& incorrect_Right) {
             std::cerr << incorrect_Right.what();
         }
     }
@@ -294,4 +294,4 @@ public:
     }
 };
 
-_MYL_END
+_AXC_END
