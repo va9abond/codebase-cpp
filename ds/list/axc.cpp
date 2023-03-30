@@ -1,5 +1,6 @@
 #include <iostream> 
 #include <iterator>
+#include <stdint.h>
 
 
 
@@ -192,6 +193,9 @@ struct _Container_base {
 	_Container_base (const _Container_base&) = delete;
 	_Container_base& operator= (const _Container_base&) = delete;
 
+	void _Orphan_all() noexcept;
+	void _Swap_proxy_and_iterators(_Container_base&) noexcept;
+
 	~_Container_base() {
 		delete _Myproxy; _Myproxy = nullptr;
 	}
@@ -296,6 +300,33 @@ private:
 	}
 
 };
+
+
+void _Container_base::_Orphan_all() noexcept {
+	if (_Myproxy == nullptr) { // no proxy, already orphaned
+		return;
+	}
+
+	// proxy allocated, drain it 
+	for (auto& Pnext = _Myproxy->_Myfirstiter; Pnext != nullptr; Pnext = Pnext->_Mynextiter) {
+		Pnext->_Myproxy = nullptr;
+	}
+	_Myproxy->_Myfirstiter = nullptr;
+}
+
+void _Container_base::_Swap_proxy_and_iterators(_Container_base& Right) noexcept {
+	_Container_proxy* Tmp = _Myproxy;
+	_Myproxy              = Right._Myproxy;
+	Right._Myproxy        = Tmp;
+
+	if (_Myproxy != nullptr) {
+		_Myproxy->_Mycont = this; // Right._Myproxy->_Mycont = this;
+	}
+
+	if (Right._Myproxy != nullptr) {
+		Right._Myproxy->_Mycont = &Right; // _Myproxy = &Right;
+	}
+}
 
 
 template <class IterTy_>

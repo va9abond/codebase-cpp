@@ -235,7 +235,9 @@ public:
 
 private:
     void _TIDY() noexcept {
-
+        _Mycont._Orphan_all();
+        _Node::_Free_non_head(_Mycont._Myhead);
+        _Node::_Freenode0(_Mycont._Myhead);
     }
 
     void _COPY_ASSIGN(const linked_list& Right) {
@@ -255,7 +257,7 @@ public:
     // TODO: need check
     linked_list (linked_list&& Right) noexcept { // shallow copy
         _ALLOCATE_HEAD_AND_PROXY();
-        _Swap_val(Right); // ?? why not _Swap_val(move(Right));
+        _SWAP_VAL(Right); // ?? why not _Swap_val(move(Right));
     }
 
     // TODO: need check
@@ -268,7 +270,14 @@ public:
     }
 
 private:
-    void _MOVE_ASSIGN(linked_list&& Right) {
+    void _SWAP_VAL (linked_list& Right) noexcept { // swap with Right, same allocator
+        auto Rightcont = Right._Mycont;
+        _Mycont._Swap_proxy_and_iterators(Rightcont);
+        _MYL swap(_Mycont._Mycont._Myhead, Rightcont._Myhead); // *WARNING* no _Swap_adl
+        _MYL swap(_Mycont._Mycont._Mysize, Rightcont._Mysize);
+    }
+
+    void _MOVE_ASSIGN (linked_list&& Right) {
 
     }
 
