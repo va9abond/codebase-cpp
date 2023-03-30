@@ -48,5 +48,11 @@ doc
 *.vcxproj
 *.user
 *.filters
+# ---
+
+# not interesting or temp files
+master.cpp
+*.txt
+test*.cpp
 
 
