@@ -25,7 +25,7 @@ public:
     _List_unchecked_const_iterator (_Nodeptr Pnode, const Mylist_* Plist) noexcept : 
         _Ptr(Pnode)
     {
-        this->Adopt(Plist);
+        this->_Adopt(Plist);
     }
 
     reference operator*() const noexcept {
