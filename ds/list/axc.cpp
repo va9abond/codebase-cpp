@@ -13,10 +13,7 @@
 #define _STD       ::std::
 
 
-_AXC_BEGIN // my library to replace functions from STD 
-
-
-
+_AXC_BEGIN // auxiliary core to replace functions from STD S
 // ************ utility ************ //
 	
 template <class _Ty>
@@ -70,7 +67,7 @@ constexpr _Ty&& forward(
 // }
 
 template <class _Ty>
-void swap(_Ty& _Left, _Ty& _Right) { // *WARNING* no check if _Ty is is_nothrow_move_constructible_v && is_nothrow_move_assignable_v
+void swap(_Ty& _Left, _Ty& _Right) noexcept { // *WARNING* no check if _Ty is is_nothrow_move_constructible_v && is_nothrow_move_assignable_v
 	if ( addressof(_Left) != addressof(_Right) )
 	{
 	    _Ty _Tmp =  move(_Left);
@@ -83,92 +80,6 @@ template <class _Ty>
 void destroy_(_Ty* _Ptr) {
 	_Ptr->~_Ty();
 }
-
-
-
-// ************ class exception ************ //  
-
-class exception {
-public:
-	exception (const char* other) noexcept : _message(other) {}
-	
-	exception (const exception&) noexcept = default;
-	
-	exception& operator= (const exception&) noexcept = default;
-	
-	exception (exception&& other) noexcept : _message(other._message) {
-		other._message = nullptr;
-	}
-
-	exception& operator= (exception&& other) {
-		if (this != &other)
-		{
-			delete[] _message;
-			_message = other._message;
-			other._message = nullptr;
-		}
-		return *this;
-	}
-
-	virtual ~exception() {
-		delete[] _message;
-		_message = nullptr;
-	}
-	
-	virtual const char* what() const noexcept {
-		return _message;
-	}
-	
-
-protected:
-	const char *_message;
-};
-
-
-
-// ************ class semantic_error ************ //
-
-class semantic_error : exception {
-public:
-	semantic_error (const char* other) noexcept :
-		exception("SEMANTIC_ERROR"),
-		_message(other) 
-	{}
-
-	semantic_error (const semantic_error&) noexcept = default;
-	
-	semantic_error& operator= (const semantic_error&) noexcept = default;
-
-	semantic_error (semantic_error&& other) noexcept
-		: exception("SEMANTIC_ERROR"),
-		_message(other._message)
-	{
-		other._message = nullptr;
-	}
-
-	semantic_error& operator= (semantic_error&& other) noexcept {
-		if (this != &other)
-		{
-			delete[] _message;
-			_message = other._message;
-			other._message = nullptr; 
-		}
-		return *this;
-	}
-
-	virtual ~semantic_error() {
-		delete[] _message;
-		_message = nullptr;
-	};
-
-	const char* what() const noexcept {
-		return _message;
-	}
-
-
-protected:
-	const char *_message;
-};
 
 
 
@@ -255,8 +166,8 @@ private:
 			if (_Myproxy != nullptr) { // already have a parent
 				_Orphan_me();
 			}
-			_Mynextiter = Parent_proxy->_Myfirstiter;
-			Parent_proxy->_Myfirstiter = this;
+			_Mynextiter = Parent_proxy->_Myfirstiter; // TODO: how it works??? 
+			Parent_proxy->_Myfirstiter = this;        // TODO: how it works???
 			_Myproxy = Parent_proxy;
 		}
 	}
@@ -358,21 +269,6 @@ struct _Simple_types { // wraps types from allocators with simple addressing for
 	using pointer         = value_type*;
 	using const_pointer   = const value_type*;
 }; // full copy from STD
-
-
-// template <class _Alloc>
-// struct _Normal_allocator_traits { // defines traits for allocators
-//     using allocator_type = _Alloc;
-//     using value_type     = typename _Alloc::value_type;
-
-//     using pointer            = typename _Get_pointer_type<_Alloc>::type;
-//     using const_pointer      = typename _Get_const_pointer_type<_Alloc>::type;
-//     using void_pointer       = typename _Get_void_pointer_type<_Alloc>::type;
-//     using const_void_pointer = typename _Get_const_void_pointer_type<_Alloc>::type;
-
-//     using size_type       = typename _Get_size_type<_Alloc>::type;
-//     using difference_type = typename _Get_difference_type<_Alloc>::type;
-// };
 
 
 template <class _Alloc>

@@ -1,16 +1,18 @@
-#include "List_node.cpp"
+#include <exception>
+#include <iostream>
+#include <cassert>
+#include <stdexcept>
 
-
-using namespace myl;
-template<class Ty_> using node = _List_node<Ty_>;
-using std::cout;
-using std::endl;
+int foo(int a) noexcept {
+    // assert(a > 0);
+    auto x = 42;
+    (a > 20) ? x : x = 0;
+    return x;
+}
 
 int main() {
-    node<int>* head = new node<int>(42, nullptr, nullptr);
-    head->_Next = head->_Prev = head;
-    head->_Next = new node<int>(24, head, head->_Prev);
-
-    cout << head->_Myval;
-
+    throw std::runtime_error("fsdfs");
+    
+    std::cout << foo(25);
+    return 0;
 }
