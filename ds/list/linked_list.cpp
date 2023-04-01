@@ -156,7 +156,7 @@ public:
             while (size --> 0) { 
                 _EMPLACE_BACK( std::move( Ty_(Value) ) ); 
                 // there I use std::move instead of std::forward, because
-                // Ty_(Value) return rvalue of type Ty_ and no perfect forwarding ever
+                // Ty_(Value) return rvalue of type Ty_ so perfect forwarding not possible
             }
         }
         catch (_AXC exception& invalid_size) { // TODO: invalid_argument
@@ -226,7 +226,7 @@ public:
 
     // TODO: create this
     ~linked_list() { 
-        this->_Tidy();
+        this->_TIDY();
         // 1. deallocate linked_list
         // 2. deallocate _List_val
         // 3. deallocate _Container_proxy

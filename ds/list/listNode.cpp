@@ -33,36 +33,26 @@ public:
     {}
 
     _List_node (const _List_node&) = delete;
-    
     _List_node& operator= (const _List_node&) = delete;
-
-    ~_List_node() {
-    	_Myval.~value_type(); // calling destructor explicitly is bad 
-    	_Next = nullptr;
-    	_Prev = nullptr;
+    
+    static void _Freenode0 (_Nodeptr ptr) noexcept {
+        _Destroy_in_place(ptr->_Next);
+        _Destroy_in_place(ptr->_Prev);
+        _AXC deallocate(ptr);
     }
 
-    // void DEALLOCATE_ (_Nodeptr ptr) noexcept {
-    // 	delete ptr->_Next; ptr->_Next = nullptr;
-    // 	delete ptr->_Prev; ptr->_Prev = nullptr;
+    static void Freenode_ (_Nodeptr ptr) noexcept { // destroy all members in ptr and deallocate memory
+    	_AXC destroy_(_AXC addressof(ptr->_Myval));
+    	_Freenode0(ptr);
+    }
 
-    // 	::operator delete(ptr);
-    // } 
-
-    // void Freenode_ (_Nodeptr ptr) noexcept { // destroy all members in ptr and deallocate memory
-    // 	_AXC destroy_(_AXC addressof(ptr->_Myval));
-    // 	DEALLOCATE_(ptr);
-    // }
-
-    // void Free_non_head_ (_Nodeptr head) noexcept { // free a list starting at head 
-    // 	head->_Prev->_Next = nullptr;
-
-    // 	auto Pnode = head->_Next;
-    // 	for (_Nodeptr Pnext; Pnode != nullptr; Pnode = Pnext) {
-    // 		Pnext = Pnode->_Next;
-    // 		Freenode_(Pnode);
-    // 	}
-    // }
+    static void _Free_non_head (_Nodeptr head) noexcept { // free a list starting at head 
+    	head->_Prev->_Next = nullptr;
+    	auto Pnode = head->_Next;
+    	for (_Nodeptr Pnext = Pnode->_Next; Pnode != nullptr; Pnode = Pnext) {
+    		_Freenode(Pnode);
+    	}
+    }
 
     template <class Ty_>
     friend std::ostream& operator<< (std::ostream& output, const _List_node<Ty_>& node);
