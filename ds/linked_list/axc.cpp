@@ -17,7 +17,7 @@ _AXC_BEGIN // auxiliary core to replace functions from STD S
 // ************ utility ************ //
 	
 template <class _Ty>
-constexpr _Ty* addressof(_Ty& _Val) noexcept { // copy of std::addressof()
+constexpr _Ty* addressof (_Ty& _Val) noexcept { // copy of std::addressof()
     // return __builtin_addressof(_Val);	
     return &_Val;
 }
@@ -50,12 +50,12 @@ template <class _Ty>
 using remove_reference_t = typename remove_reference<_Ty>::type;
 
 template <class _Ty>
-constexpr remove_reference_t<_Ty>&& move(_Ty&& _Arg) noexcept { // forward _Arg as movable // copy from STD
+constexpr remove_reference_t<_Ty>&& move (_Ty&& _Arg) noexcept { // forward _Arg as movable // copy from STD
     return static_cast<remove_reference_t<_Ty>&&>(_Arg);
 }
 
 template <class _Ty>
-constexpr _Ty&& forward(
+constexpr _Ty&& forward (
     remove_reference_t<_Ty>& _Arg) noexcept { // forward an lvalue as either an lvalue or an rvalue
     return static_cast<_Ty&&>(_Arg);
 }
@@ -67,7 +67,7 @@ constexpr _Ty&& forward(
 // }
 
 template <class _Ty>
-void swap(_Ty& _Left, _Ty& _Right) noexcept { // *WARNING* no check if _Ty is is_nothrow_move_constructible_v && is_nothrow_move_assignable_v
+void swap (_Ty& _Left, _Ty& _Right) noexcept { // *WARNING* no check if _Ty is is_nothrow_move_constructible_v && is_nothrow_move_assignable_v
 	if ( addressof(_Left) != addressof(_Right) )
 	{
 	    _Ty _Tmp =  move(_Left);
@@ -77,7 +77,7 @@ void swap(_Ty& _Left, _Ty& _Right) noexcept { // *WARNING* no check if _Ty is is
 }
 
 template <class _Ty>
-void destroy_(_Ty* _Ptr) {
+void destroy_ (_Ty* _Ptr) {
 	_Ptr->~_Ty();
 }
 
@@ -225,7 +225,7 @@ void _Container_base::_Orphan_all() noexcept {
 	_Myproxy->_Myfirstiter = nullptr;
 }
 
-void _Container_base::_Swap_proxy_and_iterators(_Container_base& Right) noexcept {
+void _Container_base::_Swap_proxy_and_iterators (_Container_base& Right) noexcept {
 	_Container_proxy* Tmp = _Myproxy;
 	_Myproxy              = Right._Myproxy;
 	Right._Myproxy        = Tmp;

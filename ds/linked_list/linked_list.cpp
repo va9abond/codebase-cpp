@@ -69,7 +69,7 @@ public:
         }
     }
 
-    _Nodeptr _Unlinknode(_Nodeptr Pnode) noexcept { // unlink Pnode from the list
+    _Nodeptr _Unlinknode (_Nodeptr Pnode) noexcept { // unlink Pnode from the list
 
         Pnode->_Prev->_Next = Pnode->_Next;
         Pnode->_Next->_Prev = Pnode->_Prev;
