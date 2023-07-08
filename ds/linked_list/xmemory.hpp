@@ -15,7 +15,7 @@
 //         [x] _Assign
 //         [?] _Orphan_me
 //    
-//    NOTE: it's better to use STL trails, i think so
+//    NOTE: it's better to use STL trails? i think so
 // [?] iterator_traits
 // [?] iterator_traits<PtrTy_*>
 // [?] _Simple_types 
