@@ -1,6 +1,26 @@
 #include "msldef.h"
 
 
+// [x] _Container_proxy
+// [x] _Container_base
+//         [?] _Orphan_all
+//         [x] _Swap_proxy_and_iterators
+//         [?] _Alloc_proxy
+// [ ] _Iterator_base
+//         [x] operator=
+//         [x] ~_Iterator_base
+//         [x] _Adopt_v1
+//         [ ] _Adopt_v2
+//         [x] _Getcont
+//         [x] _Assign
+//         [?] _Orphan_me
+//    
+//    NOTE: it's better to use STL trails, i think so
+// [?] iterator_traits
+// [?] iterator_traits<PtrTy_*>
+// [?] _Simple_types 
+// [?] _Default_allocator_traits // NOTE: it should be remove, i think
+
 template <
     class ptrTy
 >
@@ -67,7 +87,7 @@ public:
     }
 
     ~_Iterator_base() noexcept {
-        _Orphan_me(); // TODO: impl _Orphan_me
+        _Orphan_me();
     }
 
     void _Adopt_v1 (const _Container_base* Parent) noexcept {
