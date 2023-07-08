@@ -16,7 +16,7 @@
         } else {                        \
             _MSL_REPORT_ERROR(mesg);    \
         }                               \
-    } while (false)                     
+    } while (false)                      
 
 
 inline void _MSL_REPORT_ERROR_f (const char* mesg) noexcept {

@@ -98,7 +98,7 @@ private:
     }
 
     void _Adopt_v2 (const _Container_base* Parent) noexcept {
-             
+        // TODO: impl 
     }
 
     void _Orphan_me() noexcept {
@@ -131,6 +131,19 @@ void _Container_base::_Orphan_all() noexcept {
     }
 }
 
-void _Container_base::_Swap_proxy_and_iterators(_Container_base&) noexcept { // TODO: impl
- 
+// swap owners of proxy and iterators
+void _Container_base::_Swap_proxy_and_iterators(_Container_base& Rhs) noexcept {
+    // swap owners of iterators
+    _Container_proxy* temp = _Myproxy;
+    _Myproxy = Rhs._Myproxy;
+    Rhs._Myproxy = temp;
+
+    // swap owners of proxy
+    if (_Myproxy) {
+         _Myproxy->_Mycont = this;
+    }
+
+    if (Rhs._Myproxy) {
+        Rhs._Myproxy->_Mycont = &Rhs;
+    } 
 }
