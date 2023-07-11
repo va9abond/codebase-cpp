@@ -1,3 +1,7 @@
+#ifndef XMEMORY_HPP
+#define XMEMORY_HPP
+
+
 #include "msldef.h"
 
 
@@ -21,6 +25,19 @@
 // [?] _Simple_types 
 // [?] _Default_allocator_traits // NOTE: it should be remove, i think
 
+
+template <class _Alloc, class _Value_type>
+using _Rebind_alloc_t = typename std::allocator_traits<_Alloc>::template rebind_alloc<_Value_type>;
+
+
+template <class _Value_type> 
+struct _Simple_types {
+    using value_type = _Value_type;
+    using size_type  = size_t;
+    using difference_type = ptrdiff_t;
+    using pointer         = value_type*;
+    using const_pointer   = const value_type*;
+};
 
 
 struct _Iterator_base;
@@ -100,3 +117,5 @@ inline void _Container_base::_Orphan_all() noexcept {}
 
 // swap owners of proxy and iterators
 inline void _Container_base::_Swap_proxy_and_iterators(_Container_base& Rhs) noexcept {}
+
+#endif // XMEMORY_HPP
