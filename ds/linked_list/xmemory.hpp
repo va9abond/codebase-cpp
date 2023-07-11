@@ -5,17 +5,18 @@
 #include "msldef.h"
 
 
-// [ ] _Container_proxy
+// [x] _Container_proxy
 // [ ] _Container_base
-//         [ ] _Orphan_all
-//         [ ] _Swap_proxy_and_iterators
-//         [ ] _Alloc_proxy
+//         m[ ] _Orphan_all
+//         m[ ] _Swap_proxy_and_iterators
+//         m[ ] _Alloc_proxy
+//         m[ ] _Reload_proxy
 // [ ] _Iterator_base
 //         [ ] operator=
 //         [ ] ~_Iterator_base
-//         [ ] _Adopt_v1
+//        m[ ] _Adopt_v1
 //         [ ] _Adopt_v2
-//         [ ] _Getcont
+//        m[ ] _Getcont
 //         [ ] _Assign
 //         [ ] _Orphan_me
 //    
@@ -32,8 +33,8 @@ using _Rebind_alloc_t = typename std::allocator_traits<_Alloc>::template rebind_
 
 template <class _Value_type> 
 struct _Simple_types {
-    using value_type = _Value_type;
-    using size_type  = size_t;
+    using value_type      = _Value_type;
+    using size_type       = size_t;
     using difference_type = ptrdiff_t;
     using pointer         = value_type*;
     using const_pointer   = const value_type*;
@@ -60,13 +61,10 @@ public:
 
     void _Orphan_all() noexcept;
     void _Swap_proxy_and_iterators (_Container_base&) noexcept;
+    
+    void _Alloc_proxy();
 
-    template <
-        class _Alloc
-    >
-    void _Alloc_proxy (_Alloc&& _Al) {}
-
-
+    
     _Container_proxy* _Myproxy = nullptr;
 };
 
@@ -80,8 +78,7 @@ public:
     }
 
     _Iterator_base& operator= (const _Iterator_base& Rhs) noexcept {
-        _Assign(Rhs); // TODO: impl _Assign
-        _Myproxy = Rhs._Myproxy;
+        _Assign(Rhs);
         return *this;
     }
 
@@ -106,8 +103,18 @@ public:
     mutable _Iterator_base*   _Mynextiter = nullptr;
 
 private:
-    void _Assign (const _Iterator_base& Rhs) noexcept {}
-    void _Adopt_v2 (const _Container_base* Parent) noexcept {}
+    // Assign this iterator to other container by given
+    // iterator from other container
+    void _Assign (const _Iterator_base& Rhs) noexcept {
+        if (_Myproxy == Rhs._Myproxy) { return; }
+        if (Rhs._Myproxy) { // != nullptr => do adoption
+            _Adopt(Rhs._Myproxy->_Mycont);
+        } else { // == nullptr => no parent container now
+            _Orphan_me();
+        }
+    }
+
+    void _Adopt (const _Container_base* Parent) noexcept {}
     void _Orphan_me() noexcept {}
 
 };
