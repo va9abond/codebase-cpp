@@ -1,3 +1,7 @@
+#ifndef LISTITERATOR_HPP
+#define LISTITERATOR_HPP
+
+
 #include "list_node.hpp"
 
 
@@ -71,3 +75,5 @@ public:
 
     using _Mybase::_Mybase;
 };
+
+#endif // LISTITERATOR_HPP
