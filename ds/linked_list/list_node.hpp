@@ -1,3 +1,7 @@
+#ifndef LISTNODE_HPP
+#define LISTNODE_HPP
+
+
 #include "xmemory.hpp"
 
 
@@ -59,3 +63,5 @@ std::ostream& operator<< (std::ostream& _output, const _List_node<_Value_type>& 
 	_output << Node; 
     return _output;
 };
+
+#endif // LISTNODE_HPP
