@@ -6,25 +6,19 @@
 
 
 // [x] _Container_proxy
-// [ ] _Container_base
-//         m[ ] _Orphan_all
-//         m[ ] _Swap_proxy_and_iterators
-//         m[ ] _Alloc_proxy
-//         m[ ] _Reload_proxy
-// [ ] _Iterator_base
-//         [ ] operator=
-//         [ ] ~_Iterator_base
-//        m[ ] _Adopt_v1
-//         [ ] _Adopt_v2
-//        m[ ] _Getcont
-//         [ ] _Assign
-//         [ ] _Orphan_me
-//    
-//    NOTE: it's better to use STL trails? i think so
-// [?] iterator_traits
-// [?] iterator_traits<PtrTy_*>
-// [?] _Simple_types 
-// [?] _Default_allocator_traits // NOTE: it should be remove, i think
+// [x] _Container_base
+//         [x] _Orphan_all
+//         [x] _Swap_proxy_and_iterators
+//         [x] _Alloc_proxy
+//         [-] _Reload_proxy
+// [x] _Iterator_base
+//         [x] operator=
+//         [x] ~_Iterator_base
+//         [x] _Adopt
+//         [x] _Getcont
+//         [x] _Assign
+//         [?] _Orphan_me_v1
+//         [?] _Orphan_me_v2
 
 
 template <class _Alloc, class _Value_type>
@@ -49,6 +43,7 @@ struct _Container_proxy {
     _Container_proxy() noexcept = default;
     _Container_proxy (_Container_base* Mycont) noexcept : _Mycont(Mycont) {}
 
+
     const   _Container_base* _Mycont      = nullptr;
     mutable _Iterator_base*  _Myfirstiter = nullptr;
 };
@@ -59,10 +54,13 @@ public:
     _Container_base (const _Container_base&) = delete;
     _Container_base& operator= (const _Container_base&) = delete;
 
+    void _Orhan_first() noexcept;
     void _Orphan_all() noexcept;
     void _Swap_proxy_and_iterators (_Container_base&) noexcept;
     
-    void _Alloc_proxy();
+    void _Alloc_proxy() {
+        _Myproxy = static_cast<_Container_proxy*>(::operator new(sizeof(_Container_proxy)));
+    }
 
     
     _Container_proxy* _Myproxy = nullptr;
@@ -82,16 +80,8 @@ public:
         return *this;
     }
 
-    ~_Iterator_base() noexcept {
-        _Orphan_me();
-    }
-
-    void _Adopt_v1 (const _Container_base* Parent) noexcept {
-        if (Parent != nullptr) {
-            _Myproxy = Parent->_Myproxy;
-        } else {
-            _Myproxy = nullptr;
-        }
+    ~_Iterator_base() noexcept { // NOTE: mb i need to free allocated memory
+        _Orphan_me_v1();
     } 
 
     const _Container_base* _Getcont() noexcept {
@@ -103,26 +93,98 @@ public:
     mutable _Iterator_base*   _Mynextiter = nullptr;
 
 private:
-    // Assign this iterator to other container by given
-    // iterator from other container
+    // Assign self to other container by given iterator
+    // from other container
     void _Assign (const _Iterator_base& Rhs) noexcept {
         if (_Myproxy == Rhs._Myproxy) { return; }
         if (Rhs._Myproxy) { // != nullptr => do adoption
             _Adopt(Rhs._Myproxy->_Mycont);
         } else { // == nullptr => no parent container now
-            _Orphan_me();
+            _Orphan_me_v1();
         }
     }
 
-    void _Adopt (const _Container_base* Parent) noexcept {}
-    void _Orphan_me() noexcept {}
+    // adopt self by other parent container
+    void _Adopt (const _Container_base* Other_parent) noexcept {
+        if (!Other_parent) { // other parent container is nullptr, no parent cont now
+            _Orphan_me_v1();
+            return;
+        }
+        
+        // do adoption
+        _Container_proxy* Other_parent_proxy = Other_parent->_Myproxy;
+        if (_Myproxy != Other_parent_proxy) { // change parentage
+            if (_Myproxy) { // already adopted, remove self from current list
+                _Orphan_me_v1();             
+            }
+            
+            // insert at the beginning of list
+            _Mynextiter = Other_parent_proxy->_Myfirstiter;
+            Other_parent_proxy->_Myfirstiter = this;
+            _Myproxy = Other_parent_proxy;
+        }
+    }
 
+    // remove self from parent container
+    void _Orphan_me_v1() noexcept {
+        if (!_Myproxy) { return; } // already orphaned
+    
+        // remove self from current list
+        _Iterator_base** Pnext = &_Myproxy->_Myfirstiter; 
+        // _Iterator_base** because _Myfirsiter may equals nullptr
+        while (*Pnext && (*Pnext)->_Mynextiter != this) {
+            Pnext = &(*Pnext)->_Mynextiter;
+        }        
+
+        _MSL_VERIFY_f(*Pnext, "ITERATOR LIST CORRUPTED");
+        (*Pnext)->_Mynextiter = _Mynextiter;
+        _Mynextiter = nullptr; _Myproxy = nullptr;
+    }
+    
+    void _Orphan_me_v2() noexcept {
+        if (!_Myproxy) { return; } // already orphaned
+
+        // remove self from current list
+        _Iterator_base** Pnext = &_Myproxy->_Myfirstiter;
+        while (*Pnext && *Pnext != this) {
+            Pnext = &(*Pnext)->_Mynextiter;
+        }
+
+        _MSL_VERIFY_f(*Pnext, "ITERATOR LIST CORRUPTED");
+        *Pnext = _Mynextiter; // <=> this = _Mynextiter, but we need there Pnext
+                              // to make assign, expression (this = _Mynextiter)
+                              // or (this = *_Mynextiter) cause error(idk why)
+        _Myproxy = nullptr; // why _Myproxy should be nullptr now, this points to
+                            // _Mynextiter, doesn't it? And _Mynextiter still
+                            // child of current container
+    }
 };
 
 
-inline void _Container_base::_Orphan_all() noexcept {}
+inline void _Container_base::_Orphan_all() noexcept {
+    if (!_Myproxy) { return; } // no any iterators
+   
+    _Iterator_base** Pnext = &(_Myproxy->_Myfirstiter);
+    while (*Pnext) {
+        (*Pnext)->_Myproxy = nullptr;
+        Pnext = &(*Pnext)->_Mynextiter;
+    }
+    // NOTE: after that whihe loop we have iterators list somewhere in memory,
+    // they don't rely with any container, but it still a connected list.
+    // Firstly, if we have some iterator we can go to next one throught _Mynextiter,
+    // Secondly, does we still can to get access to data throught thees iterators?
+}
 
 // swap owners of proxy and iterators
-inline void _Container_base::_Swap_proxy_and_iterators(_Container_base& Rhs) noexcept {}
+inline void _Container_base::_Swap_proxy_and_iterators(_Container_base& Rhs) noexcept {
+    // swap proxy  
+    _Container_proxy* Temp = _Myproxy;
+    _Myproxy = Rhs._Myproxy;
+    Rhs._Myproxy = Temp;
+    
+    // swap proxy owners
+    if (_Myproxy) { _Myproxy->_Mycont = this; }
+    if (Rhs._Myproxy) { Rhs._Myproxy->_Mycont = &Rhs; }
+}
 
 #endif // XMEMORY_HPP
