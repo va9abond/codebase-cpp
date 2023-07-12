@@ -4,6 +4,16 @@
 
 #include "xmemory.hpp"
 
+_MSL_BEGIN
+// [ ] _List_node
+//       [x] _List_node()
+//       [x] _List_node (const _List_node&) = delete
+//       [x] _List_node& operator= (const _List_node&) = delete
+//       [-] _Buy_head_node // construct head node
+//       [ ] _Free_node // destroy pointer members and deallocate
+//       [ ] _Free_list_nodes // free a list node [_First, nullptr) 
+//       [x] operator<<
+
 
 template <
 	class _Value_type
@@ -28,21 +38,16 @@ struct _List_node { // list node
     	_Nodeptr Prev,
     	_Nodeptr Next
     ) noexcept :
-    	_Myval(move(Value)), // TODO: CHECK THIS
+    	_Myval(std::move(Value)), // TODO: check this
     	_Prev(Prev),
     	_Next(Next)
     {}
 
+    _List_node() = default;
     _List_node (const _List_node&) = delete;
     _List_node& operator= (const _List_node&) = delete;
    
-    static _Nodeptr _Buyheadnode() {}
-
-    static void _Freenode0 (_Nodeptr ptr) noexcept {}
-
-    static void _Freenode (_Nodeptr ptr) noexcept {}
-
-    static void _Free_non_head (_Nodeptr head) noexcept {}
+   /* */  
 
     template <class Ty_>
     friend std::ostream& operator<< (std::ostream& _output, const _List_node<Ty_>& Node);
@@ -64,4 +69,5 @@ std::ostream& operator<< (std::ostream& _output, const _List_node<_Value_type>& 
     return _output;
 };
 
+_MSL_END
 #endif // LISTNODE_HPP

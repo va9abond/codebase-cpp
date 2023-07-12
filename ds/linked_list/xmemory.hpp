@@ -5,6 +5,7 @@
 #include "msldef.h"
 
 
+_MSL_BEGIN
 // [x] _Container_proxy
 // [x] _Container_base
 //         [x] _Orphan_all
@@ -14,7 +15,7 @@
 // [x] _Iterator_base
 //         [x] operator=
 //         [x] ~_Iterator_base
-//         [x] _Adopt
+//         [x] _Adopt_me
 //         [x] _Getcont
 //         [x] _Assign
 //         [?] _Orphan_me_v1
@@ -98,14 +99,14 @@ private:
     void _Assign (const _Iterator_base& Rhs) noexcept {
         if (_Myproxy == Rhs._Myproxy) { return; }
         if (Rhs._Myproxy) { // != nullptr => do adoption
-            _Adopt(Rhs._Myproxy->_Mycont);
+            _Adopt_me(Rhs._Myproxy->_Mycont);
         } else { // == nullptr => no parent container now
             _Orphan_me_v1();
         }
     }
 
     // adopt self by other parent container
-    void _Adopt (const _Container_base* Other_parent) noexcept {
+    void _Adopt_me (const _Container_base* Other_parent) noexcept {
         if (!Other_parent) { // other parent container is nullptr, no parent cont now
             _Orphan_me_v1();
             return;
@@ -187,4 +188,5 @@ inline void _Container_base::_Swap_proxy_and_iterators(_Container_base& Rhs) noe
     if (Rhs._Myproxy) { Rhs._Myproxy->_Mycont = &Rhs; }
 }
 
+_MSL_END
 #endif // XMEMORY_HPP
