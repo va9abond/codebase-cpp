@@ -95,6 +95,40 @@ public:
     using reference       = value_type&;
 
     using _Mybase::_Mybase; // TODO: how it works?
+
+    reference operator*() const noexcept {
+        return const_cast<reference>(_Mybase::operator*);
+    }
+
+    pointer operator->() const noexcept {
+        return this;
+    }
+
+    explicit operator bool() const noexcept {
+        return _Mybase::operator bool();
+    }
+
+    _List_unchecked_iterator& operator++() noexcept {
+        _Mybase::operator++();
+        return *this;
+    }
+
+    _List_unchecked_iterator& operator++(int) noexcept {
+        _List_unchecked_iterator Temp = *this;
+        _Mybase::operator++();
+        return Temp;
+    }
+
+    _List_unchecked_iterator& operator--() noexcept {
+        _Mybase::operator++();
+        return *this;
+    }
+
+    _List_unchecked_iterator& operator--(int) noexcept {
+        _List_unchecked_iterator Temp = *this;
+        _Mybase::operator++();
+        return Temp;
+    }
 };
 
 
