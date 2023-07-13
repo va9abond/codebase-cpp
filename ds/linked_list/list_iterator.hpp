@@ -6,10 +6,46 @@
 
 
 _MSL_BEGIN
-// [x] _List_unchecked_const_terator
-// [ ] _List_unchecked_iterator
-// [ ] _List_const_iterator
-// [ ] _List_iterator
+// [x] _List_unchecked_const_iterator
+//          [x] operator*
+//          [?] operator->
+//          [x] operator bool
+//          [x] operator++
+//          [x] operator++(int)
+//          [x] operator--
+//          [x] opeartor--(int)
+//          [x] operator==
+//          [x] operator!=
+// [x] _List_unchecked_iterator
+///         [x] operator*
+//          [?] operator->
+//          [x] operator bool
+//          [x] operator++
+//          [x] operator++(int)
+//          [x] operator--
+//          [x] opeartor--(int)
+// [x] _List_const_iterator
+//          [x] operator*
+//          [?] operator->
+//          [x] operator bool
+//          [x] operator++
+//          [x] operator++(int)
+//          [x] operator--
+//          [x] opeartor--(int)
+//          [x] operator==
+//          [x] operator!=
+//          [x] _Verify_range
+//          [x] _Unwrapped
+//          [-] _Seek_to
+// [x] _List_iterator
+//          [x] operator*
+//          [?] operator->
+//          [x] operator bool
+//          [x] operator++
+//          [x] operator++(int)
+//          [x] operator--
+//          [x] opeartor--(int)
+//          [x] _Unwrapped
 
 
 template <
@@ -50,7 +86,7 @@ public:
         return *this;
     }
 
-    _List_unchecked_const_iterator& operator++(int) noexcept {
+    _List_unchecked_const_iterator operator++(int) noexcept {
         _List_unchecked_const_iterator Temp = *this;
         _Myptr = _Myptr->_Next;
         return Temp;
@@ -61,7 +97,7 @@ public:
         return *this;
     }
 
-    _List_unchecked_const_iterator& operator--(int) noexcept {
+    _List_unchecked_const_iterator operator--(int) noexcept {
         _List_unchecked_const_iterator Temp = *this;
         _Myptr = _Myptr->_Prev;
         return Temp;
@@ -113,7 +149,7 @@ public:
         return *this;
     }
 
-    _List_unchecked_iterator& operator++(int) noexcept {
+    _List_unchecked_iterator operator++(int) noexcept {
         _List_unchecked_iterator Temp = *this;
         _Mybase::operator++();
         return Temp;
@@ -124,7 +160,7 @@ public:
         return *this;
     }
 
-    _List_unchecked_iterator& operator--(int) noexcept {
+    _List_unchecked_iterator operator--(int) noexcept {
         _List_unchecked_iterator Temp = *this;
         _Mybase::operator++();
         return Temp;
@@ -179,7 +215,7 @@ public:
         return *this;
     }
 
-    _List_const_iterator& operator++(int) noexcept {
+    _List_const_iterator operator++(int) noexcept {
         _List_const_iterator Temp = *this;
         (*this)++;
         return Temp;
@@ -195,7 +231,7 @@ public:
         return *this;
     }
 
-    _List_const_iterator& operator--(int) noexcept {
+    _List_const_iterator operator--(int) noexcept {
         _List_const_iterator Temp = *this;
         --*this;
         return Temp;
@@ -239,6 +275,40 @@ public:
     using reference       = value_type&;
 
     using _Mybase::_Mybase;
+
+    reference operator*() const noexcept {
+        return const_cast<reference>(_Mybase::operator*());
+    }  
+
+    pointer operator->() const noexcept { // TODO: i'm not sure, probably its wrong
+        return this;
+    }
+
+    _List_iterator& operator++() noexcept {
+        _Mybase::operator++(); 
+        return *this;
+    }
+
+    _List_iterator operator++(int) noexcept {
+        _List_iterator Temp = *this;
+        _Mybase::operator++();
+        return Temp;
+    }
+
+    _List_iterator& operator--() noexcept {
+        _Mybase::operator--(); 
+        return *this;
+    }
+
+    _List_iterator operator--(int) noexcept {
+        _List_iterator Temp = *this;
+        _Mybase::operator--();
+        return Temp;
+    }
+
+    _List_unchecked_iterator<_Mylist> _Unwrapped() const noexcept {
+        return _List_unchecked_iterator<_Mylist>(this->_Myptr, static_cast<const _Mylist*>(this->_Getcont()));
+    }
 };
 
 _MSL_END
