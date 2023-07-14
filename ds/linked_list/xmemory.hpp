@@ -57,8 +57,10 @@ struct _Container_proxy {
 
 
 struct _Container_base {
-public:
-    _Container_base (const _Container_base&) = delete;
+
+    _Container_base() noexcept = default;
+
+    _Container_base (const _Container_base&)            = delete;
     _Container_base& operator= (const _Container_base&) = delete;
 
     void _Orhan_first() noexcept;
@@ -67,6 +69,7 @@ public:
     
     void _Alloc_proxy() {
         _Myproxy = static_cast<_Container_proxy*>(::operator new(sizeof(_Container_proxy)));
+        _Myproxy->_Mycont = this;
     }
 
     
