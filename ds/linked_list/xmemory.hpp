@@ -33,7 +33,7 @@ inline constexpr bool _Is_simple_alloc_v =
     && std::is_same_v<typename std::allocator_traits<_Alloc>::const_pointer, const typename _Alloc::value_type*>;
 
 template <class _Value_type> 
-struct _Simple_types {
+struct _Simple_type_traits { // _Simple_types in STL
     using value_type      = _Value_type;
     using size_type       = size_t;
     using difference_type = ptrdiff_t;

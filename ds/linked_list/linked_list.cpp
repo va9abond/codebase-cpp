@@ -12,7 +12,7 @@ _MSL_BEGIN
 // [ ] _List_val
 // [ ] linked_list
 template <class _Value_type>
-struct _List_simple_types : _Simple_types<_Value_type> {
+struct _List_simple_type_traits : _Simple_type_traits<_Value_type> { // _List_simple_types in STL
     using _Node    = _List_node<_Value_type>;
     using _Nodeptr = _List_node<_Value_type>*;
 };
@@ -28,7 +28,7 @@ template <
     class _Const_reference,
     class _Nodeprt_type
 >
-struct _List_iter_types {
+struct _List_iter_traits { // _List_iter_types in STL
     using value_type      = _Value_type;
     using size_type       = _Size_type;
     using difference_type = _Difference_type;
@@ -38,7 +38,7 @@ struct _List_iter_types {
 };
 
 
-template <class _Val_types>
+template <class _Val_types> // NOTE: does it list for iterators?
 class _List_val : public _Container_base {
 public:
     using _Nodeptr = typename _Val_types::_Nodeptr;
@@ -83,12 +83,18 @@ template <
 >
 class linked_list {
 private:
-    using _Alty        = _Rebind_alloc_t<_Alloc, _Ty>;
-    using _Alty_traits = std::allocator_traits<_Alty>;
-    using _Node        = _List_node<_Ty>;
-    using _Nodeptr     = _List_node<_Ty>*;
+    using _Alty          = _Rebind_alloc_t<_Alloc, _Ty>;
+    using _Alty_traits   = std::allocator_traits<_Alty>;
+    using _Node          = _List_node<_Ty>;
+    using _Alnode        = _Rebind_alloc_t<_Alloc, _Node>;
+    using _Alnode_traits = std::allocator_traits<_Alnode>;
+    using _Nodeptr       = typename _Alnode_traits::pointer;
 
-    using _Val_types = _List_iter_types<>;
+    using _Val_types = 
+        std::conditional_t<
+            _Is_simple_alloc_v<_Alnode>,
+                _List_simple_types<_Ty>,
+    _List_iter_types<>;
     using _Scary_val = _List_val<_Val_types>;
 
 public:
