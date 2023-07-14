@@ -3,8 +3,14 @@
 #include "xmemory.hpp"
 #include "list_node.hpp"
 #include "list_iterator.hpp"
+#include <cinttypes>
 
 
+_MSL_BEGIN
+// [x] _List_simple_types
+// [x] _List_iter_types
+// [ ] _List_val
+// [ ] linked_list
 template <class _Value_type>
 struct _List_simple_types : _Simple_types<_Value_type> {
     using _Node    = _List_node<_Value_type>;
@@ -44,6 +50,30 @@ public:
     using const_pointer   = typename _Val_types::const_pointer;
     using reference       = value_type&;
     using const_reference = const value_type&;    
+
+    _List_val() noexcept : _Myhead(), _Mysize(0) {}
+
+    void _Oprhan_iterators (_Nodeptr Ptr) noexcept;
+
+    void _Orphan_non_end() noexcept;
+
+    _Nodeptr _Unlink_node (_Nodeptr Node) noexcept; // unlink node at Where from the list
+
+    void _Adopt_unique (_List_val& Other, _Nodeptr Node) noexcept {
+        // adopt iterators pointing to spliced node
+    }
+
+    void _Adopt_all (_List_val& Other) noexcept {
+        // adopt all iterators except Other.end()
+    }
+
+    void _Adopt_range (_List_val& Other, const _Nodeptr First, const _Nodeptr Last) noexcept {
+        // adopt all iterators pointing to nodes in the range [First, Last) by marking nodes
+    }
+
+
+    _Nodeptr  _Myhead; // pointer to head node
+    size_type _Mysize; // number of elements
 };
 
 
@@ -86,3 +116,5 @@ public:
 
     _Compressed_pair<_Alnode, _Scary_val> _Mypair;
 };
+
+_MSL_END
