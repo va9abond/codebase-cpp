@@ -38,7 +38,8 @@ struct _List_iter_traits { // _List_iter_types in STL
 };
 
 
-template <class _Val_types> // NOTE: does it list for iterators?
+template <class _Val_types> // NOTE: does it list for iterators that makes
+                            // a base for main list?
 class _List_val : public _Container_base {
 public:
     using _Nodeptr = typename _Val_types::_Nodeptr;
@@ -81,7 +82,7 @@ template <
     class _Ty,
     class _Alloc = std::allocator<_Ty>
 >
-class linked_list_v1 {
+class list_v1 {
 private:
     using _Alty          = _Rebind_alloc_t<_Alloc, _Ty>;
     using _Alty_traits   = std::allocator_traits<_Alty>;
@@ -139,6 +140,51 @@ template <
     class _Ty,
     class _Alloc = std::allocator<_Ty>
 >
-class linked_list_v2 {};
+class list_v2 { // same class as list_v1, but alloc trais is simpler
+private:
+    using _Alty        = _Rebind_alloc_t<_Alloc, _Ty>;
+    using _Alty_traits = std::allocator_traits<_Alty>;
+    using _Node        = _List_node<_Ty>;
+    using _Nodeptr     = _List_node<_Ty>*;
+
+    using _Val_types = _List_iter_traits < // complex alloc
+                            _Ty,
+                            typename _Alty_traits::size_type,
+                            typename _Alty_traits::difference_type,
+                            typename _Alty_traits::pointer,
+                            typename _Alty_traits::const_pointer,
+                            _Ty&,
+                            const _Ty&,
+                            _Nodeptr
+                      >;
+    using _List_scary_val = _List_val<_Val_types>; // _Scary_val in STL
+
+public:
+    static_assert(std::is_same_v<_Ty, typename _Alloc::value_type>,
+                  "list<T, Allocator> and T MISMATCHED ALLOCATOR");
+    static_assert(std::is_object_v<_Ty>, "The C++ Standard forbids containers of non-object types "
+                                         "because of [container.requirements].");
+
+    using value_type      = _Ty;
+    using allocator_type  = _Alloc;
+    using size_type       = typename _Alty_traits::size_type;
+    using difference_type = typename _Alty_traits::difference_type;
+    using pointer         = typename _Alty_traits::pointer;
+    using const_pointer   = typename _Alty_traits::const_pointer;
+    using reference       = value_type&;
+    using const_reference = const value_type&;
+
+    using iterator                  = _List_iterator<_List_scary_val>;
+    using const_iterator            = _List_const_iterator<_List_scary_val>;
+    using _Unchecked_iterator       = _List_unchecked_iterator<_List_scary_val>;
+    using _Unchecked_const_iterator = _List_unchecked_const_iterator<_List_scary_val>;
+
+    using reverse_iterator       = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+    // _Compressed_pair<_Alnode, _List_scary_val> _Mypair;
+    _List_scary_val _Mycont;
+
+};
     
 _MSL_END
