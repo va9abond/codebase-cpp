@@ -35,8 +35,8 @@ inline constexpr bool _Is_simple_alloc_v =
 template <class _Value_type> 
 struct _Simple_type_traits { // _Simple_types in STL
     using value_type      = _Value_type;
-    using size_type       = size_t;
-    using difference_type = ptrdiff_t;
+    using size_type       = std::size_t;
+    using difference_type = std::ptrdiff_t;
     using pointer         = value_type*;
     using const_pointer   = const value_type*;
 };
@@ -67,7 +67,7 @@ struct _Container_base {
     void _Orphan_all() noexcept;
     void _Swap_proxy_and_iterators (_Container_base&) noexcept;
     
-    void _Alloc_proxy() {
+    void _Alloc_proxy() { // TODO: delete proxy
         _Myproxy = static_cast<_Container_proxy*>(::operator new(sizeof(_Container_proxy)));
         _Myproxy->_Mycont = this;
     }
