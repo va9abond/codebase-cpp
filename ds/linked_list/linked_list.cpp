@@ -3,7 +3,7 @@
 #include "xmemory.hpp"
 #include "list_node.hpp"
 #include "list_iterator.hpp"
-#include <cinttypes>
+// #include <cinttypes>
 
 
 _MSL_BEGIN
@@ -11,6 +11,52 @@ _MSL_BEGIN
 // [x] _List_iter_types
 // [ ] _List_val
 // [ ] linked_list
+//     [] list_v2()
+//     [] _Construct_n (Count)
+//     [] list_v2 (Count)
+//     [] _Construct_n(Count, Val)
+//     [] list_v2 (Count, Val)
+//     [] _Construct_range_unchecked_my
+//     [] list_v2 (Rhs)
+//     [] list_v2 (&&Rhs)
+//     [] operator=
+//     [] _Swap_val
+//     [] push_front
+//     [] push_back
+//     [] insert (Where, &&Val)
+//     [] emplace_front
+//     [] emplace_back
+//     [] emplace
+//     [] _Emplace
+//     [] ~list_v2
+//     [] operator= 
+//     [] all iters
+//     [] resize (Newsize)
+//     [] resize (Newsize, Val)
+//     [] size()
+//     [x] empty
+//     [] front
+//     [] back
+//     [] push_front
+//     [] pop_back()
+//     [?] assign (First, Last)
+//     [?] assing (Count, Val)
+//     [?] insert (Where, Val)
+//     [?] insert (Where, Count, Val)
+//     [?] insert (Where, First, Last)
+//     [?] erase (Where)
+//     [] _Unchecked_erase (Node)
+//     [] erase (First, Last)
+//     [] _Unchecked_erase (First, Last)
+//     [] clear()
+//     [] _Tidy()
+//     [] remove
+//     [] remove_if
+//     [] reverse
+//     [] _Alloc_head_and_proxy
+//     [] _Orphan_all
+
+
 template <class _Value_type>
 struct _List_simple_type_traits : _Simple_type_traits<_Value_type> { // _List_simple_types in STL
     using _Node    = _List_node<_Value_type>;
@@ -300,6 +346,67 @@ public:
         return rend();
     }
 
+    void resize (size_type Newsize); // determine new length, padding with _Ty() elements as needed
+
+    void resize (size_type Newsize, const _Ty& Val); // determine new length, padding with Val elements as needed
+
+    size_type size() const noexcept {
+        return _Mycont._Mysize;
+    }
+
+    bool empty() const noexcept {
+        return _Mycont._Mysize == 0;
+    } 
+    
+    reference front() noexcept;
+
+    const_reference front() const noexcept;
+
+    reference back() noexcept;
+
+    const_reference back() const noexcept;
+
+    void push_front (const _Ty& Val);
+
+    void pop_back() noexcept; 
+
+    template <class _Iter_t>
+    void assign (_Iter_t First, _Iter_t Last);
+
+    void assign (size_type Count, const _Ty& Val); // assign Count * Val
+    
+    iterator insert (const_iterator Where, const _Ty& Val); // insert Val at Where
+    
+    iterator insert (const_iterator Where, size_type Count, const _Ty& Val);
+    // insert Count * Val before Where
+   
+    template <class _Iter_t>
+    iterator insert (const const_iterator Where, _Iter_t First, _Iter_t Last); // insert [First, Last) before Where
+    
+    iterator erase (const const_iterator Where) noexcept;
+
+private:
+    _Nodeptr _Unchecked_erase (const _Nodeptr Node) noexcept; // erase element at Node
+
+public:
+    iterator erase (const const_iterator First, const const_iterator Last) noexcept;
+
+private:
+    _Nodeptr _Unchecked_erase (_Nodeptr First, const _Nodeptr Last) noexcept; // erase [First, Last)
+
+public:
+    void clear() noexcept; // erase all
+    
+private:
+    void _Tidy() noexcept;
+
+public:
+    auto remove (const _Ty& Val); // erase each element matching Val
+
+    template <class _Pr_t>
+    auto remove_if (_Pr_t Pred); // erase each element satisfying Pred
+
+    void reverse() noexcept; // reverse sequence
 
 private:
     void _Alloc_head_and_proxy() { // NOTE: _Mycont doesn't exist yet in ctor list_v2()
