@@ -10,7 +10,8 @@ _MSL_BEGIN
 // [x] _List_simple_types
 // [x] _List_iter_types
 // [ ] _List_val
-// [ ] linked_list
+// [ ] list_v1
+// [ ] list_v2
 //     [] list_v2()
 //     [] _Construct_n (Count)
 //     [] list_v2 (Count)
@@ -126,6 +127,108 @@ public:
 };
 
 
+template <class _Node_t>
+struct _List_node_insert_v2 { // _List_node_insert_op2 in STL
+    // list insert operation (which maintains exception safety)
+    using value_type = _Node_t;
+    using pointer    = _Node_t*;
+    using size_type  = std::size_t;
+
+    explicit _List_node_insert_v2() : _Added(0), _Head(nullptr), _Tail(nullptr) {}
+
+    _List_node_insert_v2 (const _List_node_insert_v2&) = delete;
+    _List_node_insert_v2& operator= (const _List_node_insert_v2&) = delete;
+
+    void _Append_n (size_type Count) { // Append Count elements
+        if (Count <= 0) { return; }
+
+        if (_Added == 0) {
+            pointer Newnode = static_cast<pointer>(::operator new(sizeof(value_type)));
+            _Head = Newnode; _Tail = Newnode;
+            ++_Added;
+            --Count;
+        }
+
+        for (; Count > 0; --Count) {
+            auto Append_node = static_cast<pointer>(::operator new(sizeof(value_type)));
+            _Tail->_Next = Append_node;
+            Append_node->_Prev = _Tail;
+            _Tail = Append_node;
+            ++_Added;
+        }
+    }
+    
+    // template <class _CArgT>
+    // void _Append_n (size_type Count, const _CArgT& _Carg);
+    
+    template <class _Val_types>
+    pointer _Attach_before (_List_val<_Val_types>& List, const pointer Insert_before) noexcept { // NOTO: check this!!
+        // Attach the elements from *this in List before Where
+        // If *this is empty, returns Where; otherwise returns a pointer to first inserted list node
+        // Resets *this to the default-initialized state
+    
+        if (_Added == 0) { return Insert_before; }
+
+        const auto Local_head = _Head;
+        const auto Local_tail = _Tail;
+        const auto Insert_after = Insert_before->_Prev;
+
+        Insert_after->_Next = Local_head;
+        Local_head->_Prev = Insert_after;
+        Insert_before->_Prev = Local_tail;
+        Local_tail->_Next = Insert_before;
+        List._Mysize += _Added;
+
+        _Head = nullptr; _Tail = nullptr; _Added = 0;
+
+        return Local_head;
+    }
+
+    template <class _Val_types>
+    void _Attach_at_end (_List_val<_Val_types>& List) noexcept {
+        _Attach_before(List, List._Myhead);
+    }
+
+    template <class _Val_types>
+    void _Attach_head (_List_val<_Val_types>& List) { // 
+        // Create within *this list head pointer and transfer new whole insert_list in empty List
+        pointer Newhead = static_cast<pointer>(::operator new(sizeof(value_type)));
+        // create new head
+        if (_Added == 0) { 
+            Newhead->_Next = Newhead;
+            Newhead->_Prev = Newhead;
+        } else {
+            const auto Local_head = _Head;
+            const auto Local_tail = _Tail;
+            Newhead->_Next = Local_head;
+            Newhead->_Prev = Local_tail;
+            Local_head->_Prev = Newhead;
+            Local_tail->_Next = Newhead;
+        }
+       
+        List._Mysize = _Added;
+        List._Myhead = Newhead; 
+        _Head = nullptr; _Tail = nullptr; _Added = 0;
+    }
+
+    ~_List_node_insert_v2() { // TODO: impl
+        if (_Added == 0) { return; }
+
+        _Head->_Prev = nullptr;
+        _Tail->_Next = nullptr;
+        pointer Ptr = _Head;
+        while (Ptr != nullptr) {
+            
+        }
+    }
+
+
+private:
+    size_type _Added; // if 0, the values of _Head and _Tail are indeterminate
+    pointer   _Head; // points to the first appended element; it doesn't have _Prev constructed
+    pointer   _Tail; // points to most recently appended element; id doesn't have _Next constructed
+};
+
 template <
     class _Ty,
     class _Alloc = std::allocator<_Ty>
@@ -188,25 +291,15 @@ template <
     class _Ty,
     class _Alloc = std::allocator<_Ty>
 >
-class list_v2 { // same class as list_v1, but alloc trais is simpler
+class list_v2 { // same class as list_v1, but no memory self miantain
 private:
-    using _Alty        = _Rebind_alloc_t<_Alloc, _Ty>;
-    using _Alty_traits = std::allocator_traits<_Alty>;
     using _Node        = _List_node<_Ty>;
     using _Nodeptr     = _List_node<_Ty>*;
 
-    using _Val_types = _List_iter_traits < // complex alloc
-                            _Ty,
-                            typename _Alty_traits::size_type,
-                            typename _Alty_traits::difference_type,
-                            typename _Alty_traits::pointer,
-                            typename _Alty_traits::const_pointer,
-                            _Ty&,
-                            const _Ty&,
-                            _Nodeptr
-                      >;
-    using _List_scary_val = _List_val<_Val_types>; // _Scary_val in STL
-    // using list = list_v2;
+    using _Val_types = _List_simple_type_traits<_Ty>;
+    using _List_SCARY_val = _List_val<_Val_types>; // not SCARY to tell the truth
+                                                   // because _Val_type doesn't provide SCARY
+    using _List_node_insert = _List_node_insert_v2<_List_node<_Ty>>;
 
 public:
     static_assert(std::is_same_v<_Ty, typename _Alloc::value_type>,
@@ -216,30 +309,36 @@ public:
 
     using value_type      = _Ty;
     using allocator_type  = _Alloc;
-    using size_type       = typename _Alty_traits::size_type;
-    using difference_type = typename _Alty_traits::difference_type;
-    using pointer         = typename _Alty_traits::pointer;
-    using const_pointer   = typename _Alty_traits::const_pointer;
+    using size_type       = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using pointer         = _Ty*;
+    using const_pointer   = const _Ty*;
     using reference       = value_type&;
     using const_reference = const value_type&;
 
-    using iterator                  = _List_iterator<_List_scary_val>;
-    using const_iterator            = _List_const_iterator<_List_scary_val>;
-    using _Unchecked_iterator       = _List_unchecked_iterator<_List_scary_val>;
-    using _Unchecked_const_iterator = _List_unchecked_const_iterator<_List_scary_val>;
+    using iterator                  = _List_iterator<_List_SCARY_val>;
+    using const_iterator            = _List_const_iterator<_List_SCARY_val>;
+    using _Unchecked_iterator       = _List_unchecked_iterator<_List_SCARY_val>;
+    using _Unchecked_const_iterator = _List_unchecked_const_iterator<_List_SCARY_val>;
 
     using reverse_iterator       = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    // _Compressed_pair<_Alnode, _List_scary_val> _Mypair;
-    _List_scary_val _Mycont;
+    _List_SCARY_val _Mycont;
    
     list_v2() noexcept : _Mycont() {
         _Alloc_head_and_proxy();
     } 
 
 private:
-    void _Construct_n (size_type Count);
+    void _Construct_n (size_type Count) {
+        // construct and apply Proxy for _Mycont
+        _Mycont._Container_base::_Alloc_proxy();
+        // append n elements
+        _List_node_insert Appended;
+        Appended._Append_n(Count);
+        Appended._Attach_head(_Mycont);
+    }
 
 public:
     explicit list_v2 (size_type Count) : _Mycont() {
@@ -247,29 +346,46 @@ public:
     }
 
 private:
-    void _Construct_n (size_type Count, const _Ty& Val);
+    void _Construct_n (size_type Count, const _Ty& Val) {
+        // construct and apply Proxy for _Mycont
+        _Mycont._Container_base::_Alloc_proxy();
+        // append n elements
+        _List_node_insert Appended;
+        Appended._Append_n(Count, Val);
+        Appended._Attach_head(_Mycont);
+    }
 
 public:
     list_v2 (size_type Count, const _Ty& Val) : _Mycont() {
         _Construct_n(Count, Val);
     }
 
-private:
-    template <class _Iter_t>
-    void _Construct_range_unchecked_my (_Iter_t First, _Iter_t Last);
+// private:
+//     template <class _Iter_t>
+//     void _Construct_range_unchecked_my (_Iter_t First, _Iter_t Last);
 
 public:
-    list_v2 (const list_v2& Rhs) : _Mycont(Rhs._Mycont) {
-        // _Ald_verify_range();
-        _Construct_range_unchecked_my(Rhs._Unchecked_begin(), Rhs._Unchecked_end());
+    // list_v2 (const list_v2& Rhs) : _Mycont(Rhs._Mycont) {
+    //     // _Ald_verify_range();
+    //     _Construct_range_unchecked_my(Rhs._Unchecked_begin(), Rhs._Unchecked_end());
+    // }
+
+    list_v2 (list_v2&& Rhs) : _Mycont(std::move(Rhs._Mycont)) {
+        _Alloc_head_and_proxy();
+        _Swap_val(Rhs);
     }
 
-    list_v2 (list_v2&& Rhs); // TODO
+    list_v2& operator= (list_v2&& Rhs) noexcept {
+        if (this == std::addressof(Rhs)) { return *this; }
 
-    list_v2& operator= (list_v2&& Rhs) noexcept;
+        clear(); _Swap_val(Rhs);
+        return *this;
+    }
 
 private:
-    void _Swap_val (list_v2& Rhs) noexcept; // swap with Rhs, same allocator
+    void _Swap_val (list_v2& Rhs) noexcept { // swap with Rhs
+         
+    }
 
 public:
     void push_front (_Ty&& Val); // insert element at beginning
