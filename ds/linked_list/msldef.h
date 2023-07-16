@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-#define _MSL_BEGIN namespace mls {
+#define _MSL_BEGIN namespace msl {
 #define _MSL_END   }
 #define _MSL       ::msl::
 #define _STD       ::std::
