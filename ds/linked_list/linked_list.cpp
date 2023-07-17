@@ -222,7 +222,6 @@ struct _List_node_insert_v2 { // _List_node_insert_op2 in STL
         }
     }
 
-
 private:
     size_type _Added; // if 0, the values of _Head and _Tail are indeterminate
     pointer   _Head; // points to the first appended element; it doesn't have _Prev constructed
@@ -384,21 +383,42 @@ public:
 
 private:
     void _Swap_val (list_v2& Rhs) noexcept { // swap with Rhs
-         
+        auto& Mycont = _Mycont;
+        auto& Rhscont = Rhs._Mycont;
+        Mycont._Swap_proxy_and_iterators(Rhscont);
+        auto* Temp = _Mycont._Myhead;
+        _Mycont._Myhead = Rhs._Mycont._Myhead;
+        Rhs._Mycont._Myhead = Temp;
+        std::swap(Mycont._Mysize, Rhscont._Mysize);
     }
 
 public:
-    void push_front (_Ty&& Val); // insert element at beginning
+    void push_front (_Ty&& Val) { // insert element at beginning
+        _Emplace(_Mycont._Myhead->_Next, std::move(Val)); 
+    }
 
-    void push_back (_Ty&& Val); // insert element at end
+    void push_back (_Ty&& Val) { // insert element at end
+        _Emplace(_Mycont._Myhead, std::move(Val));
+    }
 
-    iterator insert (const_iterator Where, _Ty&& Val); // Val at Where
+    iterator insert (const_iterator Where, _Ty&& Val) { // Val at Where
+        return emplace(Where, std::move(Val)); 
+    }
 
-    decltype(auto) emplace_front (_Ty&& Val); // insert element at beggining
+    decltype(auto) emplace_front (_Ty&& Val) { // insert element at beggining
+        reference Result = _Emplace(_Mycont._Myhead->_Next, std::move(Val)); 
+        return Result;
+    }
 
-    decltype(auto) emplace_back (_Ty&& Val); // insert element at end
+    decltype(auto) emplace_back (_Ty&& Val) { // insert element at end
+        reference Result = _Emplace(_Mycont._Myhead, std::move(Val));
+        return Result;
+    }
 
-    iterator emplace (const const_iterator Where, _Ty&& Val); // insert element at Where
+    iterator emplace (const const_iterator Where, _Ty&& Val) { // insert element at Where
+        
+
+    }
 
     _Nodeptr _Emplace (const _Nodeptr Where, _Ty&& Val); // insert element at Where
 
