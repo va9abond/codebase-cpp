@@ -5,13 +5,13 @@
 #include "xmemory.hpp"
 
 _MSL_BEGIN
-// [ ] _List_node
+// [x] _List_node
 //       [x] _List_node()
 //       [x] _List_node (const _List_node&) = delete
 //       [x] _List_node& operator= (const _List_node&) = delete
-//       [-] _Buy_head_node // construct head node
-//       [ ] _Free_node // destroy pointer members and deallocate
-//       [ ] _Free_list_nodes // free a list node [_First, nullptr) 
+//       [x] _Buy_head_node // construct head node
+//       [x] _Freenode0 // destroy pointer members and deallocate
+//       [x] _Freenode
 //       [x] operator<<
 
 
