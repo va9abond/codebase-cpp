@@ -63,6 +63,11 @@ struct _Container_base {
     _Container_base (const _Container_base&)            = delete;
     _Container_base& operator= (const _Container_base&) = delete;
 
+    ~_Container_base() noexcept {
+        _Orphan_all();
+        delete _Myproxy;
+    }
+
     void _Orhan_first() noexcept;
     void _Orphan_all() noexcept;
     void _Swap_proxy_and_iterators (_Container_base&) noexcept;
@@ -182,7 +187,7 @@ inline void _Container_base::_Orphan_all() noexcept {
     // NOTE: after that whihe loop we have iterators list somewhere in memory,
     // they don't rely with any container, but it still a connected list.
     // Firstly, if we have some iterator we can go to next one throught _Mynextiter,
-    // Secondly, does we still can to get access to data throught thees iterators?
+    // Secondly, does we still can to get access to data throught these iterators?
 }
 
 // swap owners of proxy and iterators
