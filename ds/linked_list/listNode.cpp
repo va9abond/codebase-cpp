@@ -38,7 +38,7 @@ public:
     static void _Freenode0 (_Nodeptr ptr) noexcept {
         _Destroy_in_place(ptr->_Next);
         _Destroy_in_place(ptr->_Prev);
-        _AXC deallocate(ptr);
+        // _AXC deallocate(ptr);
     }
 
     static void Freenode_ (_Nodeptr ptr) noexcept { // destroy all members in ptr and deallocate memory
@@ -78,9 +78,10 @@ std::ostream& operator<< (std::ostream& output, const _List_node<Vty_>& node) {
 
 _AXC_END
 
+using namespace axc;
 
-// int main() {
-// 	auto node1 = static_cast<_List_node<int>*>(::operator new(sizeof(_List_node<int>)));
+int main() {
+	auto node1 = static_cast<_List_node<int>*>(::operator new(sizeof(_List_node<int>)));
 // 	auto node2 = static_cast<_List_node<int>*>(::operator new(sizeof(_List_node<int>)));
 	
 // 	node1->_Next = node2;
@@ -92,10 +93,10 @@ _AXC_END
 // 	// _List_node<int> node(2542, node1, node2);
 
 
-// 	operator delete(node1);
+	operator delete(node1);
 // 	// operator delete(node1);
 // 	operator delete(node2);
-// }
+}
 
 
 
