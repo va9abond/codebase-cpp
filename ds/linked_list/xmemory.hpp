@@ -72,9 +72,14 @@ struct _Container_base {
     void _Orphan_all() noexcept;
     void _Swap_proxy_and_iterators (_Container_base&) noexcept;
     
-    void _Alloc_proxy() { // TODO: delete proxy
+    void _Alloc_proxy() {
         _Myproxy = static_cast<_Container_proxy*>(::operator new(sizeof(_Container_proxy)));
         _Myproxy->_Mycont = this;
+    }
+
+    void _Free_proxy() noexcept {
+        _Myproxy->_Mycont = nullptr; _Myproxy->_Myfirstiter = nullptr;
+        delete _Myproxy;
     }
 
     
