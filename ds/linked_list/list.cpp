@@ -244,6 +244,56 @@ private:
 };
 
 
+// [ ] list_v2
+//     [x] list_v2()
+//     [x] _Construct_n (Count)
+//     [x] list_v2 (Count)
+//     [] _Construct_n(Count, Val)
+//     [] list_v2 (Count, Val)
+//     [] _Construct_range_unchecked_my
+//     [] list_v2 (const list_v2& Rhs)
+//     [?] list_v2 (list_v2&&)
+//     [] operator=
+//     [?] _Swap_val
+//     [x] push_front
+//     [x] push_back
+//     [x] insert (Where, &&Val)
+//     [x] emplace_front
+//     [x] emplace_back
+//     [x] emplace (const const_iterator, _Ty&&)
+//     [x] _Emplace (const _Nodeptr, _Ty&&)
+//     [] list_v2 (std::init_list)
+//     [] list_v2& operator= (std::init_list)
+//     [] assign (std::init_list)
+//     [x] ~list_v2
+//     [] operator= 
+//     [?] all iters
+//     [x] resize (Newsize)
+//     [x] resize (Newsize, Val)
+//     [x] size
+//     [] max_size
+//     [x] empty
+//     [?] front
+//     [?] back
+//     [?] push_front
+//     [?] pop_front
+//     [?] push_back
+//     [?] pop_back
+//     [] insert (const_iterator, const _Ty&)
+//     [] insert (const_iterator, size_type, const _Ty&)
+//     [] insert (const_iterator, _Iter_t, _Iter_t)
+//     [] erase (const const_iterator)
+//     [] erase (const const_iterator, const const_iterator)
+//     [] _Unchecked_erase (const _Nodeptr)
+//     [] _Unchecked_erase (_Nodeptr, _Nodeptr)
+//     [?] clear
+//     [x] _Tidy
+//     [] swap (list_v2&)
+//     [] remove
+//     [] remove_if
+//     [] reverse
+//     [x] _Alloc_head_and_proxy
+//     [x] _Orphan_all
 template < 
     class _Ty
 >
@@ -374,20 +424,20 @@ public:
     }
 
     list_v2 (std::initializer_list<_Ty> Ilist) : _Mycont() {
-        _Construct_range_unchecked_my(Ilist.begin(), Ilist.end()); // TODO: 
+        _Construct_range_unchecked_my(Ilist.begin(), Ilist.end()); // TODO: _Construct_range_unchecked_my
     }
 
-    list_v2& operator= (std::initializer_list<_Ty> Ilist) {
+    list_v2& operator= (std::initializer_list<_Ty> Ilist) { // TODO: assign
         assign(Ilist.begin(), Ilist.end());
         return *this;
     }
 
-    void assing (std::initializer_list<_Ty> Ilist) {
+    void assign (std::initializer_list<_Ty> Ilist) { // TODO: assign
         assign(Ilist.begin, Ilist.end());
     }
 
     iterator insert (const_iterator Where, std::initializer_list<_Ty> Ilist) { // insert initializer_list
-        return insert(Where, Ilist.begin(), Ilist.end());
+        return insert(Where, Ilist.begin(), Ilist.end()); // TODO: insert(...)
     }
     
     ~list_v2() noexcept {
@@ -507,6 +557,7 @@ public:
     }
 
     size_type max_size() const noexcept {
+        // TODO: diff_type vs. size_type
         return static_cast<size_type>(std::numeric_limits<difference_type>::max); // redefine diff_type
     }
 
@@ -580,7 +631,7 @@ public:
     }
 
 private:
-    _Nodeptr _Unchecked_erase (_Nodeptr First, _Nodeptr Last) noexcept { // erase [First, Last)
+    _Nodeptr _Unchecked_erase (_Nodeptr First, const _Nodeptr Last) noexcept { // erase [First, Last)
 
     }
 
@@ -590,8 +641,7 @@ public:
 
         _Nodeptr Myhead = _Mycont._Myhead;
         _Node::_Free_non_head(Myhead);
-        Myhead->_Next = Myhead;
-        Myhead->_Prev = Myhead;
+        Myhead->_Next = Myhead; Myhead->_Prev = Myhead;
         _Mycont._Mysize = 0;
     }
 
@@ -626,8 +676,7 @@ private:
 
 
 private:
-    void _Alloc_head_and_proxy() { // NOTE: _Mycont doesn't exist yet in ctor list_v2()
-        // _Container_proxy* Newproxy = new _Container_proxy(&_Mycont); // TODO: delete
+    void _Alloc_head_and_proxy() {
         _Mycont._Container_base::_Alloc_proxy();
         _Mycont._Myhead = _Node::_Buy_head_node();
     }
