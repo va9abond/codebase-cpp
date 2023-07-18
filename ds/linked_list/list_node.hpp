@@ -23,35 +23,35 @@ struct _List_node { // list node
     using _Nodeptr        = _List_node<_Value_type>*;           
 
 
-    // explicit _List_node (
-    // 	const value_type& Value,
-    // 	_Nodeptr Prev,
-    // 	_Nodeptr Next
-    // ) noexcept :
-    // 	_Myval(Value),
-    // 	_Prev(Prev),
-    // 	_Next(Next)
-    // {}
-    //
-    // explicit _List_node (
-    // 	value_type&& Value,
-    // 	_Nodeptr Prev,
-    // 	_Nodeptr Next
-    // ) noexcept :
-    // 	_Myval(std::move(Value)), // TODO: check this
-    // 	_Prev(Prev),
-    // 	_Next(Next)
-    // {}
+    explicit _List_node (
+    	const value_type& Value,
+    	_Nodeptr Prev,
+    	_Nodeptr Next
+    ) noexcept :
+    	_Myval(Value),
+    	_Prev(Prev),
+    	_Next(Next)
+    {}
 
     explicit _List_node (
     	value_type&& Value,
     	_Nodeptr Prev,
     	_Nodeptr Next
     ) noexcept :
-    	_Myval(std::forward<value_type>(Value)), // TODO: check this
+    	_Myval(std::move(Value)), // TODO: check this
     	_Prev(Prev),
     	_Next(Next)
     {}
+
+    // explicit _List_node (
+    // 	value_type&& Value,
+    // 	_Nodeptr Prev,
+    // 	_Nodeptr Next
+    // ) noexcept :
+    // 	_Myval(std::forward<value_type>(Value)), // TODO: check this
+    // 	_Prev(Prev),
+    // 	_Next(Next)
+    // {}
 
     _List_node() = default;
     _List_node (const _List_node&) = delete;
