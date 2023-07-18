@@ -58,9 +58,8 @@ struct _List_node { // list node
     _List_node& operator= (const _List_node&) = delete;
     
     static _Nodeptr _Buy_head_node() {
-        const auto Result = static_cast<_Nodeptr>(::operator new(sizeof(_List_node<_Value_type>)));
-        Result->_Next = Result;
-        Result->_Prev = Result;
+        auto Result = new _List_node();
+        Result->_Next = Result; Result->_Prev = Result;
         return Result;
     }
 
@@ -72,14 +71,14 @@ struct _List_node { // list node
     
     static void _Freenode (_Nodeptr Ptr) noexcept {
         // destroy all members in Ptr
-        Ptr->~_Myval();
+        Ptr->_Myval.~_Value_type();
         _Freenode0(Ptr);
     }
 
     static void _Free_non_head (_Nodeptr Head) noexcept { 
         // free a list starting at Head and terminate at nullptr
         Head->_Prev->_Next = nullptr;
-        auto Pnode = Head;
+        auto Pnode = Head->_Next;
         for (_Nodeptr Pnext; Pnode; Pnode = Pnext) {
             Pnext = Pnode->_Next;
             _Freenode(Pnode);
