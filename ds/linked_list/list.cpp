@@ -379,7 +379,7 @@ public:
         // delete all elements
         _Tidy();
         // delete proxy
-        _Mycont._Free_proxy(); // TODO: impl _Free_proxy()
+        _Mycont._Free_proxy();
     }
 
     list_v2& operator= (const list_v2& Rhs); // TODO:
@@ -614,9 +614,7 @@ private:
     void _Alloc_head_and_proxy() { // NOTE: _Mycont doesn't exist yet in ctor list_v2()
         // _Container_proxy* Newproxy = new _Container_proxy(&_Mycont); // TODO: delete
         _Mycont._Container_base::_Alloc_proxy();
-        _Nodeptr Newhead = static_cast<_Nodeptr>(::operator new(sizeof(_Node)));
-        _Mycont._Myhead = Newhead;
-        Newhead->_Next = Newhead; Newhead->_Prev = Newhead;
+        _Mycont._Myhead = _Node::_Buy_head_node();
     }
 
     void _Orphan_all() noexcept {
