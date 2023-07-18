@@ -29,12 +29,33 @@ public:
     
     _List_val() noexcept : _Myhead(nullptr), _Mysize(0) {} 
 
-    void _Oprhan_iterators (_Nodeptr Ptr) noexcept;
+    void _Oprhan_iter_on_ptr (_Nodeptr Ptr) noexcept;
 
-    void _Orphan_non_end() noexcept;
+    void _Orphan_non_end() noexcept { // orphan iterators except end()
+        _Iterator_base** Pnext = &(this->_Myproxy->_Myfirstiter); 
+        const auto Head = _Myhead;
+        while (*Pnext) { // *Pnext ~ _Mynextiter
+            _Iterator_base** Pnextnext = &(*Pnext)->_Mynextiter;
+            // TODO: how it works? 
+            // casting from _Iterator_base to _List_const_iterator
+            if (static_cast<_List_const_iterator<_List_val>&>(**Pnext)._Myptr == Head) { // iterator is end(), move on
+                Pnext = Pnextnext;
+            } else {
+                (*Pnext)->_Myproxy = nullptr;
+                (*Pnext)->_Mynextiter = nullptr;
+                *Pnext = *Pnextnext;
+            }
+        }
+    }
 
-    _Nodeptr _Unlink_node (_Nodeptr Node) noexcept; // unlink node at Where from the list
-
+    _Nodeptr _Unlink_node (_Nodeptr Pnode) noexcept { // unlink node at Where from the list
+        _Orphan_ptr(Pnode);
+        Pnode->_Prev->_Next = Pnode->_Next;
+        Pnode->_Next->_Prev = Pnode->_Prev;
+        --_Mysize;
+        return Pnode;
+    }
+    
     void _Adopt_unique (_List_val& Other, _Nodeptr Node) noexcept {
         // adopt iterators pointing to spliced node
     }
@@ -438,7 +459,7 @@ public:
     }
 
     void resize (size_type Newsize) { // determine new length, padding with _Ty() elements as needed
-        _MSL_VERIFY_f(Newsize < mas_size(), "list too long");
+        _MSL_VERIFY_f(Newsize < max_size(), "list too long");
         
         if (Newsize > _Mycont._Mysize) { // pad to make larger
             _List_node_insert Appended;
@@ -453,7 +474,7 @@ public:
 
     void resize (size_type Newsize, const _Ty& Val) { 
         // determine new length, padding with Val elements as needed
-        _MSL_VERIFY_f(Newsize < mas_size(), "list too long");
+        _MSL_VERIFY_f(Newsize < max_size(), "list too long");
         
         if (Newsize > _Mycont._Mysize) { // pad to make larger
             _List_node_insert Appended;
@@ -516,8 +537,67 @@ public:
         _Unchecked_erase(_Mycont._Myhead->_Prev);
     }
 
+    iterator insert (const_iterator Where, const _Ty& Val) { // insert Val at Where
+        
+    }
+
+    iterator insert (const_iterator Where, size_type Count, const _Ty& Val) {
+
+    }
+    
+    template <class _Iter_t>
+    iterator insert (const_iterator Where, _Iter_t First, _Iter_t Last) { // insert [First, Last) before Where
+        
+    }
+
+    iterator erase (const const_iterator Where) noexcept {
+
+    }
+
+private:
+    _Nodeptr _Unchecked_erase (const _Nodeptr Pnode) noexcept { // erase element at Pnode
+
+    }
+
+public:
+    iterator erase (const const_iterator First, const const_iterator Last) noexcept {
+
+    }
+
+private:
+    _Nodeptr _Unchecked_erase (_Nodeptr First, _Nodeptr Last) noexcept { // erase [First, Last)
+
+    }
+
+public:
+    void clear() noexcept { // erase all 
+        _Mycont._Orphan_non_end(); // erase all iterators exclude end
+
+        _Nodeptr Myhead = _Mycont._Myhead;
+        _Node::_Free_non_head(Myhead);
+        Myhead->_Next = Myhead;
+        Myhead->_Prev = Myhead;
+        _Mycont._Mysize = 0;
+    }
+
+private:
+    void _Tidy() noexcept {
+        _Mycont._Container_base::_Orphan_all(); // erase all itearators
+        _Node::_Free_non_head(_Mycont._Myhead);
+        _Node::_Freenode0(_Mycont._Myhead); // _Myhead doesn't have constructed _Myval
+    }
+
+public:
+    void swap (list_v2& Rhs) noexcept {
+
+    }
+
+private:
+    // template <class 
+    // void _Assign_cast ()
 
 
+// TODO: check type conversation const_iterator <--> iterator
 
 
 
