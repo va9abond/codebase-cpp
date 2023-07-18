@@ -29,7 +29,21 @@ public:
     
     _List_val() noexcept : _Myhead(nullptr), _Mysize(0) {} 
 
-    void _Oprhan_iter_on_ptr (_Nodeptr Ptr) noexcept;
+    void _Oprhan_iter_on_ptr (_Nodeptr Ptr) noexcept { // orphan iterators with specified node pointers
+        _Iterator_base** Pnext = &(this->_Myproxy->_Myfirstiter);
+        const auto Head = _Myhead;
+        while (*Pnext) {
+            _Iterator_base** Pnextnext = &(*Pnext)->_Mynextiter;
+            const auto Pnextptr = static_cast<_List_const_iterator<_List_val>&>(**Pnext)._Myptr;
+            if (Pnextptr == Head || Pnextptr != Ptr) {
+                // iterator is end() or doesn't point at the one we are orphaning, move on
+                Pnext = Pnextnext;
+            } else { // orphan the iterator
+                (*Pnext)->_Myproxy = nullptr;
+                *Pnext = *Pnextnext; // now ...->_Mynextiter = *Pnextnext
+            }
+        }
+    }
 
     void _Orphan_non_end() noexcept { // orphan iterators except end()
         _Iterator_base** Pnext = &(this->_Myproxy->_Myfirstiter); 
@@ -38,7 +52,8 @@ public:
             _Iterator_base** Pnextnext = &(*Pnext)->_Mynextiter;
             // TODO: how it works? 
             // casting from _Iterator_base to _List_const_iterator
-            if (static_cast<_List_const_iterator<_List_val>&>(**Pnext)._Myptr == Head) { // iterator is end(), move on
+            if (static_cast<_List_const_iterator<_List_val>&>(**Pnext)._Myptr == Head) {
+                // iterator is end(), move on
                 Pnext = Pnextnext;
             } else {
                 (*Pnext)->_Myproxy = nullptr;
