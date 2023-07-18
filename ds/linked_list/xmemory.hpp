@@ -63,23 +63,19 @@ struct _Container_base {
     _Container_base (const _Container_base&)            = delete;
     _Container_base& operator= (const _Container_base&) = delete;
 
-    ~_Container_base() noexcept {
-        _Orphan_all();
-        delete _Myproxy;
-    }
 
-    void _Orhan_first() noexcept;
     void _Orphan_all() noexcept;
     void _Swap_proxy_and_iterators (_Container_base&) noexcept;
     
     void _Alloc_proxy() {
-        _Myproxy = static_cast<_Container_proxy*>(::operator new(sizeof(_Container_proxy)));
-        _Myproxy->_Mycont = this;
+        _Myproxy = new _Container_proxy(this);
+        // _Myproxy = static_cast<_Container_proxy*>(::operator new(sizeof(_Container_proxy)));
+        // _Myproxy->_Mycont = this;
     }
 
     void _Free_proxy() noexcept {
         _Myproxy->_Mycont = nullptr; _Myproxy->_Myfirstiter = nullptr;
-        delete _Myproxy;
+        delete _Myproxy; _Myproxy = nullptr;
     }
 
     
@@ -184,10 +180,10 @@ private:
 inline void _Container_base::_Orphan_all() noexcept {
     if (!_Myproxy) { return; } // no any iterators
    
-    _Iterator_base** Pnext = &(_Myproxy->_Myfirstiter);
-    while (*Pnext) {
-        (*Pnext)->_Myproxy = nullptr;
-        Pnext = &(*Pnext)->_Mynextiter;
+    _Iterator_base* Pnext = _Myproxy->_Myfirstiter; _Myproxy->_Myfirstiter = nullptr;
+    while (Pnext) {
+        Pnext->_Myproxy = nullptr;
+        Pnext = Pnext->_Mynextiter;
     }
     // NOTE: after that whihe loop we have iterators list somewhere in memory,
     // they don't rely with any container, but it still a connected list.
