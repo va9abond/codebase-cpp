@@ -8,7 +8,7 @@
 _MSL_BEGIN
 // [x] _List_unchecked_const_iterator
 //          [x] operator*
-//          [?] operator->
+//          [x] operator->
 //          [x] operator bool
 //          [x] operator++
 //          [x] operator++(int)
@@ -18,7 +18,7 @@ _MSL_BEGIN
 //          [x] operator!=
 // [x] _List_unchecked_iterator
 ///         [x] operator*
-//          [?] operator->
+//          [x] operator->
 //          [x] operator bool
 //          [x] operator++
 //          [x] operator++(int)
@@ -26,7 +26,7 @@ _MSL_BEGIN
 //          [x] opeartor--(int)
 // [x] _List_const_iterator
 //          [x] operator*
-//          [?] operator->
+//          [x] operator->
 //          [x] operator bool
 //          [x] operator++
 //          [x] operator++(int)
@@ -39,7 +39,7 @@ _MSL_BEGIN
 //          [-] _Seek_to
 // [x] _List_iterator
 //          [x] operator*
-//          [?] operator->
+//          [x] operator->
 //          [x] operator bool
 //          [x] operator++
 //          [x] operator++(int)
