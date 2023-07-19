@@ -23,35 +23,16 @@ struct _List_node { // list node
     using _Nodeptr        = _List_node<_Value_type>*;           
 
 
+    template <class _Arg_t>
     explicit _List_node (
-    	const value_type& Value,
+    	_Arg_t&& Value,
     	_Nodeptr Prev = nullptr,
     	_Nodeptr Next = nullptr
     ) noexcept :
-    	_Myval(Value),
+    	_Myval(std::forward<value_type>(Value)), // need type conversion from _Arg_t to value_type
     	_Prev(Prev),
     	_Next(Next)
     {}
-
-    explicit _List_node (
-    	value_type&& Value,
-    	_Nodeptr Prev = nullptr,
-    	_Nodeptr Next = nullptr
-    ) noexcept :
-    	_Myval(std::move(Value)), // TODO: check this
-    	_Prev(Prev),
-    	_Next(Next)
-    {}
-
-    // explicit _List_node (
-    // 	value_type&& Value,
-    // 	_Nodeptr Prev,
-    // 	_Nodeptr Next
-    // ) noexcept :
-    // 	_Myval(std::forward<value_type>(Value)), // TODO: check this
-    // 	_Prev(Prev),
-    // 	_Next(Next)
-    // {}
 
     _List_node() = default;
     _List_node (const _List_node&) = delete;
