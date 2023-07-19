@@ -66,7 +66,7 @@ struct _List_node { // list node
     static void _Freenode0 (_Nodeptr Ptr) noexcept {
         // destroy pointer members
         Ptr->_Next = nullptr; Ptr->_Prev = nullptr;
-        delete Ptr; 
+        delete Ptr; Ptr = nullptr;
     }
     
     static void _Freenode (_Nodeptr Ptr) noexcept {
