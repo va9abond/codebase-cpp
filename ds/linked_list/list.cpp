@@ -558,7 +558,7 @@ public:
 
     size_type max_size() const noexcept {
         // TODO: diff_type vs. size_type
-        return static_cast<size_type>(std::numeric_limits<difference_type>::max); // redefine diff_type
+        return static_cast<size_type>((std::numeric_limits<difference_type>::max)()); // redefine diff_type
     }
 
     bool empty() const noexcept {
