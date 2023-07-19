@@ -160,3 +160,80 @@
 
 
 # list.cpp
+### struct _List_simple_type_traits
+| _List_simple_type_traits<_Value_type> | : public \_Simple_type_traits |
+| ------------------------------------- | ----------------------------- |
+| _Node                                 | _List_node<_Value_type>       |
+| _Nodeptr                              | _List_node<_Value_type>\*     |
+
+### class _List_val
+| _List_val<_Val_types> | : public \_Container_base  |
+| --------------------- | -------------------------- |
+| _Nodeptr              | _Val_type::_Nodeptr        |
+| value_type            | _Val_type::value_type      |
+| size_type             | _Val_type::size_type       |
+| defference_type       | _Val_type::difference_type |
+| pointer               | _Val_type::pointer         |
+| const_pointer         | _Val_type::const_pointer   |
+| reference             | value_type&                |
+| const_reference       | const value_type&          |
+
+| _List_val | : public \_Container_base |
+| --------- | ------------------------- |
+| _Nodeptr  | _Myhead                   |
+| size_type | _Mysize                   |
+
+| keyword / feature | return    | name                | args      | notes     |
+| ----------------- | --------- | ------------------- | --------- | --------- |
+|                   | _List_val | default Ctor        |           |           |
+| \--------         | \-------- | \--------           | \-------- | \-------- |
+| noexcept          | void      | _Orphan_iter_on_ptr | _Nodeptr  |           |
+| noexcept          | void      | _Orphan_non_end     |           |           |
+| noexcept          | _Nodeptr  | _Unlink_node        | _Nodeptr  |           |
+
+### struct _List_node_emplace_v2
+| _List_node_emplace_v2<_Node_t> |           |
+| ------------------------------ | --------- |
+| pointer                        | _Node_t\* |
+
+| _List_node_emplace_v2 |         |
+| --------------------- | ------- |
+| pointer               | _Mynode |
+
+| keyword / feature   | return                | name                   | args           | notes     |
+| ------------------- | --------------------- | ---------------------- | -------------- | --------- |
+| template / explicit | _List_node_emplace_v2 | Ctor                   | _Value_types&& |           |
+| template / explicit | _List_node_emplace_v2 | Ctor                   | _Value_types&& |           |
+|                     |                       | Dtor                   |                | TODO: fix |
+|                     | _List_node_emplace_v2 | Ctor [ = delete ]      |                |           |
+|                     | _List_node_emplace_v2 | operator= [ = delete ] |                |           |
+| \--------           | \--------             | \--------              | \--------      | \-------- |
+| noexcept            | pointer               | _Transfer_before       | const pointer  |           |
+
+### struct _List_node_insert_v2
+| _List_node_insert_v2<_Node_t> |             |
+| ----------------------------- | ----------- |
+| value_type                    | _Node_t     |
+| pointer                       | _Node_t\*   |
+| size_type                     | std::size_t |
+
+| _List_node_insert_v2 |        |
+| -------------------- | ------ |
+| size_type            | _Added |
+| pointer              | _Head  |
+| pointer              | _Tail  |
+
+| keyword / feature | return               | name                    | args                                 | notes     |
+| ----------------- | -------------------- | ----------------------- | ------------------------------------ | --------- |
+| explicit          | _List_node_insert_v2 | default Ctor            |                                      |           |
+|                   | _List_node_insert_v2 | Ctor [ = delete ]       |                                      |           |
+|                   | _List_node_insert_v2 | Ctor [ = delete ]       |                                      |           |
+|                   |                      | Dtor                    |                                      |           |
+| \--------         | \--------            | \--------               | \--------                            | \-------- |
+|                   | void                 | _Append_n               | size_type                            |           |
+| template          | void                 | _Append_range_unchecked | _Iter_t1, \_Iter_t2                  |           |
+| template          | pointer              | _Attach_before          | _List_val<_Val_type>&, const pointer |           |
+| template          | void                 | _Attach_at_end          | _List_val<_Val_type>&                |           |
+| template          | void                 | _Attach_head            | _List_val<_Val_type>&                |           |
+
+### class list_v2
