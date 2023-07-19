@@ -25,8 +25,8 @@ struct _List_node { // list node
 
     explicit _List_node (
     	const value_type& Value,
-    	_Nodeptr Prev,
-    	_Nodeptr Next
+    	_Nodeptr Prev = nullptr,
+    	_Nodeptr Next = nullptr
     ) noexcept :
     	_Myval(Value),
     	_Prev(Prev),
@@ -35,8 +35,8 @@ struct _List_node { // list node
 
     explicit _List_node (
     	value_type&& Value,
-    	_Nodeptr Prev,
-    	_Nodeptr Next
+    	_Nodeptr Prev = nullptr,
+    	_Nodeptr Next = nullptr
     ) noexcept :
     	_Myval(std::move(Value)), // TODO: check this
     	_Prev(Prev),
