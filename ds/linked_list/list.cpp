@@ -64,7 +64,7 @@ public:
     }
 
     _Nodeptr _Unlink_node (_Nodeptr Pnode) noexcept { // unlink node at Where from the list
-        _Orphan_ptr(Pnode);
+        _Orphan_iter_on_ptr(Pnode);
         Pnode->_Prev->_Next = Pnode->_Next;
         Pnode->_Next->_Prev = Pnode->_Prev;
         --_Mysize;
@@ -284,7 +284,7 @@ private:
 //     [] insert (const_iterator, _Iter_t, _Iter_t)
 //     [] erase (const const_iterator)
 //     [] erase (const const_iterator, const const_iterator)
-//     [] _Unchecked_erase (const _Nodeptr)
+//     [?] _Unchecked_erase (const _Nodeptr)
 //     [] _Unchecked_erase (_Nodeptr, _Nodeptr)
 //     [?] clear
 //     [x] _Tidy
@@ -622,7 +622,9 @@ public:
 
 private:
     _Nodeptr _Unchecked_erase (const _Nodeptr Pnode) noexcept { // erase element at Pnode
-
+        const _Nodeptr Pnext = Pnode->_Next;
+        _Node::_Freenode(_Mycont._Unlink_node(Pnode));
+        return Pnext;
     }
 
 public:
@@ -632,7 +634,38 @@ public:
 
 private:
     _Nodeptr _Unchecked_erase (_Nodeptr First, const _Nodeptr Last) noexcept { // erase [First, Last)
+        if (First == Last) { return Last; }
 
+        const _Nodeptr Pprev = First->_Prev;
+        const _Nodeptr Head  = _Mycont._Myhead;
+        if (First == Head->_Next && Last == Head) { // orphan all non-end iterators
+            _Mycont._Orphan_non_end();
+        } else { // we need mark nodes to erase, cause [First, Last) may not be linear sequence
+            for (_Nodeptr Marked = First; Marked != Last; Marked = Marked->_Next) {
+                Marked->_Prev = nullptr;
+            } // orphan iterators points marked nodes
+            _Iterator_base** Inext = &(_Mycont._Myproxy->_Myfirstiter);
+            while (*Inext) {
+                _Iterator_base** Inextnext = &(*Inext)->_Mynextiter;
+                if (static_cast<const_iterator&>(**Inext)._Myptr->_Prev) { // node still has a _Prev, move on
+                    Inext = Inextnext;
+                } else { // orphan the iterator
+                    (*Inext)->_Myproxy = nullptr;
+                    *Inext = *Inextnext; // TODO: why * = *, and 2 line above just = ?
+                }
+            }
+        }
+
+        size_type Erase_count = 0;
+        do { // TODO: why do-while, First != Last on the first step ever, this case was viewed above
+            const _Nodeptr Next = First->_Next;
+            _Node::_Freenode(First);
+            First = Next;
+            ++Erase_count;
+        } while (First != Last);
+
+        _Mycont._Mysize -= Erase_count;
+        return Last;
     }
 
 public:
