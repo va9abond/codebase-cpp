@@ -155,14 +155,15 @@ struct _List_node_insert_v2 { // Does not specialize in allocator types
         if (Count <= 0) { return; }
 
         if (_Added == 0) { // no _Head, make it
-            pointer Newnode = static_cast<pointer>(::operator new(sizeof(value_type)));
-            _Head = Newnode; _Tail = Newnode;
+            pointer Newhead = new value_type();
+            _Head = Newhead; _Tail = Newhead;
             ++_Added;
             --Count;
         }
 
         for (; Count > 0; --Count) {
-            auto Newnode = static_cast<pointer>(::operator new(sizeof(value_type)));
+            pointer Newnode = new value_type();
+            // auto Newnode = static_cast<pointer>(::operator new(sizeof(value_type)));
             _Tail->_Next = Newnode;
             Newnode->_Prev = _Tail;
             _Tail = Newnode;
@@ -173,6 +174,32 @@ struct _List_node_insert_v2 { // Does not specialize in allocator types
     // template <class... _CArgT>
     // void _Append_n (size_type Count, const _CArgT&... _Carg);
     
+    template <
+        class _Iter_t1,
+        class _Iter_t2
+    >
+    void _Append_range_unchecked (_Iter_t1 First, _Iter_t2 Last) {
+        // Append values in [First, Last)
+        if (First == Last) { return; }
+
+        pointer Newnode = new value_type(*First);
+        if (_Added == 0) { // no _Head, make it
+            const pointer Newhead = new value_type(*First);
+            _Head = Newhead;
+            _Tail = Newhead;
+            ++_Added;
+            ++First;
+        }
+
+        while (First != Last) {
+            pointer Newnode = new value_type(*First);
+            _Tail->_Next = Newnode; Newnode->_Prev = _Tail;
+            _Tail - Newnode;
+            ++_Added;
+            ++First;
+        }
+    }
+
     template <class _Val_types>
     pointer _Attach_before (_List_val<_Val_types>& List, const pointer Insert_before) noexcept { // NOTO: check this!!
         // Attach the elements from *this in List before Where
@@ -248,12 +275,12 @@ private:
 //     [x] list_v2()
 //     [x] _Construct_n (Count)
 //     [x] list_v2 (Count)
-//     [] _Construct_n(Count, Val)
-//     [] list_v2 (Count, Val)
-//     [] _Construct_range_unchecked_my
-//     [] list_v2 (const list_v2& Rhs)
+//     [ ] _Construct_n(Count, Val)
+//     [ ] list_v2 (Count, Val)
+//     [?] _Construct_range_unchecked
+//     [ ] list_v2 (const list_v2& Rhs)
 //     [?] list_v2 (list_v2&&)
-//     [] operator=
+//     [ ] operator=
 //     [?] _Swap_val
 //     [x] push_front
 //     [x] push_back
@@ -262,16 +289,16 @@ private:
 //     [x] emplace_back
 //     [x] emplace (const const_iterator, _Ty&&)
 //     [x] _Emplace (const _Nodeptr, _Ty&&)
-//     [] list_v2 (std::init_list)
-//     [] list_v2& operator= (std::init_list)
-//     [] assign (std::init_list)
+//     [ ] list_v2 (std::init_list)
+//     [ ] list_v2& operator= (std::init_list)
+//     [ ] assign (std::init_list)
 //     [x] ~list_v2
-//     [] operator= 
+//     [ ] operator= 
 //     [?] all iters
 //     [x] resize (Newsize)
 //     [x] resize (Newsize, Val)
 //     [x] size
-//     [] max_size
+//     [ ] max_size
 //     [x] empty
 //     [?] front
 //     [?] back
@@ -279,19 +306,19 @@ private:
 //     [?] pop_front
 //     [?] push_back
 //     [?] pop_back
-//     [] insert (const_iterator, const _Ty&)
-//     [] insert (const_iterator, size_type, const _Ty&)
-//     [] insert (const_iterator, _Iter_t, _Iter_t)
-//     [] erase (const const_iterator)
-//     [] erase (const const_iterator, const const_iterator)
+//     [ ] insert (const_iterator, const _Ty&)
+//     [ ] insert (const_iterator, size_type, const _Ty&)
+//     [ ] insert (const_iterator, _Iter_t, _Iter_t)
+//     [ ] erase (const const_iterator)
+//     [ ] erase (const const_iterator, const const_iterator)
 //     [?] _Unchecked_erase (const _Nodeptr)
-//     [] _Unchecked_erase (_Nodeptr, _Nodeptr)
+//     [ ] _Unchecked_erase (_Nodeptr, _Nodeptr)
 //     [?] clear
 //     [x] _Tidy
-//     [] swap (list_v2&)
-//     [] remove
-//     [] remove_if
-//     [] reverse
+//     [ ] swap (list_v2&)
+//     [ ] remove
+//     [ ] remove_if
+//     [ ] reverse
 //     [x] _Alloc_head_and_proxy
 //     [x] _Orphan_all
 template < 
@@ -362,6 +389,19 @@ public:
         _Construct_n(Count, Val);
     }
 
+private:
+    template <
+    class _Iter_t1,
+    class _Iter_t2
+>
+    void _Construct_range_unchecked (_Iter_t1 First, const _Iter_t2 Last) {
+        _Mycont._Container_base::_Alloc_proxy();
+        _List_node_insert Appended;
+        Appended._Append_range_unchecked(std::move(First), Last);
+        Appended._Attach_head(_Mycont);
+    }
+
+public:
     list_v2 (const list_v2& Rhs); // TODO: _Construct_range_unchecked
 
     list_v2 (list_v2&& Rhs) : _Mycont(std::move(Rhs)) {
@@ -424,7 +464,7 @@ public:
     }
 
     list_v2 (std::initializer_list<_Ty> Ilist) : _Mycont() {
-        _Construct_range_unchecked_my(Ilist.begin(), Ilist.end()); // TODO: _Construct_range_unchecked_my
+        _Construct_range_unchecked(Ilist.begin(), Ilist.end()); // TODO: _Construct_range_unchecked
     }
 
     list_v2& operator= (std::initializer_list<_Ty> Ilist) { // TODO: assign
