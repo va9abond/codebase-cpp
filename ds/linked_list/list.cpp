@@ -1,3 +1,4 @@
+#include <cinttypes>
 #include <limits>
 #include "msldef.h"
 #include "xmemory.hpp"
@@ -273,49 +274,50 @@ private:
 
 // [ ] list_v2
 //     [x] list_v2()
-//     [x] _Construct_n (Count)
-//     [x] list_v2 (Count)
-//     [ ] _Construct_n(Count, Val)
-//     [ ] list_v2 (Count, Val)
-//     [?] _Construct_range_unchecked
-//     [ ] list_v2 (const list_v2& Rhs)
+//     [x] _Construct_n (size_type)
+//     [x] list_v2 (size_type)
+//     [ ] _Construct_n(size_type, const _Ty&)
+//     [ ] list_v2 (size_type, const _Ty&)
+//     [?] _Construct_range_unchecked (_Iter_t1, _Iter_t2)
+//     [?] list_v2 (const list_v2&)
 //     [?] list_v2 (list_v2&&)
-//     [ ] operator=
-//     [?] _Swap_val
-//     [x] push_front
-//     [x] push_back
-//     [x] insert (Where, &&Val)
-//     [x] emplace_front
-//     [x] emplace_back
+//     [ ] operator= (list_v2&&)
+//     [?] _Swap_val (list_v2&)
+//     [x] push_front (_Ty&&)
+//     [x] push_back (_Ty&&)
+//     [x] insert (const_iterator, _Ty&&)
+//     [x] emplace_front (_Ty&&)
+//     [x] emplace_back (_Ty&&)
 //     [x] emplace (const const_iterator, _Ty&&)
 //     [x] _Emplace (const _Nodeptr, _Ty&&)
-//     [ ] list_v2 (std::init_list)
-//     [ ] list_v2& operator= (std::init_list)
+//     [?] list_v2 (std::init_list)
+//     [ ] operator= (std::init_list)
 //     [ ] assign (std::init_list)
+//     [ ] insert (const_iterator, std::init_list)
 //     [x] ~list_v2
 //     [ ] operator= 
 //     [?] all iters
 //     [x] resize (Newsize)
-//     [x] resize (Newsize, Val)
+//     [ ] resize (Newsize, Val)
 //     [x] size
-//     [ ] max_size
+//     [x] max_size
 //     [x] empty
 //     [?] front
 //     [?] back
-//     [?] push_front
+//     [?] push_front (const _Ty&)
 //     [?] pop_front
-//     [?] push_back
+//     [?] push_back (const _Ty&)
 //     [?] pop_back
-//     [ ] insert (const_iterator, const _Ty&)
-//     [ ] insert (const_iterator, size_type, const _Ty&)
-//     [ ] insert (const_iterator, _Iter_t, _Iter_t)
-//     [ ] erase (const const_iterator)
-//     [ ] erase (const const_iterator, const const_iterator)
+//     [?] insert (const_iterator, const _Ty&)
+//     [?] insert (const_iterator, size_type, const _Ty&)
+//     [?] insert (const_iterator, _Iter_t, _Iter_t)
+//     [?] erase (const const_iterator)
+//     [?] erase (const const_iterator, const const_iterator)
 //     [?] _Unchecked_erase (const _Nodeptr)
-//     [ ] _Unchecked_erase (_Nodeptr, _Nodeptr)
+//     [?] _Unchecked_erase (_Nodeptr, _Nodeptr)
 //     [?] clear
 //     [x] _Tidy
-//     [ ] swap (list_v2&)
+//     [?] swap (list_v2&)
 //     [ ] remove
 //     [ ] remove_if
 //     [ ] reverse
@@ -402,11 +404,15 @@ private:
     }
 
 public:
-    list_v2 (const list_v2& Rhs); // TODO: _Construct_range_unchecked
+    list_v2 (const list_v2& Rhs) : _Mycont() {
+        _Mycont._Alloc_proxy();
+        _Construct_range_unchecked(Rhs._Unchecked_begin(), Rhs._Unchecked_end());
+    }
 
-    list_v2 (list_v2&& Rhs) : _Mycont(std::move(Rhs)) {
+    list_v2 (list_v2&& Rhs) : _Mycont(std::move(Rhs)) { // NOTE: Ctors for _List_val = delete, std::move works?
         _Alloc_head_and_proxy();
-        _Swap_val(Rhs);
+        _Swap_val(Rhs); // std::forward<list_v2>(Rhs) ?? _Swap_val(list_v2&)
+        //                                                                ^
     }
 
     list_v2& operator= (list_v2&& Rhs) noexcept; // TODO: Dtor need
@@ -464,7 +470,7 @@ public:
     }
 
     list_v2 (std::initializer_list<_Ty> Ilist) : _Mycont() {
-        _Construct_range_unchecked(Ilist.begin(), Ilist.end()); // TODO: _Construct_range_unchecked
+        _Construct_range_unchecked(Ilist.begin(), Ilist.end());
     }
 
     list_v2& operator= (std::initializer_list<_Ty> Ilist) { // TODO: assign
@@ -477,7 +483,7 @@ public:
     }
 
     iterator insert (const_iterator Where, std::initializer_list<_Ty> Ilist) { // insert initializer_list
-        return insert(Where, Ilist.begin(), Ilist.end()); // TODO: insert(...)
+        return insert(Where, Ilist.begin(), Ilist.end());
     }
     
     ~list_v2() noexcept {
@@ -583,7 +589,7 @@ public:
         
         if (Newsize > _Mycont._Mysize) { // pad to make larger
             _List_node_insert Appended;
-            Appended._Append_n(Newsize - _Mycont._Mysize, Val);
+            Appended._Append_n(Newsize - _Mycont._Mysize, Val); // TODO: _Append_n(size_type, const _Ty&)
             Appended._Attach_at_end();
         } else {
             while (Newsize < _Mycont._Mysize) {
@@ -644,20 +650,32 @@ public:
     }
 
     iterator insert (const_iterator Where, const _Ty& Val) { // insert Val at Where
-        
+        _MSL_VERIFY_f(Where._Getcont() == std::addressof(_Mycont), "list insert iterator outside range");
+        return _Make_iter(_Emplace(Where._Myptr, Val));
     }
 
-    iterator insert (const_iterator Where, size_type Count, const _Ty& Val) {
-
+    iterator insert (const_iterator Where, size_type Count, const _Ty& Val) { // TODO: _Append_n (size_type, const _Ty&)
+        _MSL_VERIFY_f(Where._Getcont() == std::addressof(_Mycont), "list insert iterator outside range");
+        _List_node_insert Appended;
+        Appended._Append_n(Count, Val); // TODO: _Append_n(size_type, const _Ty&)
+        return _Make_iter(Appended._Attach_before(_Mycont, Where._Myptr));
     }
     
     template <class _Iter_t>
     iterator insert (const_iterator Where, _Iter_t First, _Iter_t Last) { // insert [First, Last) before Where
-        
+        _MSL_VERIFY_f(Where._Getcont() == std::addressof(_Mycont), "list insert iterator outside range");
+        // verify range // TODO: verify range  
+        _List_node_insert Appended;
+        Appended._Append_range_unchecked(First, Last);
+        return _Make_iter(Appended._Attach_before(_Mycont, Where._Myptr));
     }
 
     iterator erase (const const_iterator Where) noexcept {
-
+        _MSL_VERIFY_f(Where._Getcont() == std::addressof(_Mycont), "list insert iterator outside range");
+        const _Nodeptr Result = Where._Myptr->_Next;
+        _Node::_Freenode(_Mycont._Unlink_node(Where._Myptr));
+        return _Make_iter(Result);
+        // return _Make_iter(_Unchecked_erase(Where._Myptr)); // NOTE: does it works?
     }
 
 private:
@@ -669,7 +687,8 @@ private:
 
 public:
     iterator erase (const const_iterator First, const const_iterator Last) noexcept {
-
+        // verify range // TODO: verify range
+        return _Make_iter(_Unchecked_erase(First._Myptr, Last._Myptr));
     }
 
 private:
@@ -727,26 +746,12 @@ private:
 
 public:
     void swap (list_v2& Rhs) noexcept {
-
+        if (this != std::addressof(Rhs)) {
+            _Swap_val(Rhs);
+        }
     }
 
-private:
-    // template <class 
-    // void _Assign_cast ()
-
-
 // TODO: check type conversation const_iterator <--> iterator
-
-
-
-
-
-
-
-
-
-
-
 
 private:
     void _Alloc_head_and_proxy() {
