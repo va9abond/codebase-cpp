@@ -72,9 +72,9 @@
 | noexcept          | void              | _Orphan_me_v2              |                          |           |           |
 
 
-# list_node.cpp
+# list_node.hpp
 ### struct _List_node
-| _List_node\<Value_type\> |                           |
+| _List_node\<Value_type\> |                         |
 | ---------------------- | ------------------------- |
 | value_type             | _Value_type               |
 | _Nodeptr               | _List_node<_Value_type>\* |
@@ -94,13 +94,69 @@
 | friend             | std::ostream& | operator<<                 | std::ostream&, const \_List_node<_Ty>& |           |                       |
 
 
+# list_iterator.hpp
+
+| Iterators                      |
+| ------------------------------ |
+| _List_unchecked_const_iterator |
+| _List_const_iterator           |
+| _List_const_iterator           |
+| _List_iterator                 |
+
+### struct _List_unchecked_const_iterator
+| _List_unchecked_const_iterator<\_Mylist, \_Base>|                                |
+| ----------------------------------------------- | ------------------------------- |
+| iterator_category                               | std::bidirectional_iterator_tag |
+| _Nodeptr                                        | _Mylist::_Nodeptr               |
+| value_type                                      | _Mylist::value_type             |
+| difference_type                                 | _Mylist::difference_type        |
+| pointer                                         | _Mylist::const_pointer          |
+| reference                                       | const value_type&               |
+
+| _List_unchecked_const_iterator |        |
+| ------------------------------ | ------ |
+| _Nodeptr                       | _Myptr |
+
+| keyword / feature           | return                         | name            | args                                  | notes     | status    |
+| --------------------------- | ------------------------------ | --------------- | ------------------------------------- | --------- | --------- |
+| noexcept                    | _List_unchecked_const_iterator | default Ctor    |                                       |           |           |
+| noexcept                    | _List_unchecked_const_iterator | Ctor            | _Nodeptr, const \_Mylist\*            |           |           |
+| \--------                   | \--------                      | \--------       | \--------                             | \-------- | \-------- |
+| const / noexcept            | reference                      | operator\*      |                                       |           |           |
+| const / noexcept            | pointer                        | operator->      |                                       |           |           |
+| explicit / const / noexcept | bool                           | operator bool   |                                       |           |           |
+| noexcept                    | _List_unchecked_const_iterator | operator++      |                                       |           |           |
+| noexcept                    | _List_unchecked_const_iterator | operator++(int) |                                       |           |           |
+| noexcept                    | _List_unchecked_const_iterator | operator--      |                                       |           |           |
+| noexcept                    | _List_unchecked_const_iterator | operator--(int) |                                       |           |           |
+| const / noexcept            | bool                           | operator==      | const \_List_unchecked_const_iterator |           |           |
+| const / noexcept            | bool                           | operator!=      | const \_List_unchecked_const_iterator |           |           |
+
+### struct _List_const_iterator
+| _List_const_iterator | : public \_List_unchecked_const_iterator |
+| -------------------- | ---------------------------------------- |
+| _Mybase              | _List_unchecked_const_iterator           |
+| iterator_category    | std::bidirectional_iterator_tag          |
+| _Nodeptr             | _Mylist::_Nodeptr                        |
+| value_type           | _Mylist::value_type                      |
+| difference_type      | _Mylist::difference_type                 |
+| pointer              | _Mylist::const_pointer                   |
+| reference            | const value_type&                        |
+
+| keyword / feature           | return                         | name            | args                                                     | notes     | status    |
+| --------------------------- | ------------------------------ | --------------- | -------------------------------------------------------- | --------- | --------- |
+| const / noexcept            | reference                      | operator\*      |                                                          |           |           |
+| const / noexcept            | pointer                        | operator->      |                                                          |           |           |
+| explicit / const / noexcept | bool                           | operator bool   |                                                          |           |           |
+| noexcept                    | _List_const_iterator           | operator++      |                                                          |           |           |
+| noexcept                    | _List_const_iterator           | operator++(int) |                                                          |           |           |
+| noexcept                    | _List_const_iterator           | operator--      |                                                          |           |           |
+| noexcept                    | _List_const_iterator           | operator--(int) |                                                          |           |           |
+| const / noexcept            | bool                           | operator==      | const \_List_const_iterator                              |           |           |
+| const / noexcept            | bool                           | operator!=      | const \_List_const_iterator                              |           |           |
+| \--------                   | \--------                      | \--------       | \--------                                                | \-------- | \-------- |
+| friend                      | void                           | _Verify_range   | const \_List_const_iterator, const \_List_const_iterator |           |           |
+|                             | _List_unchecked_const_iterator | _Unwrapped      |                                                          |           |           |
 
 
-
-
-
-
-
-
-
-
+# list.cpp
