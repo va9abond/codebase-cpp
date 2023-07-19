@@ -73,12 +73,12 @@ public:
     } 
 
     pointer operator->() const noexcept { // TODO: impl
-
+        return _Myptr;
     }
 
     explicit operator bool() const noexcept { // type conversation iterator to bool
                                               // _Myptr == nullptr ? true : false;
-        return _Myptr;
+        return _Myptr == nullptr;
     }
 
     _List_unchecked_const_iterator& operator++() noexcept {
@@ -137,7 +137,7 @@ public:
     }
 
     pointer operator->() const noexcept {
-        return this;
+        return _Mybase::_Myptr;
     }
 
     explicit operator bool() const noexcept {
@@ -198,7 +198,7 @@ public:
     }
 
     pointer operator->() const noexcept {
-        return this;
+        return _Mybase::_Myptr;
     } 
 
     explicit operator bool() const noexcept {
@@ -281,7 +281,7 @@ public:
     }  
 
     pointer operator->() const noexcept { // TODO: i'm not sure, probably its wrong
-        return this;
+        return _Mybase::_Myptr;
     }
 
     _List_iterator& operator++() noexcept {
