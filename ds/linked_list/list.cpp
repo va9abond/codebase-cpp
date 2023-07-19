@@ -30,7 +30,7 @@ public:
     
     _List_val() noexcept : _Myhead(nullptr), _Mysize(0) {} 
 
-    void _Oprhan_iter_on_ptr (_Nodeptr Ptr) noexcept { // orphan iterators with specified node pointers
+    void _Orphan_iter_on_ptr (_Nodeptr Ptr) noexcept { // orphan iterators with specified node pointers
         _Iterator_base** Pnext = &(this->_Myproxy->_Myfirstiter);
         const auto Head = _Myhead;
         while (*Pnext) {
