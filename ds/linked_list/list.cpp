@@ -202,7 +202,7 @@ struct _List_node_insert_v2 { // Does not specialize in allocator types
     }
 
     template <class _Val_types>
-    pointer _Attach_before (_List_val<_Val_types>& List, const pointer Insert_before) noexcept { // NOTO: check this!!
+    pointer _Attach_before (_List_val<_Val_types>& List, const pointer Insert_before) noexcept { // NOTE: check this!!
         // Attach the elements from *this in List before Where
         // If *this is empty, returns Where; otherwise returns a pointer to first inserted list node
         // Resets *this to the default-initialized state
