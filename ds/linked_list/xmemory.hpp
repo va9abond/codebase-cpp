@@ -106,6 +106,10 @@ public:
         _Orphan_me_v1();
     } 
 
+    void _Adopt_by_cont(const _Container_base* Parent) noexcept {
+        return _Adopt_me(Parent);
+    }
+
     const _Container_base* _Getcont() const noexcept {
         return _Myproxy ? _Myproxy->_Mycont : nullptr;
     }
