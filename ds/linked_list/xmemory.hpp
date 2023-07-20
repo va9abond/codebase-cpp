@@ -106,7 +106,7 @@ public:
         _Orphan_me_v1();
     } 
 
-    const _Container_base* _Getcont() noexcept {
+    const _Container_base* _Getcont() const noexcept {
         return _Myproxy ? _Myproxy->_Mycont : nullptr;
     }
 
