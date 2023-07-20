@@ -237,3 +237,96 @@
 | template          | void                 | _Attach_head            | _List_val<_Val_type>&                |           |
 
 ### class list_v2
+
+| list_v2<_Ty>              |                                                 |
+| ------------------------- | ----------------------------------------------- |
+| _Alloc                    | std::allocator<_Ty>                             |
+| _Node                     | _List_node<_Ty>                                 |
+| _Nodeptr                  | _List_node<_Ty>\*                               |
+| \--------                 | \--------                                       |
+| _Val_types                | _List_simple_type_traits<_Ty>                   |
+| _List_SCARY_val           | _List_val<_Val_types>                           |
+| _List_node_insert         | _List_node_insert_v2<_Node>                     |
+| _List_node_emplace        | _List_node_emplace_v2<_Node>                    |
+| \--------                 | \--------                                       |
+| value_type                | _Ty                                             |
+| allocator_type            | _Alloc                                          |
+| size_type                 | std::size_t                                     |
+| difference_type           | std::ptrdiff_t                                  |
+| pointer                   | _Ty\*                                           |
+| const_pointer             | const \_Ty\*                                    |
+| reference                 | value_type&                                     |
+| const_reference           | const value_type&                               |
+| \--------                 | \--------                                       |
+| iterator                  | _List_iterator<_List_SCARY_val>                 |
+| const_iterator            | _List_const_iterator<_List_SCARY_val>           |
+| _Unchecked_iterator       | _List_unchecked_iterator<_List_SCARY_val>       |
+| _Unchecked_const_iterator | _List_const_unchecked_iterator<_List_SCARY_val> |
+| \--------                 | \--------                                       |
+| reverse_iterator          | std::reverse_iterator<iterator>                 |
+| const_reverse_iterator    | std::reverse_iterator<const_iterator>           |
+
+| list_v2         |         |
+| --------------- | ------- |
+| _List_SCARY_val | _Mycont |
+
+| keyword / feature | return          | name                       | args                                       | notes                                        |
+| ----------------- | --------------- | -------------------------- | ------------------------------------------ | -------------------------------------------- |
+|                   | list_v2         | default Ctor               |                                            |                                              |
+| explicit          | list_v2         | Ctor                       | size_type                                  |                                              |
+|                   | list_v2         | Ctor                       | size_type, const \_Ty&                     |                                              |
+|                   | list_v2         | Ctor                       | const list_v2&                             |                                              |
+|                   | list_v2         | Ctor                       | list_v2&&                                  |                                              |
+|                   | list_v2         | Ctor                       | std::init_list                             |                                              |
+| \--------         | \--------       | \--------                  | \--------                                  | \--------                                    |
+|                   | void            | _Construct_n               | size_type                                  |                                              |
+|                   | void            | _Construct_n               | size_type, const \_Ty&                     | TODO: impl \_Append(size_type, const \_Ty&)  |
+| template          | void            | _Construct_range_unchecked | _Iter_t1, const \_Iter_t2                  |                                              |
+| \--------         | \--------       | \--------                  | \--------                                  | \--------                                    |
+|                   | list_v2&        | operator=                  | list_v2&&                                  | TODO: Dtor                                   |
+|                   | list_v2&        | operator=                  | std::init_list                             | TODO: assign (_Iter_t1, \_Iter_t2)           |
+|                   | list_v2&        | operator=                  | const list_v2&                             | TODO:                                        |
+|                   | void            | assign                     | std::init_list                             | TODO: assign (_Iter_t1, \_Iter_t2)           |
+|                   |                 | Dtor                       |                                            |                                              |
+| \--------         | \--------       | \--------                  | \--------                                  | \--------                                    |
+| noexcept          | void            | _Swap_val                  | list_v2&                                   |                                              |
+| \--------         | \--------       | \--------                  | \--------                                  | \--------                                    |
+|                   | void            | push_front                 | _Ty&&                                      |                                              |
+|                   | void            | push_back                  | _Ty&&                                      |                                              |
+|                   | void            | push_front                 | _Ty&                                       |                                              |
+|                   | void            | push_back                  | _Ty&                                       |                                              |
+|                   | decltype(auto)  | emplace_front              | _Ty&&                                      | TODO: template                               |
+|                   | decltype(auto)  | emplace_back               | _Ty&&                                      | TODO: template                               |
+|                   | iterator        | emplace                    | const_iterator, \_Ty&&                     | TODO: template                               |
+|                   | _Nodeptr        | emplace                    | const \_Nodeptr, \_Ty&&                    | TODO: template                               |
+|                   | iterator        | insert                     | const_iterator, \_Ty&&                     |                                              |
+|                   | iterator        | insert                     | const_iterator, std::init_list             |                                              |
+|                   | iterator        | insert                     | const_iterator, const \_Ty&                |                                              |
+|                   | iterator        | insert                     | const_iterator, size_type, const \_Ty&     | TODO: impl \_Append(size_type, const \_Ty&)  |
+| template          | iterator        | insert                     | _Iter_t, \_Iter_t                          | TODO: verify range; 2 iter types in template |
+|                   | void            | pop_front                  |                                            |                                              |
+|                   | void            | pop_back                   |                                            |                                              |
+| \--------         | \--------       | \--------                  | \--------                                  | \--------                                    |
+|                   | all iterators   |                            |                                            |                                              |
+| \--------         | \--------       | \--------                  | \--------                                  | \--------                                    |
+|                   | void            | resize                     | size_type                                  |                                              |
+|                   | void            | resize                     | size_type, const \_Ty&                     |                                              |
+| const / noexcept  | size_type       | size                       |                                            |                                              |
+| const / noexcept  | size_type       | max_size                   |                                            |                                              |
+| const / noexcept  | bool            | empty                      |                                            |                                              |
+| \--------         | \--------       | \--------                  | \--------                                  | \--------                                    |
+| noexcept          | reference       | front                      |                                            |                                              |
+| const / noexcept  | const_reference | front                      |                                            |                                              |
+| noexcept          | reference       | back                       |                                            |                                              |
+| const / noexcept  | const_reference | back                       |                                            |                                              |
+| \--------         | \--------       | \--------                  | \--------                                  | \--------                                    |
+| noexcept          | iterator        | erase                      | const const_iterator                       |                                              |
+| noexcept          | iterator        | erase                      | const const_iterator, const const_iterator | TODO: verify range                           |
+| noexcept          | _Nodeptr        | _Unchecked_erase           | const \_Nodeptr                            |                                              |
+| noexcept          | _Nodeptr        | _Unchecked_erase           | _Nodeptr, const \_Nodeptr                  |                                              |
+| noexcept          | void            | clear                      |                                            |                                              |
+| noexcept          | void            | _Tidy                      |                                            |                                              |
+| noexcept          | swap            | list_v2&                   |                                            |                                              |
+| \--------         | \--------       | \--------                  | \--------                                  | \--------                                    |
+|                   | void            | _Alloc_head_and_proxy      |                                            |                                              |
+| noexcept          | void            | _Orphan_all                |                                            |                                              |
