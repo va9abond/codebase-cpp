@@ -63,6 +63,10 @@ struct _Container_base {
     _Container_base (const _Container_base&)            = delete;
     _Container_base& operator= (const _Container_base&) = delete;
 
+    ~_Container_base() {
+        _Orphan_all();
+        _Free_proxy();
+    }
 
     void _Orphan_all() noexcept;
     void _Swap_proxy_and_iterators (_Container_base&) noexcept;
