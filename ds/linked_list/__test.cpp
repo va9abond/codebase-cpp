@@ -22,5 +22,7 @@ int main() {
     Cont_base2.~_Container_base();
 
 
+    std::cout << "Hello World";
+
     return 0;
 }

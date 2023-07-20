@@ -78,8 +78,10 @@ struct _Container_base {
     }
 
     void _Free_proxy() noexcept {
-        _Myproxy->_Mycont = nullptr; _Myproxy->_Myfirstiter = nullptr;
-        delete _Myproxy; _Myproxy = nullptr;
+        if (_Myproxy) {
+            _Myproxy->_Mycont = nullptr; _Myproxy->_Myfirstiter = nullptr;
+            delete _Myproxy; _Myproxy = nullptr;
+        }
     }
 
     
