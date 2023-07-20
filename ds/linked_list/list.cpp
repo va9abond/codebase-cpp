@@ -143,32 +143,31 @@ struct _List_node_insert_v2 { // Does not specialize in allocator types
 
     _List_node_insert_v2 (const _List_node_insert_v2&) = delete;
     _List_node_insert_v2& operator= (const _List_node_insert_v2&) = delete;
-
-    void _Append_n (size_type Count) { 
+    
+    template <class... _Arg_t>
+    void _Append_n (size_type Count, const _Arg_t&... Arg) { 
         // create an append list with Count pointers 
         // or add them to current one
         if (Count <= 0) { return; }
 
         if (_Added == 0) { // no _Head, make it
-            pointer Newhead = new value_type();
+            // auto Newhead = static_cast<pointer>(::operator new(sizeof(value_type)));
+            pointer Newhead = new value_type(Arg...);
             _Head = Newhead; _Tail = Newhead;
             ++_Added;
             --Count;
         }
 
         for (; Count > 0; --Count) {
-            pointer Newnode = new value_type();
             // auto Newnode = static_cast<pointer>(::operator new(sizeof(value_type)));
+            pointer Newnode = new value_type(Arg...);
             _Tail->_Next = Newnode;
             Newnode->_Prev = _Tail;
             _Tail = Newnode;
             ++_Added;
         }
     }
-    
-    // template <class... _CArgT>
-    // void _Append_n (size_type Count, const _CArgT&... _Carg);
-    
+     
     template <
         class _Iter_t1,
         class _Iter_t2
