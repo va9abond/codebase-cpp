@@ -90,31 +90,25 @@ public:
 };
 
 
-// [] _List_node_emplace_v2
-//     [] Ctor
-//         [] _Value_types&&... Vals
-//         [x] _Vauley_type&& Val
+// [x] _List_node_emplace_v2
+//     [x] Ctor
+//         [x] _Arg_t&&
 //     [x] Dtor
 //     [x] _Tranfer_before
 
 template <class _Node_t>
-struct _List_node_emplace_v2 { // Does not specialize in allocator types
+struct _List_node_emplace_v2 { // Does not specialize in node allocator types
     using pointer = _Node_t*;
     
-    template <class... _Value_types>
-    explicit _List_node_emplace_v2 (_Value_types&&... Vals) {
-         
-    }
 
-    template <class _Value_type>
-    explicit _List_node_emplace_v2 (_Value_type&& Val) {
-        _Mynode = new _Node_t(std::forward(Val));
+    template <class _Arg_t>
+    explicit _List_node_emplace_v2 (_Arg_t&& Val) {
+        _Mynode = new _Node_t(std::forward<_Arg_t>(Val), nullptr, nullptr);
     }
 
     ~_List_node_emplace_v2() { 
-        if (_Mynode != nullptr) { // emplace didn't happen; TODO: does it works?
-           ~(*_Mynode);
-            _Mynode = nullptr;
+        if (_Mynode != nullptr) {
+            _Node_t::_Freenode(_Mynode); _Mynode = nullptr;
         } 
     }
 
@@ -295,7 +289,7 @@ private:
 //     [ ] assign (std::init_list)
 //     [ ] insert (const_iterator, std::init_list)
 //     [x] ~list_v2
-//     [ ] operator= 
+//     [ ] operator= (const list_v2&) 
 //     [?] all iters
 //     [x] resize (Newsize)
 //     [ ] resize (Newsize, Val)

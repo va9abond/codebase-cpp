@@ -202,9 +202,8 @@
 
 | keyword / feature   | return                | name                   | args           | notes     |
 | ------------------- | --------------------- | ---------------------- | -------------- | --------- |
-| template / explicit | _List_node_emplace_v2 | Ctor                   | _Value_types&& |           |
-| template / explicit | _List_node_emplace_v2 | Ctor                   | _Value_types&& |           |
-|                     |                       | Dtor                   |                | TODO: fix |
+| template / explicit | _List_node_emplace_v2 | Ctor                   | _Arg_t&&       |           |
+|                     |                       | Dtor                   |                |           |
 |                     | _List_node_emplace_v2 | Ctor [ = delete ]      |                |           |
 |                     | _List_node_emplace_v2 | operator= [ = delete ] |                |           |
 | \--------           | \--------             | \--------              | \--------      | \-------- |
