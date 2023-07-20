@@ -448,7 +448,7 @@ public:
 
     iterator emplace (const const_iterator Where, _Ty&& Val) { // insert element at Where
         msl::_MSL_VERIFY_f(Where._Getcont() == std::addressof(_Mycont), "list emplace iterator outside range"); 
-        return _Make_iter(_Emplace(Where._Myptr, std::forward(Val)));
+        return _Make_iter(_Emplace(Where._Myptr, std::forward<_Ty>(Val)));
     }
 
     _Nodeptr _Emplace (const _Nodeptr Where, _Ty&& Val) { // insert element at Where
@@ -457,7 +457,7 @@ public:
             _MSL_REPORT_ERROR_f("list too long");
         } 
 
-        _List_node_emplace Emplaced{ std::forward(Val) };
+        _List_node_emplace Emplaced{ std::forward<_Ty>(Val) };
         ++_Mysize;
         return Emplaced._Transfer_before(Where);
     }
