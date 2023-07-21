@@ -181,7 +181,10 @@ private:
                               // to make assign, expression (this = _Mynextiter)
                               // or (this = *_Mynextiter) cause error(idk why) 
                               // INCORRECT ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        // 
+        // this and *Pnext point to same memory cell, and all those pointers that
+        // point to the memory cell this alse point to *Pnext, and if we change 
+        // *Pnext to another address, than all pointers will point to the cell
+        // corressponding to new adress // TODO: how it works?
         _Myproxy = nullptr; // why _Myproxy should be nullptr now, this points to
                             // _Mynextiter, doesn't it? And _Mynextiter still
                             // child of current container
