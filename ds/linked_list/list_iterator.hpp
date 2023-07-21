@@ -193,7 +193,7 @@ public:
         // (*) nullptr has type std::nullptr_t, which convertible to any
         // raw pointer type
         const _Mylist* Mycont = static_cast<const _Mylist*>(this->_Mybase::_Getcont());
-        _MSL_VERIFY_f(Mycont, "cannot dereference valut-initialized list iterator");
+        _MSL_VERIFY_f(Mycont, "cannot dereference value-initialized list iterator");
         _MSL_VERIFY_f(this->_Myptr != Mycont->_Myhead, "cannot dereference end list iterator");
 
         return _Mybase::_Myptr->_Myval;

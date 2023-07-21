@@ -101,9 +101,9 @@ struct _List_node_emplace_v2 { // Does not specialize in node allocator types
     using pointer = _Node_t*;
     
 
-    template <class _Arg_t>
-    explicit _List_node_emplace_v2 (_Arg_t&& Val) {
-        _Mynode = new _Node_t(std::forward<_Arg_t>(Val), nullptr, nullptr);
+    template <class... _Arg_t>
+    explicit _List_node_emplace_v2 (_Arg_t&&... Val) {
+        _Mynode = new _Node_t(std::forward<_Arg_t>(Val)..., nullptr, nullptr);
     }
 
     ~_List_node_emplace_v2() { 
@@ -377,7 +377,14 @@ public:
     }
 
 private:
-    void _Construct_n (size_type Count, const _Ty& Val); // TODO: impl _Append(Count, Val)
+    void _Construct_n(size_type Count, const _Ty& Val) {
+        // construct and apply Proxy for _Mycont
+        _Mycont._Container_base::_Alloc_proxy();
+        // append n elements constructed with Val
+        _List_node_insert Appended;
+        Appended._Append_n(Count);
+        Appended._Attach_head(_Mycont);
+    }
 
 public:
     list_v2 (size_type Count, const _Ty& Val) : _Mycont() {
@@ -451,13 +458,14 @@ public:
         return _Make_iter(_Emplace(Where._Myptr, std::forward<_Ty>(Val)));
     }
 
-    _Nodeptr _Emplace (const _Nodeptr Where, _Ty&& Val) { // insert element at Where
+    template <class... _Arg_t>
+    _Nodeptr _Emplace (const _Nodeptr Where, _Arg_t&&... Val) { // insert element at Where
         size_type& _Mysize = _Mycont._Mysize;
         if (_Mysize == max_size()) {
             _MSL_REPORT_ERROR_f("list too long");
         } 
 
-        _List_node_emplace Emplaced{ std::forward<_Ty>(Val) };
+        _List_node_emplace Emplaced{ std::forward<_Arg_t>(Val)... };
         ++_Mysize;
         return Emplaced._Transfer_before(Where);
     }

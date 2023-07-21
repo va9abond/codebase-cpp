@@ -29,7 +29,7 @@ struct _List_node { // list node
     	_Nodeptr Prev = nullptr,
     	_Nodeptr Next = nullptr
     ) noexcept :
-    	_Myval(std::forward<value_type>(Value)), // need type conversion from _Arg_t to value_type
+    	_Myval(std::forward<_Arg_t>(Value)), // need type conversion from _Arg_t to value_type
     	_Prev(Prev),
     	_Next(Next)
     {}

@@ -23,7 +23,7 @@ void print(const _Container_t<_Value_t>& Cont) {
 int main() {
    
     // default Ctor
-    std::list<int> exmpl;
+    //std::list<int> exmpl;
     list_v2<int> mylist;
     print(mylist);
 
@@ -32,28 +32,30 @@ int main() {
     print(mylist2);
 
     // list_v2 (size_type, const _Ty&)
-    //int var = 42;
-    //list_v2<int> mylist3(11, var);
-    //print(mylist3);
+    int var = 42;
+    //std::list<int> exmpl(11, var);
+    list_v2<int> mylist3(11, var);
+    print(mylist3);
 
     // operator= (list_v&&)
-    //mylist2 = list_v2<int>(5, var + 1);
-    //print(mylist2);
+    // mylist2 = list_v2<int>(5, var + 1);
+    // print(mylist2);
 
     // push_front (_Ty&&)
-    //mylist.push_front(1);
-    //print(mylist);
+    mylist.push_front(1);
+    print(mylist);
 
     // push_front (const _Ty&)
-    //mylist.push_front(var);
-    //print(mylist);
+    mylist.push_front(var);
+    print(mylist);
 
     // push_back (_Ty&&);
-    //mylist.push_back(9);
-    //print(mylist);
+    mylist.push_back(9);
+    print(mylist);
 
     // push_back (const _Ty&)
-    //mylist.push_back(var);
+    mylist.push_back(var);
+    print(mylist);
 
     // emplace_fornt (_Ty&&)
     //mylist.emplace_front(8);
