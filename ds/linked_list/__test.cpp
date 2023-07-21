@@ -1,4 +1,5 @@
 #include <iostream>
+#include <list>
 #include "list.cpp"
 
 
@@ -6,23 +7,28 @@ using msl::list_v2;
 using msl::_List_node;
 
 
+template< 
+    template <class... > class _Container_t,
+    class _Value_t
+>
+void print(const _Container_t<_Value_t>& Cont) {
+    auto It = Cont.begin(); std::cout << "\n" << "{ ";
+    while (It != Cont.end()) {
+        std::cout << *(++It) << " ";
+    }
+    std::cout << "};" << "\n";
+}
+
+
 int main() {
    
-    msl::_Container_base Cont_base1;
-    Cont_base1._Orphan_all();
-    Cont_base1._Alloc_proxy();
-    Cont_base1._Free_proxy();
-    Cont_base1._Alloc_proxy();
-
-    msl::_Container_base Cont_base2;
-    Cont_base2._Alloc_proxy();
-    Cont_base1._Swap_proxy_and_iterators(Cont_base2);
-
-    Cont_base1.~_Container_base();
-    Cont_base2.~_Container_base();
+    std::list<int> exmpl;
+    list_v2<int> mylist;
+    print(mylist);
 
 
-    std::cout << "Hello World";
 
+
+    std::cout << "END";
     return 0;
 }

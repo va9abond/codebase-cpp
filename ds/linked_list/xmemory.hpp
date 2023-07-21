@@ -103,7 +103,7 @@ public:
     }
 
     ~_Iterator_base() noexcept { // NOTE: mb i need to free allocated memory
-        _Orphan_me_v1();
+        _Orphan_me_v2();
     } 
 
     void _Adopt_by_cont(const _Container_base* Parent) noexcept {
@@ -126,14 +126,14 @@ private:
         if (Rhs._Myproxy) { // != nullptr => do adoption
             _Adopt_me(Rhs._Myproxy->_Mycont);
         } else { // == nullptr => no parent container now
-            _Orphan_me_v1();
+            _Orphan_me_v2();
         }
     }
 
     // adopt self by other parent container
     void _Adopt_me (const _Container_base* Other_parent) noexcept {
         if (!Other_parent) { // other parent container is nullptr, no parent cont now
-            _Orphan_me_v1();
+            _Orphan_me_v2();
             return;
         }
         
@@ -141,7 +141,7 @@ private:
         _Container_proxy* Other_parent_proxy = Other_parent->_Myproxy;
         if (_Myproxy != Other_parent_proxy) { // change parentage
             if (_Myproxy) { // already adopted, remove self from current list
-                _Orphan_me_v1();             
+                _Orphan_me_v2();             
             }
             
             // insert at the beginning of list
@@ -179,10 +179,13 @@ private:
         _MSL_VERIFY_f(*Pnext, "ITERATOR LIST CORRUPTED");
         *Pnext = _Mynextiter; // <=> this = _Mynextiter, but we need there Pnext
                               // to make assign, expression (this = _Mynextiter)
-                              // or (this = *_Mynextiter) cause error(idk why)
+                              // or (this = *_Mynextiter) cause error(idk why) 
+                              // INCORRECT ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        // 
         _Myproxy = nullptr; // why _Myproxy should be nullptr now, this points to
                             // _Mynextiter, doesn't it? And _Mynextiter still
                             // child of current container
+                            // INCORRECT ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     }
 };
 
