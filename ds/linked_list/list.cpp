@@ -147,7 +147,7 @@ struct _List_node_insert_v2 { // Does not specialize in allocator types
     template <class... _Arg_t>
     void _Append_n (size_type Count, const _Arg_t&... Arg) { 
         // create an append list with Count pointers 
-        // or add them to current one
+        // or add them to current local one
         if (Count <= 0) { return; }
 
         if (_Added == 0) { // no _Head, make it
