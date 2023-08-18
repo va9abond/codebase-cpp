@@ -54,5 +54,6 @@ doc
 master.cpp
 *.txt
 test*.cpp
+build/
 
 
