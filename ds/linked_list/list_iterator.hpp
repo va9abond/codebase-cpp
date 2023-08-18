@@ -17,7 +17,7 @@ _MSL_BEGIN
 //          [x] operator==
 //          [x] operator!=
 // [x] _List_unchecked_iterator
-///         [x] operator*
+//          [x] operator*
 //          [x] operator->
 //          [x] operator bool
 //          [x] operator++
@@ -65,12 +65,12 @@ public:
     _List_unchecked_const_iterator() noexcept : _Myptr() {}
 
     _List_unchecked_const_iterator (_Nodeptr Parent_node, const _Mylist* Parent_list) noexcept : _Myptr(Parent_node) {
-        _Base::_Adopt_by_cont(Parent_list); 
+        _Base::_Adopt_by_cont(Parent_list);
     }
 
     reference operator*() const noexcept {
         return _Myptr->_Myval;
-    } 
+    }
 
     pointer operator->() const noexcept { // TODO: impl
         return _Myptr;
@@ -106,7 +106,7 @@ public:
     bool operator== (const _List_unchecked_const_iterator& Rhs) const noexcept {
         return _Myptr == Rhs._Myptr;
     }
-    
+
     bool operator!= (const _List_unchecked_const_iterator& Rhs) const noexcept {
         return _Myptr != Rhs._Myptr;
     }
@@ -201,7 +201,7 @@ public:
 
     pointer operator->() const noexcept {
         return _Mybase::_Myptr;
-    } 
+    }
 
     explicit operator bool() const noexcept {
         const auto Mycont = static_cast<const _Mylist*>(this->_Getcont());
@@ -221,14 +221,14 @@ public:
         _List_const_iterator Temp = *this;
         ++(*this);
         return Temp;
-    } 
+    }
 
      _List_const_iterator& operator--() noexcept {
         const auto New_ptr = this->_Myptr->_Prev;
         const auto Mycont = static_cast<const _Mylist*>(this->_Getcont());
         _MSL_VERIFY_f(Mycont, "cannot decrement value_initialized list iterator");
         _MSL_VERIFY_f(New_ptr != Mycont->_Myhead, "cannot decrement begin list iterator");
-        
+
         this->_Myptr = New_ptr;
         return *this;
     }
@@ -243,7 +243,7 @@ public:
         _MSL_VERIFY_f(this->_Getcont() == Rhs._Getcont(), "list iterators incompatible");
         return this->_Myptr == Rhs._Myptr;
     }
-    
+
     bool operator!= (const _List_const_iterator& Rhs) const noexcept {
         return !(*this == Rhs);
     }
