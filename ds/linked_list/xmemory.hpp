@@ -25,12 +25,12 @@ _MSL_BEGIN
 template <class _Alloc, class _Value_type>
 using _Rebind_alloc_t = typename std::allocator_traits<_Alloc>::template rebind_alloc<_Value_type>;
 
-template <class _Alloc> // tests if allocator has simple addressing
-inline constexpr bool _Is_simple_alloc_v =
-    std::is_same_v<typename std::allocator_traits<_Alloc>::size_type, size_t>
-    && std::is_same_v<typename std::allocator_traits<_Alloc>::difference_type, ptrdiff_t>
-    && std::is_same_v<typename std::allocator_traits<_Alloc>::pointer, typename _Alloc::value_type*>
-    && std::is_same_v<typename std::allocator_traits<_Alloc>::const_pointer, const typename _Alloc::value_type*>;
+// template <class _Alloc> // tests if allocator has simple addressing
+// inline constexpr bool _Is_simple_alloc_v =
+//     std::is_same_v<typename std::allocator_traits<_Alloc>::size_type, size_t>
+//     && std::is_same_v<typename std::allocator_traits<_Alloc>::difference_type, ptrdiff_t>
+//     && std::is_same_v<typename std::allocator_traits<_Alloc>::pointer, typename _Alloc::value_type*>
+//     && std::is_same_v<typename std::allocator_traits<_Alloc>::const_pointer, const typename _Alloc::value_type*>;
 
 template <class _Value_type> 
 struct _Simple_type_traits { // _Simple_types in STL

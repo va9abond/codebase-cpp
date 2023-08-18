@@ -63,8 +63,19 @@ int main() {
     //mylist.emplace_back(7);
     //print(mylist);
 
+    // print(mylist2);
+    // mylist.insert(++mylist.begin(), mylist2.begin(), mylist2.end());
+    // print(mylist);
 
+    // std::list<int> list1(4);
+    // print(list1);
+    //
+    // std::list<int> list_main;
+    // list_main.insert(++list_main.begin(), list1.begin(), list1.end());
+    // print(list_main);
 
+    mylist.erase(++mylist.begin());
+    print(mylist);
 
     std::cout << "END";
     return 0;

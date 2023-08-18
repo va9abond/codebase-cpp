@@ -199,7 +199,7 @@ struct _List_node_insert_v2 { // Does not specialize in allocator types
         // Attach the elements from *this in List before Where
         // If *this is empty, returns Where; otherwise returns a pointer to first inserted list node
         // Resets *this to the default-initialized state
-    
+
         if (_Added == 0) { return Insert_before; }
 
         const auto Local_head = _Head;
@@ -223,7 +223,7 @@ struct _List_node_insert_v2 { // Does not specialize in allocator types
     }
 
     template <class _Val_types>
-    void _Attach_head (_List_val<_Val_types>& List) { // 
+    void _Attach_head (_List_val<_Val_types>& List) {
         // Create within *this list head pointer and transfer new whole append list in empty List
         pointer Newhead = static_cast<pointer>(::operator new(sizeof(value_type)));
         // create new head
@@ -240,9 +240,9 @@ struct _List_node_insert_v2 { // Does not specialize in allocator types
         } // NOTE: after that we have:
           // ... <--> Local_tail <--> Newhead <--> Loca_head <--> ...
           // Local_head doesn't have _Myval
-       
+
         List._Mysize = _Added;
-        List._Myhead = Newhead; 
+        List._Myhead = Newhead;
         _Head = nullptr; _Tail = nullptr; _Added = 0;
     }
 
@@ -332,10 +332,10 @@ private:
     using _List_node_emplace = _List_node_emplace_v2<_List_node<_Ty>>;
 
 public:
-    static_assert(std::is_same_v<_Ty, typename _Alloc::value_type>,
-                  "list<T, Allocator> and T MISMATCHED ALLOCATOR");
-    static_assert(std::is_object_v<_Ty>, "The C++ Standard forbids containers of non-object types "
-                                         "because of [container.requirements].");
+//     static_assert(std::is_same_v<_Ty, typename _Alloc::value_type>,
+//                   "list<T, Allocator> and T MISMATCHED ALLOCATOR");
+//     static_assert(std::is_object_v<_Ty>, "The C++ Standard forbids containers of non-object types "
+//                                          "because of [container.requirements].");
 
     using value_type      = _Ty;
     using allocator_type  = _Alloc;
@@ -356,7 +356,7 @@ public:
 
     _List_SCARY_val _Mycont;
 
-    
+
     list_v2() : _Mycont() {
         _Alloc_head_and_proxy();
     }
@@ -393,9 +393,9 @@ public:
 
 private:
     template <
-    class _Iter_t1,
-    class _Iter_t2
->
+        class _Iter_t1,
+        class _Iter_t2
+    >
     void _Construct_range_unchecked (_Iter_t1 First, const _Iter_t2 Last) {
         _Mycont._Container_base::_Alloc_proxy();
         _List_node_insert Appended;
@@ -422,17 +422,17 @@ private:
         auto& Mycont = _Mycont;
         auto& Rhscont = Rhs._Mycont;
         Mycont._Swap_proxy_and_iterators(Rhscont);
-        
+
         auto* Temp = _Mycont._Myhead;
         _Mycont._Myhead = Rhs._Mycont._Myhead;
         Rhs._Mycont._Myhead = Temp;
-        
+
         std::swap(Mycont._Mysize, Rhscont._Mysize);
     }
 
 public:
     void push_front (_Ty&& Val) { // insert element at beginning
-        _Emplace(_Mycont._Myhead->_Next, std::move(Val)); 
+        _Emplace(_Mycont._Myhead->_Next, std::move(Val));
     }
 
     void push_back (_Ty&& Val) { // insert element at end
@@ -440,11 +440,11 @@ public:
     }
 
     iterator insert (const_iterator Where, _Ty&& Val) { // Val at Where
-        return emplace(Where, std::move(Val)); 
+        return emplace(Where, std::move(Val));
     }
 
     decltype(auto) emplace_front (_Ty&& Val) { // insert element at beggining
-        reference Result = _Emplace(_Mycont._Myhead->_Next, std::move(Val)); 
+        reference Result = _Emplace(_Mycont._Myhead->_Next, std::move(Val));
         return Result;
     }
 
@@ -454,7 +454,7 @@ public:
     }
 
     iterator emplace (const const_iterator Where, _Ty&& Val) { // insert element at Where
-        msl::_MSL_VERIFY_f(Where._Getcont() == std::addressof(_Mycont), "list emplace iterator outside range"); 
+        msl::_MSL_VERIFY_f(Where._Getcont() == std::addressof(_Mycont), "list emplace iterator outside range");
         return _Make_iter(_Emplace(Where._Myptr, std::forward<_Ty>(Val)));
     }
 
@@ -463,7 +463,7 @@ public:
         size_type& _Mysize = _Mycont._Mysize;
         if (_Mysize == max_size()) {
             _MSL_REPORT_ERROR_f("list too long");
-        } 
+        }
 
         _List_node_emplace Emplaced{ std::forward<_Arg_t>(Val)... };
         ++_Mysize;
@@ -486,7 +486,7 @@ public:
     iterator insert (const_iterator Where, std::initializer_list<_Ty> Ilist) { // insert initializer_list
         return insert(Where, Ilist.begin(), Ilist.end());
     }
-    
+
     ~list_v2() noexcept {
         // delete all elements
         _Tidy();
@@ -549,7 +549,7 @@ public:
     reverse_iterator rend() noexcept {
         return reverse_iterator(begin());
     }
-    
+
     const_reverse_iterator rend() const noexcept {
         return const_reverse_iterator(begin());
     }
@@ -572,7 +572,7 @@ public:
 
     void resize (size_type Newsize) { // determine new length, padding with _Ty() elements as needed
         _MSL_VERIFY_f(Newsize < max_size(), "list too long");
-        
+
         if (Newsize > _Mycont._Mysize) { // pad to make larger
             _List_node_insert Appended;
             Appended._Append_n(Newsize - _Mycont._Mysize);
@@ -587,7 +587,7 @@ public:
     void resize (size_type Newsize, const _Ty& Val) { 
         // determine new length, padding with Val elements as needed
         _MSL_VERIFY_f(Newsize < max_size(), "list too long");
-        
+
         if (Newsize > _Mycont._Mysize) { // pad to make larger
             _List_node_insert Appended;
             Appended._Append_n(Newsize - _Mycont._Mysize, Val); // TODO: _Append_n(size_type, const _Ty&)
@@ -661,13 +661,13 @@ public:
         Appended._Append_n(Count, Val); // TODO: _Append_n(size_type, const _Ty&)
         return _Make_iter(Appended._Attach_before(_Mycont, Where._Myptr));
     }
-    
+
     template <class _Iter_t>
     iterator insert (const_iterator Where, _Iter_t First, _Iter_t Last) { // insert [First, Last) before Where
         _MSL_VERIFY_f(Where._Getcont() == std::addressof(_Mycont), "list insert iterator outside range");
-        // verify range // TODO: verify range  
+        // verify range // TODO: verify range
         _List_node_insert Appended;
-        Appended._Append_range_unchecked(First, Last);
+        Appended._Append_range_unchecked(First, Last); // TODO: I should pass unwrapped iterators
         return _Make_iter(Appended._Attach_before(_Mycont, Where._Myptr));
     }
 
@@ -729,7 +729,7 @@ private:
     }
 
 public:
-    void clear() noexcept { // erase all 
+    void clear() noexcept { // erase all
         _Mycont._Orphan_non_end(); // erase all iterators exclude end
 
         _Nodeptr Myhead = _Mycont._Myhead;
