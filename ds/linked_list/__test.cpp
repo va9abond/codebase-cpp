@@ -22,7 +22,7 @@ void print(const _Container_t<_Value_t>& Cont) {
 
 
 int main() {
-   
+
     // default Ctor
     //std::list<int> exmpl;
     list_v2<int> mylist;
@@ -62,7 +62,7 @@ int main() {
     //mylist.emplace_front(8);
     //mylist.emplace_back(7);
     //print(mylist);
-    
+
 
 
 

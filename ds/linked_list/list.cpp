@@ -19,16 +19,16 @@ template <class _Val_types>
 class _List_val : public _Container_base {
 public:
     using _Nodeptr = typename _Val_types::_Nodeptr;
-    
+
     using value_type      = typename _Val_types::value_type;
     using size_type       = typename _Val_types::size_type;
     using difference_type = typename _Val_types::difference_type;
     using pointer         = typename _Val_types::pointer;
     using const_pointer   = typename _Val_types::const_pointer;
     using reference       = value_type&;
-    using const_reference = const value_type&;    
-    
-    _List_val() noexcept : _Myhead(nullptr), _Mysize(0) {} 
+    using const_reference = const value_type&;
+
+    _List_val() noexcept : _Myhead(nullptr), _Mysize(0) {}
 
     void _Orphan_iter_on_ptr (_Nodeptr Ptr) noexcept { // orphan iterators with specified node pointers
         _Iterator_base** Pnext = &(this->_Myproxy->_Myfirstiter);
@@ -143,7 +143,7 @@ struct _List_node_insert_v2 { // Does not specialize in allocator types
 
     _List_node_insert_v2 (const _List_node_insert_v2&) = delete;
     _List_node_insert_v2& operator= (const _List_node_insert_v2&) = delete;
-    
+
     template <class... _Arg_t>
     void _Append_n (size_type Count, const _Arg_t&... Arg) { 
         // create an append list with Count pointers 
@@ -167,7 +167,7 @@ struct _List_node_insert_v2 { // Does not specialize in allocator types
             ++_Added;
         }
     }
-     
+
     template <
         class _Iter_t1,
         class _Iter_t2
@@ -377,12 +377,12 @@ public:
     }
 
 private:
-    void _Construct_n(size_type Count, const _Ty& Val) {
-        // construct and apply Proxy for _Mycont
+    void _Construct_n (size_type Count, const _Ty& Val) {
+        // construct and create Proxy for _Mycont
         _Mycont._Container_base::_Alloc_proxy();
         // append n elements constructed with Val
         _List_node_insert Appended;
-        Appended._Append_n(Count);
+        Appended._Append_n(Count, Val);
         Appended._Attach_head(_Mycont);
     }
 
