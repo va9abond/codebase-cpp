@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 
-namespace MSL {
+namespace msl {
 double generateDouble(double value_min, double value_max) {
     double value = (double)rand() / RAND_MAX;
     return value_min + value * (value_max - value_min);
@@ -99,5 +99,21 @@ TContainer<TObject> filter (const TContainer<TObject> &container,
         }
     }
     return containerResult;
+}
+
+template <
+    template<class...> class Cont_input_t,
+    template<class...> class Cont_output_t, // should be stack or queue or general_container
+    class Val_t
+>
+Cont_output_t<Val_t> general_filter (const Cont_input_t<Val_t> &Cont,
+                                     bool (*func_key)(Val_t)) {
+    Cont_output_t<Val_t> Cont_output;
+    for (Val_t value : Cont) {
+        if (func_key(value) == true) {
+            Cont_output.insert(value);
+        }
+    }
+    return Cont_output;
 }
 }

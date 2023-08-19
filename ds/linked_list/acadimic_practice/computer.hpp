@@ -3,7 +3,7 @@
 #include <iostream>
 #include <algorithm>
 
-namespace MSL {
+namespace msl {
 class Computer {
 public:
     Computer (std::string model = "unknown",
