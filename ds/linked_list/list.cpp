@@ -1,3 +1,6 @@
+#ifndef LIST_CPP
+#define LIST_CPP
+
 #include <cinttypes>
 #include <limits>
 #include "msldef.h"
@@ -71,7 +74,7 @@ public:
         --_Mysize;
         return Pnode;
     }
-    
+
     void _Adopt_unique (_List_val& Other, _Nodeptr Node) noexcept {
         // adopt iterators pointing to spliced node
     }
@@ -316,7 +319,7 @@ private:
 //     [ ] reverse
 //     [x] _Alloc_head_and_proxy
 //     [x] _Orphan_all
-template < 
+template <
     class _Ty
 >
 class list_v2 { // does not prepare for custom allocators!
@@ -409,7 +412,7 @@ public:
         _Construct_range_unchecked(Rhs._Unchecked_begin(), Rhs._Unchecked_end());
     }
 
-    list_v2 (list_v2&& Rhs) : _Mycont(std::move(Rhs)) { // NOTE: Ctors for _List_val = delete, std::move works?
+    list_v2 (list_v2&& Rhs) : _Mycont() { // NOTE: Ctors for _List_val = delete, std::move works?
         _Alloc_head_and_proxy();
         _Swap_val(Rhs); // std::forward<list_v2>(Rhs) ?? _Swap_val(list_v2&)
         //                                                                ^
@@ -584,7 +587,7 @@ public:
         }
     }
 
-    void resize (size_type Newsize, const _Ty& Val) { 
+    void resize (size_type Newsize, const _Ty& Val) {
         // determine new length, padding with Val elements as needed
         _MSL_VERIFY_f(Newsize < max_size(), "list too long");
 
@@ -636,7 +639,7 @@ public:
         _Emplace(_Mycont._Myhead->_Next, Val);
     }
 
-    void pop_front() noexcept { 
+    void pop_front() noexcept {
         _MSL_VERIFY_f(_Mycont._Mysize != 0, "pop_front() called on empty list");
         _Unchecked_erase(_Mycont._Myhead->_Next);
     }
@@ -765,3 +768,4 @@ private:
     }
 };
 _MSL_END
+#endif
