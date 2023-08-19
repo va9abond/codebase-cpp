@@ -43,6 +43,62 @@ namespace MYBASE {
 // ****************************************************************************
 
     // i'm done
+template <
+    class Ty1_,
+    class Ty2_
+>
+struct mypair {
+public:
+
+    // tags:
+    using first_type  = Ty1_;
+    using second_type = Ty2_;
+
+
+
+    mypair (const Ty1_ &Val1, const Ty2_ &Val2) noexcept :
+        first(Val1),
+        second(Val2)
+    {}
+
+    ~mypair() = default;
+
+    // template <
+    //     class _Other1,
+    //     class _Other2
+    // >
+    // explicit mypair(_Other1 &&Val1, _Other2 &&Val2) noexcept :
+    //     first(std::forward<_Other1>(Val1)),
+    //     second(std::forward<_Other2>(Val2)) 
+    // {}
+
+    mypair& operator= (const volatile mypair&) = delete;
+
+    // _CONSTEXPR20 pair& operator=(const pair<_Other1, _Other2>& _Right) noexcept(
+    // is_nothrow_assignable_v<_Ty1&, const _Other1&>&&
+    // is_nothrow_assignable_v<_Ty2&, const _Other2&>) /* strengthened */ {
+    // first  = _Right.first;
+    // second = _Right.second;
+    // return *this;
+    // }
+
+    mypair (const mypair&) = default;
+    
+    mypair (mypair&&) = default;
+
+    void swap (mypair &other) {
+        if (this != std::addressof(other)) {
+            _MYBASE swap(first , other.first );
+            _MYBASE swap(second, other.second);
+        }
+    }
+
+
+
+    Ty1_ first;
+    Ty2_ second;
+
+};
 
 // ****************************************************************************
 // ************************* ContainerNodeInterface ***************************
