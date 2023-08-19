@@ -62,26 +62,16 @@ TObject POP (TContainer<TObject> &container, const int &pos) {
 
 
 
-template <
-    template<class...> class TContainer,
-    class TObject
+template< 
+    template <class... > class _Container_t,
+    class _Value_t
 >
-void print (const TContainer<TObject> &container) {
-    // std::for_each(list.begin(), list.end(), [](const Type &n) { std::cout << n << ", "; });
-    auto itt = container.begin();
-
-    while ( itt != container.end() ) {
-        if ( itt == container.begin() ) {
-            std::cout << '\n' << "{ " << *itt;
-        }
-        else {
-            std::cout << ", " << *itt; 
-        }
-
-        itt++;
+void print(const _Container_t<_Value_t>& Cont) {
+    auto It = Cont.begin(); std::cout << "\n" << "{ ";
+    while (It != Cont.end()) {
+        std::cout << *(It++) << " ";
     }
-
-    std::cout << " }";
+    std::cout << "};" << "\n";
 }
 
 
