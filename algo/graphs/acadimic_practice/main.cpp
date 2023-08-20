@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "vector_utils.hpp"
-// #include "graph.hpp"
+#include "graph.hpp"
 
 
 template<
@@ -18,23 +17,10 @@ void print (const _Container_t<_Value_t>& Cont) {
 
 
 int main() {
-
-    // auto string = generate_vector_from_file<int>("graph.txt");
-    // std::cout << string << "\n";
-
-    std::string mystr { "hola muchaco" };
-    // for (std::string::size_type sz{0}; sz < mystr.size(); ++sz) {
-    //     std::cout << mystr[sz] << "\n";
-    // }
-
-    // std::cout << mystr.substr(0, 6);
-
-    std::string sstr {"{34, 4, 332, gskg, 25,323 };"};
-    std::vector<int> myvec = str_to_vec(sstr);
-    print(myvec);
-
-    // std::cout << mystr.substr(0,2);
-
+    weighted_graph<int> graph { "graph.txt" };
+    for (const std::vector<int> &vec : graph.data) {
+        print(vec);
+    }
 
     return 0;
 }

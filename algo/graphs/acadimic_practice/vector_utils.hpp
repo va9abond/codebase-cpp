@@ -10,28 +10,6 @@
 using s_sz = std::string::size_type;
 
 
-// file to double vector
-template <
-    class Val_t
->
-// inline std::vector<Val_t> generate_vector_from_file (std::ifstream& file) {
-inline decltype(auto) generate_vector_from_file (const std::string& file_name) {
-    std::ifstream file (file_name, std::ios::in); // create an input stream to read from file
-    // file.open(file_name, std::ios::in); // open file by file_name
-    std::string string_res;
-
-    if (file.is_open()) {
-    std::string line;
-        while (getline(file, line)) {
-            string_res += line;
-        }
-    }
-
-    file.close();
-    return string_res;
-}
-
-
 inline bool is_digit (char c) { return (c > 47 && c < 58 ? true : false); }
 
 
@@ -50,18 +28,23 @@ inline s_sz find_last_numeric (const std::string& str, s_sz pos) {
 }
 
 
+// [WARNING]: Val_t should have conversation to std::string with
+//            std::{ stoi, stol, stoll, stof, stod, stold, stoul, stoull } or
+//            with user-defined function
+// [WARNING]: First symbol of str MUST be non numeric
+// [TODO]: make a template; try std::vector<decltype(auto)>
 inline std::vector<int> str_to_vec (const std::string &str) {
-    std::vector<int> Result;
+    std::vector<int> result;
     s_sz pos_first {0}, pos_last {0}; /* pos_global {0} */;
     for (
       pos_first = find_first_numeric(str, pos_first);
       pos_first < str.size() && pos_first;
-      pos_first = pos_last + 1
-    ) {
+      pos_first = pos_last + 1, pos_first = find_first_numeric(str, pos_first)
+   ) {
         pos_last  = find_last_numeric(str, pos_first + 1);
-        Result.push_back( std::stoi(str.substr(pos_first, pos_last - pos_first)) );
+        result.push_back( std::stoi(str.substr(pos_first, pos_last - pos_first)) );
     }
-    return Result;
+    return result;
 }
 
 
@@ -75,33 +58,20 @@ inline std::string normalize_string (std::string str) {
 }
 
 
-template<
-    class Val_t
->
-decltype(auto) find_next_value (const std::string& str) {
-    // str
+// file to double vector
+inline std::vector<std::vector<int>> generate_vector_from_file (const std::string& file_name) {
+    std::ifstream file (file_name, std::ios::in); // create an input stream to read from file
+    std::vector<std::vector<int>> result;
+
+    if (file.is_open()) {
+        std::string line;
+        while (getline(file, line)) {
+            std::vector<int> current_line_vector = str_to_vec(line);
+            if (current_line_vector.size()) { result.push_back(current_line_vector); }
+        }
+    }
+
+    file.close();
+    return result;
 }
-
-
-// template <
-//     class Val_t
-// >
-// // [WARNING]: Val_t should have conversation to std::string with
-//            std::{ stoi, stol, stoll, stof, stod, stold, stoul, stoull } or
-//            with user-defined function
-
-// [WARNING]: param str should be look like "{ ..., ..., ... };"
-// inline std::vector<Val_t> create_vector_by_string (const std::string& str) {
-//     std::vector<Val_t> Result;
-//     std::string::size_type pos { 0 };
-//
-//     while (pos != str.size()) {
-//         pos;
-//
-//     }
-//     // for (const char )
-// }
-//
-
-
 #endif // VECTORUTILS_HPP
