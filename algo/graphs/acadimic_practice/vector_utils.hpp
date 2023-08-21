@@ -13,10 +13,10 @@ using s_sz = std::string::size_type;
 inline bool is_digit (char c) { return (c > 47 && c < 58 ? true : false); }
 
 
-// return pos at where symbol is numeric, else return 0
+// return pos at where symbol is numeric, else return size()
 inline s_sz find_first_numeric (const std::string& str, s_sz pos) {
     while ( pos < str.size() && !is_digit(str[pos]) ) { ++pos; }
-    return (pos == str.size() ? 0 : pos);
+    return pos;
 }
 
 
@@ -31,14 +31,13 @@ inline s_sz find_last_numeric (const std::string& str, s_sz pos) {
 // [WARNING]: Val_t should have conversation to std::string with
 //            std::{ stoi, stol, stoll, stof, stod, stold, stoul, stoull } or
 //            with user-defined function
-// [WARNING]: First symbol of str MUST be non numeric
 // [TODO]: make a template; try std::vector<decltype(auto)>
 inline std::vector<int> str_to_vec (const std::string &str) {
     std::vector<int> result;
-    s_sz pos_first {0}, pos_last {0}; /* pos_global {0} */;
+    s_sz pos_first {0}, pos_last {0};
     for (
       pos_first = find_first_numeric(str, pos_first);
-      pos_first < str.size() && pos_first;
+      pos_first < str.size();
       pos_first = pos_last + 1, pos_first = find_first_numeric(str, pos_first)
    ) {
         pos_last  = find_last_numeric(str, pos_first + 1);
