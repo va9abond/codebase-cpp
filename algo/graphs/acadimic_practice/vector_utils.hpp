@@ -48,6 +48,7 @@ inline std::vector<int> str_to_vec (const std::string &str) {
 
 
 // "{ a, b, c, d, e };" --> " a b c d e;"
+// [TODO]: this version of function delete all spaces!!
 inline std::string normalize_string (std::string str) {
     for (s_sz pos {0}; pos < str.size(); ++pos) {
         if (!( is_digit(str[pos]) || str[pos] == 46 || str[pos] == 59 || str[pos] == 32)) { str.erase(pos, 1); }
@@ -69,8 +70,8 @@ inline std::vector<std::vector<int>> generate_vector_from_file (const std::strin
             if (current_line_vector.size()) { result.push_back(current_line_vector); }
         }
     }
-
     file.close();
     return result;
 }
+
 #endif // VECTORUTILS_HPP
