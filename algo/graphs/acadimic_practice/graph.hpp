@@ -3,7 +3,8 @@
 
 
 #include "vector_utils.hpp"
-
+#include <cassert>
+#include <limits.h>
 
 // [TODO]: split weight function and graph
 //         (it makes possible to passing one graph with different weight functions)
@@ -12,19 +13,44 @@
 
 
 struct Graph_base_ {
-    // pair.first ~ source; pair.second ~ targer
-    using edge = std::pair<int,int>;
+    //                  Traits
+    // +------------------------------------------+
+    // |          pair.first ~ source;            |
+    // |          pair.second ~ target;           |
+    /* | */   using edge = std::pair<int,int>; // |
+    /* | */   using size_type = unsigned;      // |
+    /* | */   using vert      = int;           // |
+    // +------------------------------------------+
 
+    Graph_base_(size_type vertsCount = 0) : m_Verts() {
+        Construct_verts_range(vertsCount);
+    }
 
-    Graph_base_(int vertCount = 0) : m_vertsCount(vertCount) {}
+    void resize (size_type newCount) noexcept {
+        assert(newCount > 0 && newCount <= UINT_MAX && "Invalid Value: newCount");
+        if (newCount > m_Verts.size()) {
+            Construct_verts_range(newCount - m_Verts.size());
+        } else { // [NOTE]: it's expensive and never should be used!
+            while (m_Verts.size() > newCount) {
+                m_Verts.erase(m_Verts.end());
+            }
+        }
+    }
 
     // Graph_base_& operator= (const Graph_base_&) = delete;
     // Graph_base_ (const Graph_base_&)            = delete;
 
-    size_t size() const noexcept { return m_vertsCount; }
+    size_type size() const noexcept { return m_Verts.size(); }
 
+private:
+    void Construct_verts_range (size_type vertsCount) noexcept {
+        for (vert vi {1}; vi <= vertsCount; ++vi) {
+            m_Verts.insert(vi);
+        }
+    }
 
-    mutable int m_vertsCount;
+public:
+    mutable std::set<vert> m_Verts;
 };
 
 
@@ -33,26 +59,29 @@ template <
     class Weight_t
 >
 struct weighted_graph : Graph_base_ {
-    using Mybase = Graph_base_;
+    using Mybase      = Graph_base_;
+    using weight_type = Weight_t;
+    using size_type   = Mybase::size_type;
+    using vert        = Mybase::vert;
 
-    // generate graph with vertCount*vertCount adjacency matrix filled 0
-    weighted_graph(int vertCount) : Graph_base_(vertCount) {
-        m_Adjmatrix = std::vector<std::vector<int>>(vertCount, std::vector<int>(vertCount, 0));
+    // generate graph with vertsCount*vertsCount adjacency matrix filled 0
+    weighted_graph(size_type vertsCount) : Graph_base_(vertsCount) {
+        m_Adjmatrix = std::vector<std::vector<int>>(vertsCount, std::vector<int>(vertsCount, 0));
     }
 
     weighted_graph (std::string Filename) : Graph_base_() {
         m_Adjmatrix = generate_vector_from_file(Filename);
-        Mybase::m_vertsCount = m_Adjmatrix.size();
+        Mybase::resize(m_Adjmatrix.size());
     }
 
     weighted_graph& operator= (const weighted_graph& Rhs) = default;
 
-    virtual std::map<Weight_t, edge> get_edges() const noexcept {
-        std::map<Weight_t, edge> Result;
-        size_t sz = Mybase::size();
-        for (int vi {0}; vi < sz; ++vi) {
-            for (int vj {vi + 1}; vj < sz; ++vj) {
-                Weight_t weight = m_Adjmatrix[vi][vj];
+    virtual std::map<weight_type, edge> get_edges() const noexcept {
+        std::map<weight_type, edge> Result;
+        size_type sz = Mybase::size();
+        for (vert vi {0}; vi < sz; ++vi) {
+            for (vert vj {vi + 1}; vj < sz; ++vj) {
+                weight_type weight = m_Adjmatrix[vi][vj];
                 if (weight) {
                     Result.insert({ weight, {vi,vj} });
                     Result.insert({ weight, {vj,vi} });
@@ -70,12 +99,15 @@ struct weighted_graph : Graph_base_ {
 struct general_graph : weighted_graph<bool> {};
 
 
-// all edges have source and targer
+// all edges have source and target
 template <
     class Weight_t
 >
 struct oriented_graph : weighted_graph<Weight_t> {
-    using Mybase = weighted_graph<Weight_t>;
+    using Mybase      = weighted_graph<Weight_t>;
+    using weight_type = bool;
+    using size_type   = typename Mybase::size_type;
+    using vert        = typename Mybase::vert;
     using Mybase::Mybase;
 
 
