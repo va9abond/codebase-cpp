@@ -53,7 +53,7 @@ template <
 >
 inline void DFSvoid (
     const Graph_t& Graph,
-    int Vnow,
+    int Vnow, // [TODO]: Vnow is Visited.front() always??
     std::set<int>& Visited
 ) {
     // std::set<int> Visited;
@@ -62,6 +62,7 @@ inline void DFSvoid (
     for (int Vnext {1}; Vnext <= Neighbours.size(); ++Vnext) {
        if (Neighbours[Vnext - 1]) { // Vnow connected with Vnex
             if (Visited.find(Vnext) != Visited.end()) {
+                // Vnext doesn't be visited before
                 Visited.insert(Vnext);
                 DFS(Graph, Vnext, Visited);
             }
@@ -69,5 +70,17 @@ inline void DFSvoid (
     }
 }
 
+
+// generate Minimal Spannig Tree
+inline weighted_graph<int> generic_MST (const weighted_graph<int>& Graph) {
+    weighted_graph<int> MST (Graph.size());
+
+    while (MST.size() < Graph.size()) {
+        // find minimal safe edge e
+        // add e in MST
+    }
+
+    return MST;
+}
 
 #endif // GRAPHALGO_HPP
