@@ -13,7 +13,7 @@
 struct edge_base_ {
     using vert = int;
 
-    edge_base_()  = default;
+    edge_base_(vert* Vs, vert* Vt) : sou(Vs), tar(Vt) {}
 
     ~edge_base_() {
         sou = nullptr;
@@ -87,7 +87,7 @@ struct edge : edge_base_ {
     using Mybase = edge_base_;
     using vert   = Mybase::vert;
 
-    edge (Weight_t weight) : edge_base_(), wei(weight) {}
+    edge (vert* Vs, vert* Vt, Weight_t Weight) : edge_base_(Vs, Vt), wei(Weight) {}
 
     ~edge() {
         wei = Weight_t {0};
