@@ -151,7 +151,7 @@ private:
             for (int j {i + 1}; j < Mybase::size(); ++j) {
                 weight_type weight = m_Weightfunc[i][j];
                 if (weight) { // vert i connected with vert j
-                    // m_Edges.emplace();
+                    m_Edges.emplace(m_Verts[i-1], m_Verts[j-1], weight);
                 }
             }
 
