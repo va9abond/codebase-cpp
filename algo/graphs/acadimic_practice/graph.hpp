@@ -147,11 +147,11 @@ struct weighted_graph : Graph_base_ {
 private:
     // construct edges by weight function
     void Construct_edges() noexcept {
-        for (vert vi {0}; vi < size(); ++vi) {
-            for (vert vj {vi + 1}; vj < size(); ++vj) {
-                weight_type weight = m_Weightfunc[vi][vj];
-                if (weight) {
-                    m_Edges.emplace(weight, {vi + 1, vj + 1});
+        for (int i {0}; i < Mybase::size(); ++i) {
+            for (int j {i + 1}; j < Mybase::size(); ++j) {
+                weight_type weight = m_Weightfunc[i][j];
+                if (weight) { // vert i connected with vert j
+                    // m_Edges.emplace();
                 }
             }
 
@@ -160,14 +160,11 @@ private:
 
 public:
     // weighted_graph must have a weight function on it's edges;
-    // weight of edge e is equals m_Weightfunc[e.first][e.secont]
-    std::vector<std::vector<Weight_t>> m_Weightfunc;
-    mutable std::multimap<Weight_t, edge_base_> m_Edges;
-    // [TODO]: key = 0 is unacceptable
-    // [TODO]: try make edge as std::pair<*vert, *vert>;
-    //         1. to connect m_Verts and m_Edges
-    //         2. replace one vert to another (edge contraction)
-    //            is nice with pointers
+    // weight of edge e is equals m_Weightfunc[e.sou][e.tar]
+    mutable std::vector<std::vector<Weight_t>> m_Weightfunc;
+            std::set<wedge>                    m_Edges;
+    // [NOTE]: strict order by wedge::operator<
+    // [TODO]: or multimap to find by keys (weight)??
 };
 
 
