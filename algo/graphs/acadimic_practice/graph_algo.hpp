@@ -71,16 +71,32 @@ inline void DFSvoid (
 }
 
 
-// generate Minimal Spannig Tree
-inline weighted_graph<int> generic_MST (const weighted_graph<int>& Graph) {
-    weighted_graph<int> MST (Graph.size());
+// [pseudocode]: generate Minimal Spannig Tree
+// inline weighted_graph<int> generic_MST (const weighted_graph<int>& Graph) {
+    // 0. init MST {Graph.m_Verts, empty_set};
+    // 1. Choose random vert and insert it in MST.m_Verts
+    // 2. while (MST is not Spanning Tree) {
+    //        cutGraph = cutting_graph(respect wirh MST.m_Verts)
+    //        find_all_safe_edges() {
+    //            for (vi : Graph.m_Verts) {
+    //                for (vj : Graph.m_Verts) {
+    //                    if (vi in cutGraph.m_Verts && vj in Graph.m_Verts && vj not in cutGraph.m_Verts) {
+    //                              edge e {vi, vj} is safe;
+    //                              add e in safe_set
+    //                    }
+    //                }
+    //            }
+    //        };
+    //        choose light edge from all sefe
+    //        add safe edge to MST
+    // }
+// }
 
-    while (MST.size() < Graph.size()) {
-        // find minimal safe edge e
-        // add e in MST
-    }
+enum MST_base_algorithm {
+    Prim,
+    Kruskal
+};
 
-    return MST;
-}
+
 
 #endif // GRAPHALGO_HPP

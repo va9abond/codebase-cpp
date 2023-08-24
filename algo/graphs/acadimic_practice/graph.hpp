@@ -150,11 +150,10 @@ private:
         for (int i {0}; i < Mybase::size(); ++i) {
             for (int j {i + 1}; j < Mybase::size(); ++j) {
                 weight_type weight = m_Weightfunc[i][j];
-                if (weight) { // vert i connected with vert j
+                if (weight) { // verts i and j are connected
                     m_Edges.emplace(m_Verts[i-1], m_Verts[j-1], weight);
                 }
             }
-
         }
     }
 
@@ -182,12 +181,6 @@ struct oriented_graph : weighted_graph<Weight_t> {
     using size_type   = typename Mybase::size_type;
     using vert        = typename Mybase::vert;
     using Mybase::Mybase;
-
-
-    std::map<Weight_t, typename Mybase::edge> get_edges() const noexcept override {
-        /* Override here */
-    };
-
 };
 
 
