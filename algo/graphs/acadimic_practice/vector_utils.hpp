@@ -61,7 +61,7 @@ inline std::string normalize_string (std::string str) {
 
 
 // file to double vector
-inline std::vector<std::vector<int>> generate_vector_from_file (const std::string& file_name) {
+inline std::vector<std::vector<int>> generate_2dvector_from_file (const std::string& file_name) {
     std::ifstream file (file_name, std::ios::in); // create an input stream to read from file
     std::vector<std::vector<int>> result;
 
