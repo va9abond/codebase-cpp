@@ -10,19 +10,34 @@
 // [TODO]: tree is derived class from Grap_base_ with static_assert(is_tree);
 
 
+struct edge_base_ {
+    using vert = int;
+
+    edge_base_()  = default;
+
+    ~edge_base_() {
+        sou = nullptr;
+        tar = nullptr;
+    }
+
+    edge_base_ (const edge_base_&)            = delete;
+    edge_base_& operator= (const edge_base_&) = delete;
+
+
+    vert* sou; // source vertice
+    vert* tar; // targer vertice
+};
+
+
 struct Graph_base_ {
     //                         Traits
     // +---------------------------------------------------------+
-    // |             pair.first ~ source;                        |
-    // |             pair.second ~ target;                       |
     /* | */   using vert      = int;                          // |
-    /* | */   using edge      = std::pair<vert*,vert*>;       // |
     /* | */   using size_type = std::set<vert*>::size_type;   // |
     // +---------------------------------------------------------+
     // [WARNING]: Despite the fact that size_type is usigned long
     //            for std::set<vert*>, we allow to create just
     //            INT_MAX vertice!
-
 
     Graph_base_ (int Count = 0) : m_Verts() {
         assert(Count > 0 &&
@@ -65,6 +80,44 @@ public:
 };
 
 
+template <
+    class Weight_t
+>
+struct edge : edge_base_ {
+    using Mybase = edge_base_;
+    using vert   = Mybase::vert;
+
+    edge (Weight_t weight) : edge_base_(), wei(weight) {}
+
+    ~edge() {
+        wei = Weight_t {0};
+    }
+
+    bool operator== (const edge& Rhs) const noexcept {
+        return (Mybase::tar == Rhs.tar) * (Mybase::sou == Rhs.sou) * (wei == Rhs.wei);
+    }
+
+    bool operator< (const edge& Rhs) const noexcept {
+        return wei < Rhs.wei;
+    }
+
+    bool operator<= (const edge& Rhs) const noexcept {
+        return (*this < Rhs) + (*this == Rhs);
+    }
+
+    bool operator> (const edge& Rhs) const noexcept {
+        return !(*this < Rhs);
+    }
+
+    bool operator>= (const edge& Rhs) const noexcept {
+        return !(*this < Rhs) + (*this == Rhs);
+    }
+
+
+    Weight_t wei; // weight of edge
+};
+
+
 // graph with a function of weights on edges
 template <
     class Weight_t
@@ -74,9 +127,10 @@ struct weighted_graph : Graph_base_ {
     using weight_type = Weight_t;
     using size_type   = Mybase::size_type;
     using vert        = Mybase::vert;
+    using wedge       = edge<weight_type>;
 
     // generate graph with Count verts and zero weight function
-    // Graph = { verts:Count, edges:0,  weight_funct==0 }
+    // Graph = { verts:Count, wedges:0,  weight_funct==0 }
     weighted_graph (int Count) : Graph_base_(Count) {
         m_Weightfunc = std::vector<std::vector<int>>(Count, std::vector<int>(Count, 0));
     }
@@ -108,7 +162,7 @@ public:
     // weighted_graph must have a weight function on it's edges;
     // weight of edge e is equals m_Weightfunc[e.first][e.secont]
     std::vector<std::vector<Weight_t>> m_Weightfunc;
-    mutable std::multimap<Weight_t, edge> m_Edges;
+    mutable std::multimap<Weight_t, edge_base_> m_Edges;
     // [TODO]: key = 0 is unacceptable
     // [TODO]: try make edge as std::pair<*vert, *vert>;
     //         1. to connect m_Verts and m_Edges
