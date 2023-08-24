@@ -71,12 +71,12 @@ private:
     void Construct_verts (int Count, int startNo = 1) noexcept { // [TODO]: is there a better way?
         for (int i {0}; i < Count; ++i) {
             vert* Vnew = new vert(startNo + i);
-            m_Verts.insert(Vnew);
+            m_Verts.push_back(Vnew);
         }
     }
 
 public:
-    mutable std::set<vert*> m_Verts;
+    std::vector<vert*> m_Verts;
 };
 
 
