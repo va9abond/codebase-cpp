@@ -1,6 +1,3 @@
-/* [[WARNING]]: */
-
-
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 
@@ -9,14 +6,12 @@
 #include <cassert>
 #include <limits>
 
-// [TODO]: split weight function and graph
-//         (it makes possible to passing one graph with different weight functions)
 // [TODO]: different ways to store graph
 // [TODO]: tree is derived class from Grap_base_ with static_assert(is_tree);
 
 
 struct Graph_base_ {
-    //                      Traits
+    //                         Traits
     // +---------------------------------------------------------+
     // |             pair.first ~ source;                        |
     // |             pair.second ~ target;                       |
@@ -27,6 +22,7 @@ struct Graph_base_ {
     // [WARNING]: Despite the fact that size_type is usigned long
     //            for std::set<vert*>, we allow to create just
     //            INT_MAX vertice!
+
 
     Graph_base_ (int Count = 0) : m_Verts() {
         assert(Count > 0 &&
@@ -46,9 +42,9 @@ struct Graph_base_ {
     Graph_base_& operator= (const Graph_base_&) = delete;
     Graph_base_ (const Graph_base_&)            = delete;
 
-    ~Graph_base_() { 
+    ~Graph_base_() {
         // [NOTE]: does it really work? (= yes, valgrind approves)
-        // [TODO]: better way?
+        // [TODO]: is there a better way?
         for (auto Vit = m_Verts.begin(); Vit != m_Verts.end(); ++Vit) {
             delete *Vit;
         }
@@ -69,7 +65,7 @@ public:
 };
 
 
-// there is a function of weights on edges
+// graph with a function of weights on edges
 template <
     class Weight_t
 >
@@ -80,22 +76,19 @@ struct weighted_graph : Graph_base_ {
     using vert        = Mybase::vert;
 
     // generate graph with Count verts and zero weight function
-    weighted_graph (size_type Count) : Graph_base_(Count) {
+    // Graph = { verts:Count, edges:0,  weight_funct==0 }
+    weighted_graph (int Count) : Graph_base_(Count) {
         m_Weightfunc = std::vector<std::vector<int>>(Count, std::vector<int>(Count, 0));
     }
 
     // generate graph with weight function from file
     weighted_graph (std::string Filename) : Graph_base_() {
         m_Weightfunc = generate_2dvector_from_file(Filename);
-        Mybase::add_n_verts(m_Weightfunc.size());
+        Mybase::add_n_verts( (int)m_Weightfunc.size() );
         Construct_edges();
     }
 
-    weighted_graph& operator= (const weighted_graph& Rhs) = default;
-
-    // std::map<weight_type, edge> get_edges() const noexcept {
-    //     return m_Edges;
-    // }
+    // weighted_graph& operator= (const weighted_graph& Rhs) = default;
 
 private:
     // construct edges by weight function
@@ -112,9 +105,8 @@ private:
     }
 
 public:
-    // weighted_graph must have a weight function on it's
-    // edges; weight of edge e is equals
-    // m_Weightfunc[e.first][e.secont]
+    // weighted_graph must have a weight function on it's edges;
+    // weight of edge e is equals m_Weightfunc[e.first][e.secont]
     std::vector<std::vector<Weight_t>> m_Weightfunc;
     mutable std::multimap<Weight_t, edge> m_Edges;
     // [TODO]: key = 0 is unacceptable
