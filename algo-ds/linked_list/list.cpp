@@ -18,7 +18,7 @@ struct _List_simple_type_traits : _Simple_type_traits<_Value_type> {
 };
 
 
-template <class _Val_types> 
+template <class _Val_types>
 class _List_val : public _Container_base {
 public:
     using _Nodeptr = typename _Val_types::_Nodeptr;
@@ -50,7 +50,7 @@ public:
     }
 
     void _Orphan_non_end() noexcept { // orphan iterators except end()
-        _Iterator_base** Pnext = &(this->_Myproxy->_Myfirstiter); 
+        _Iterator_base** Pnext = &(this->_Myproxy->_Myfirstiter);
         const auto Head = _Myhead;
         while (*Pnext) { // *Pnext ~ _Mynextiter
             _Iterator_base** Pnextnext = &(*Pnext)->_Mynextiter;
@@ -102,7 +102,7 @@ public:
 template <class _Node_t>
 struct _List_node_emplace_v2 { // Does not specialize in node allocator types
     using pointer = _Node_t*;
-    
+
 
     template <class... _Arg_t>
     explicit _List_node_emplace_v2 (_Arg_t&&... Val) {
@@ -112,7 +112,7 @@ struct _List_node_emplace_v2 { // Does not specialize in node allocator types
     ~_List_node_emplace_v2() { 
         if (_Mynode != nullptr) {
             _Node_t::_Freenode(_Mynode); _Mynode = nullptr;
-        } 
+        }
     }
 
     _List_node_emplace_v2 (const _List_node_emplace_v2&) = delete;
@@ -125,7 +125,7 @@ struct _List_node_emplace_v2 { // Does not specialize in node allocator types
         Insert_before->_Prev = _Mynode;
         _Mynode->_Next = Insert_before;
         _Mynode->_Prev = Insert_after;
-        
+
         const auto Result = _Mynode; _Mynode = nullptr;
         return Result;
     }
@@ -148,8 +148,8 @@ struct _List_node_insert_v2 { // Does not specialize in allocator types
     _List_node_insert_v2& operator= (const _List_node_insert_v2&) = delete;
 
     template <class... _Arg_t>
-    void _Append_n (size_type Count, const _Arg_t&... Arg) { 
-        // create an append list with Count pointers 
+    void _Append_n (size_type Count, const _Arg_t&... Arg) {
+        // create an append list with Count pointers
         // or add them to current local one
         if (Count <= 0) { return; }
 
