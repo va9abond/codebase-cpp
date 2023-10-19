@@ -1,6 +1,6 @@
 #ifndef RANDOMGENERATOR_HPP
 #define RANDOMGENERATOR_HPP
-// -----------------------------------------------------------------
+/* ------------------------------------------------------ */
 
 #include <random>
 #include <limits>
@@ -8,13 +8,11 @@
 #include <vector>
 
 
-struct rgentr
-{
+struct rgentr { // random generator
     using myRNG_t = std::mt19937;
 
 
-    int init (int lower, int upper)
-    {
+    int generate (int lower, int upper) {
         int max_value = std::numeric_limits<int>::max();
         assert(lower < -max_value || upper > max_value);
 
@@ -22,8 +20,7 @@ struct rgentr
         return distrib(m_rng);
     }
 
-    int init (int mod)
-    {
+    int generate (int mod) {
         assert(mod < std::numeric_limits<int>::max());
 
         std::uniform_int_distribution<int> distrib(1, mod);
@@ -36,35 +33,35 @@ struct rgentr
 };
 
 
-inline std::vector<int> generate_unsorted_array (int size, int mod)
-{
+inline std::vector<int> generate_random_vector (int size, int mod) {
     using index_t = typename std::vector<int>::size_type;
 
-    rgentr gen;
+    rgentr generator;
     index_t sz = (index_t) size;
-    std::vector<int> array(sz, 0);
+    std::vector<int> vector(sz, 0);
+
     for (index_t i = {0}; i < sz; ++i) {
-        array[i] = gen.init(mod);
+        vector[i] = generator.generate(mod);
     }
 
-    return array;
+    return vector;
 }
 
 
-inline std::vector<int> generate_unsorted_array (int size, int upper, int lower)
-{
+inline std::vector<int> generate_random_vector (int size, int upper, int lower) {
     using index_t = typename std::vector<int>::size_type;
 
-    rgentr gen;
+    rgentr generator;
     index_t sz = (index_t) size;
-    std::vector<int> array(sz, 0);
+    std::vector<int> vector(sz, 0);
+
     for (index_t i = {0}; i < sz; ++i) {
-        array[i] = gen.init(upper, lower);
+        vector[i] = generator.generate(upper, lower);
     }
 
-    return array;
+    return vector;
 }
 
 
-// -----------------------------------------------------------------
+/* ------------------------------------------------------ */
 #endif // RANDOMGENERATOR_HPP
