@@ -20,7 +20,7 @@ template <
 >
 struct _List_node { // list node
     using value_type      = _Value_type;
-    using _Nodeptr        = _List_node<_Value_type>*;           
+    using _Nodeptr        = _List_node<_Value_type>*;
 
 
     template <class _Arg_t>
@@ -37,7 +37,7 @@ struct _List_node { // list node
     _List_node() = default;
     _List_node (const _List_node&) = delete;
     _List_node& operator= (const _List_node&) = delete;
-    
+
     static _Nodeptr _Buy_head_node() {
         auto Result = new _List_node();
         Result->_Next = Result; Result->_Prev = Result;
@@ -49,7 +49,7 @@ struct _List_node { // list node
         Ptr->_Next = nullptr; Ptr->_Prev = nullptr;
         delete Ptr; Ptr = nullptr;
     }
-    
+
     static void _Freenode (_Nodeptr Ptr) noexcept {
         // destroy all members in Ptr
         Ptr->_Myval.~_Value_type();
@@ -63,24 +63,24 @@ struct _List_node { // list node
         for (_Nodeptr Pnext; Pnode; Pnode = Pnext) {
             Pnext = Pnode->_Next;
             _Freenode(Pnode);
-        }     
+        }
     }
 
 
     template <class Ty_>
     friend std::ostream& operator<< (std::ostream& _Output, const _List_node<Ty_>& Node);
-   
 
-	_Value_type _Myval; // the stored value, unused if head
-	_Nodeptr    _Prev;  // successor node, or first element if head
-	_Nodeptr    _Next;  // the stored value, unused if head
+
+    _Value_type _Myval; // the stored value, unused if head
+    _Nodeptr    _Prev;  // successor node, or first element if head
+    _Nodeptr    _Next;  // the stored value, unused if head
 };
 
 template <
-	class _Value_type
+    class _Value_type
 >
 std::ostream& operator<< (std::ostream& _Output, const _List_node<_Value_type>& Node) {
-	_Output << Node; 
+    _Output << Node;
     return _Output;
 };
 
