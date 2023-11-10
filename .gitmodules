@@ -1,3 +1,6 @@
 [submodule "algo-ds/graphs-cpp-cdb"]
 	path = algo-ds/graphs-cpp-cdb
 	url = git@github.com:va9abond/graphs-cpp-cdb.git
+[submodule "algo-ds/trees-cpp-cdb"]
+	path = algo-ds/trees-cpp-cdb
+	url = git@github.com:va9abond/trees-cpp-cdb.git
