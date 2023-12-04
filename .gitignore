@@ -34,7 +34,7 @@
 
 # Executables
 *.exe
-# *.out
+*.out
 *.app
 # ---
 
@@ -50,10 +50,8 @@ doc
 *.filters
 # ---
 
-# not interesting or temp files
-master.cpp
+# Not interesting or temp files
 *.txt
 test*.cpp
 build/
-
-
+bin/

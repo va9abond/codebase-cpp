@@ -32,7 +32,7 @@ using _Rebind_alloc_t = typename std::allocator_traits<_Alloc>::template rebind_
 //     && std::is_same_v<typename std::allocator_traits<_Alloc>::pointer, typename _Alloc::value_type*>
 //     && std::is_same_v<typename std::allocator_traits<_Alloc>::const_pointer, const typename _Alloc::value_type*>;
 
-template <class _Value_type> 
+template <class _Value_type>
 struct _Simple_type_traits { // _Simple_types in STL
     using value_type      = _Value_type;
     using size_type       = std::size_t;
@@ -70,7 +70,7 @@ struct _Container_base {
 
     void _Orphan_all() noexcept;
     void _Swap_proxy_and_iterators (_Container_base&) noexcept;
-    
+
     void _Alloc_proxy() {
         _Myproxy = new _Container_proxy(this);
         // _Myproxy = static_cast<_Container_proxy*>(::operator new(sizeof(_Container_proxy)));
@@ -84,7 +84,7 @@ struct _Container_base {
         }
     }
 
-    
+
     _Container_proxy* _Myproxy = nullptr;
 };
 
@@ -104,7 +104,7 @@ public:
 
     ~_Iterator_base() noexcept { // NOTE: mb i need to free allocated memory
         _Orphan_me_v2();
-    } 
+    }
 
     void _Adopt_by_cont(const _Container_base* Parent) noexcept {
         return _Adopt_me(Parent);
@@ -136,14 +136,14 @@ private:
             _Orphan_me_v2();
             return;
         }
-        
+
         // do adoption
         _Container_proxy* Other_parent_proxy = Other_parent->_Myproxy;
         if (_Myproxy != Other_parent_proxy) { // change parentage
             if (_Myproxy) { // already adopted, remove self from current list
-                _Orphan_me_v2();             
+                _Orphan_me_v2();
             }
-            
+
             // insert at the beginning of list
             _Mynextiter = Other_parent_proxy->_Myfirstiter;
             Other_parent_proxy->_Myfirstiter = this;
@@ -154,19 +154,19 @@ private:
     // remove self from parent container
     void _Orphan_me_v1() noexcept {
         if (!_Myproxy) { return; } // already orphaned
-    
+
         // remove self from current list
-        _Iterator_base** Pnext = &_Myproxy->_Myfirstiter; 
+        _Iterator_base** Pnext = &_Myproxy->_Myfirstiter;
         // _Iterator_base** because _Myfirsiter may equals nullptr
         while (*Pnext && (*Pnext)->_Mynextiter != this) {
             Pnext = &(*Pnext)->_Mynextiter;
-        }        
+        }
 
         _MSL_VERIFY_f(*Pnext, "ITERATOR LIST CORRUPTED");
         (*Pnext)->_Mynextiter = _Mynextiter;
         _Mynextiter = nullptr; _Myproxy = nullptr;
     }
-    
+
     void _Orphan_me_v2() noexcept {
         if (!_Myproxy) { return; } // already orphaned
 
@@ -195,7 +195,7 @@ private:
 
 inline void _Container_base::_Orphan_all() noexcept {
     if (!_Myproxy) { return; } // no any iterators
-   
+
     _Iterator_base* Pnext = _Myproxy->_Myfirstiter; _Myproxy->_Myfirstiter = nullptr;
     while (Pnext) {
         Pnext->_Myproxy = nullptr;
@@ -209,11 +209,11 @@ inline void _Container_base::_Orphan_all() noexcept {
 
 // swap owners of proxy and iterators
 inline void _Container_base::_Swap_proxy_and_iterators(_Container_base& Rhs) noexcept {
-    // swap proxy  
+    // swap proxy
     _Container_proxy* Temp = _Myproxy;
     _Myproxy = Rhs._Myproxy;
     Rhs._Myproxy = Temp;
-    
+
     // swap proxy owners
     if (_Myproxy) { _Myproxy->_Mycont = this; }
     if (Rhs._Myproxy) { Rhs._Myproxy->_Mycont = &Rhs; }
