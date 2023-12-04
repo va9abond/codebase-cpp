@@ -7,3 +7,6 @@
 [submodule "ac-som"]
 	path = ac-som
 	url = git@github.com:va9abond/ac-som.git
+[submodule "algo-ds/linked_list-cpp-cdb"]
+	path = algo-ds/linked_list-cpp-cdb
+	url = git@github.com:va9abond/linked_list-cpp-cdb.git
