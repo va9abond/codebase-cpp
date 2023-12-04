@@ -51,10 +51,7 @@ doc
 # ---
 
 # Not interesting or temp files
-master.cpp
-# *.txt
+*.txt
 test*.cpp
 build/
 bin/
-
-
